@@ -1,0 +1,521 @@
+[
+  {
+    "schemaVersion": 38,
+    "nodeType": "dinkster.set_save_target_prefix",
+    "version": 1,
+    "displayName": "Set Save Target Prefix",
+    "category": "utilities/save",
+    "description": "Replaces a structured save target's relative prefix while preserving its explicit mount id. The prefix may be linked from a computed string; mount write authority is still checked by the save node at execution.",
+    "idempotent": true,
+    "interface": [
+      {
+        "role": "input",
+        "id": "target",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "dinkster.save_target"
+          ]
+        },
+        "required": true,
+        "widget": {
+          "type": "SAVE_TARGET"
+        },
+        "displayName": "Target and Mount"
+      },
+      {
+        "role": "input",
+        "id": "prefix",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.string"
+          ]
+        },
+        "required": false,
+        "displayName": "Computed Prefix"
+      },
+      {
+        "role": "output",
+        "id": "save_target",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "dinkster.save_target"
+          ]
+        }
+      }
+    ],
+    "searchTerms": [
+      "computed save prefix",
+      "string to save target",
+      "save destination",
+      "output path"
+    ]
+  },
+  {
+    "schemaVersion": 38,
+    "nodeType": "dinkster.save_video",
+    "version": 3,
+    "displayName": "Save Video",
+    "category": "video",
+    "description": "",
+    "idempotent": false,
+    "interface": [
+      {
+        "role": "input",
+        "id": "video",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "comfy.VIDEO"
+          ]
+        },
+        "required": true
+      },
+      {
+        "role": "input",
+        "id": "target",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "dinkster.save_target"
+          ]
+        },
+        "required": false,
+        "default": {
+          "mount": "comfy-output",
+          "prefix": "video/ComfyUI"
+        },
+        "widget": {
+          "type": "SAVE_TARGET"
+        }
+      },
+      {
+        "role": "input",
+        "id": "container",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.combo"
+          ]
+        },
+        "required": false,
+        "default": "auto",
+        "widget": {
+          "type": "COMBO",
+          "options": [
+            "auto",
+            "mp4",
+            "mkv",
+            "mov",
+            "webm",
+            "avi",
+            "gif"
+          ]
+        }
+      },
+      {
+        "role": "input",
+        "id": "codec",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.combo"
+          ]
+        },
+        "required": false,
+        "default": "auto",
+        "widget": {
+          "type": "COMBO",
+          "options": [
+            "auto",
+            "h264",
+            "av1",
+            "vp9"
+          ]
+        }
+      },
+      {
+        "role": "input",
+        "id": "crf",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.int"
+          ]
+        },
+        "required": false,
+        "widget": {
+          "type": "NUMBER",
+          "min": 0,
+          "max": 63,
+          "step": 1
+        },
+        "doc": "Omit for stream copy where possible; specifying CRF requests encoding."
+      },
+      {
+        "role": "input",
+        "id": "metadata",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.string"
+          ]
+        },
+        "required": false,
+        "default": "{}",
+        "widget": {
+          "type": "STRING",
+          "multiline": true
+        },
+        "doc": "JSON object of container metadata tags."
+      },
+      {
+        "role": "input",
+        "id": "format",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.combo"
+          ]
+        },
+        "required": false,
+        "widget": {
+          "type": "COMBO",
+          "options": [
+            "mp4_h264",
+            "webm_vp9",
+            "webm_av1"
+          ]
+        },
+        "doc": "Legacy format; cannot combine with container or codec overrides.",
+        "advanced": true
+      },
+      {
+        "role": "output",
+        "id": "video",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "comfy.VIDEO"
+          ]
+        }
+      },
+      {
+        "role": "output",
+        "id": "asset",
+        "type": {
+          "kind": "asset",
+          "element": {
+            "kind": "concrete",
+            "types": [
+              "comfy.VIDEO"
+            ]
+          }
+        },
+        "preview": true
+      }
+    ],
+    "searchTerms": [
+      "video encoder",
+      "mp4",
+      "webm",
+      "H.264",
+      "VP9",
+      "AV1"
+    ],
+    "replacements": [
+      {
+        "from": "dinkster.save_video",
+        "migration": {
+          "historicalInputs": [
+            "images",
+            "fps",
+            "audio",
+            "bit_depth",
+            "format.crf",
+            "format.bit_depth"
+          ]
+        },
+        "cases": [
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "any",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format.crf"
+                },
+                {
+                  "kind": "inputConnected",
+                  "input": "format.crf"
+                },
+                {
+                  "kind": "valuePresent",
+                  "input": "format.bit_depth"
+                },
+                {
+                  "kind": "inputConnected",
+                  "input": "format.bit_depth"
+                }
+              ]
+            },
+            "nodes": {
+              "assemble": {
+                "type": "dinkster.video.assemble",
+                "values": {
+                  "color_space": "sRGB"
+                }
+              }
+            },
+            "inputs": {
+              "assemble:images": {
+                "kind": "copy",
+                "input": "images"
+              },
+              "assemble:fps": {
+                "kind": "copy",
+                "input": "fps"
+              },
+              "assemble:audio": {
+                "kind": "copy",
+                "input": "audio"
+              },
+              "assemble:bit_depth": {
+                "kind": "copy",
+                "input": "format.bit_depth"
+              },
+              "target": {
+                "kind": "copy",
+                "input": "target"
+              },
+              "format": {
+                "kind": "copy",
+                "input": "format"
+              },
+              "crf": {
+                "kind": "copy",
+                "input": "format.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "assemble:video",
+                "to": "video"
+              }
+            ],
+            "outputs": {
+              "asset": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "nodes": {
+              "assemble": {
+                "type": "dinkster.video.assemble",
+                "values": {
+                  "color_space": "sRGB"
+                }
+              }
+            },
+            "inputs": {
+              "assemble:images": {
+                "kind": "copy",
+                "input": "images"
+              },
+              "assemble:fps": {
+                "kind": "copy",
+                "input": "fps"
+              },
+              "assemble:audio": {
+                "kind": "copy",
+                "input": "audio"
+              },
+              "assemble:bit_depth": {
+                "kind": "copy",
+                "input": "bit_depth"
+              },
+              "target": {
+                "kind": "copy",
+                "input": "target"
+              },
+              "format": {
+                "kind": "copy",
+                "input": "format"
+              },
+              "crf": {
+                "kind": "copy",
+                "input": "crf"
+              }
+            },
+            "links": [
+              {
+                "from": "assemble:video",
+                "to": "video"
+              }
+            ],
+            "outputs": {
+              "asset": "video"
+            }
+          }
+        ]
+      }
+    ],
+    "outputNode": true
+  },
+  {
+    "schemaVersion": 38,
+    "nodeType": "dinkster.value.convert",
+    "version": 1,
+    "displayName": "Convert Value",
+    "category": "utilities/conversion",
+    "description": "Converts one scalar to a selected type or to both numeric outputs.",
+    "idempotent": true,
+    "interface": [
+      {
+        "role": "input",
+        "id": "value",
+        "type": {
+          "kind": "union",
+          "types": [
+            "core.int",
+            "core.float",
+            "core.string",
+            "core.boolean"
+          ]
+        },
+        "required": true,
+        "forceInput": true
+      },
+      {
+        "role": "input",
+        "id": "target",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.combo"
+          ]
+        },
+        "required": true,
+        "default": "float",
+        "widget": {
+          "type": "COMBO",
+          "options": [
+            "int",
+            "float",
+            "number",
+            "string",
+            "boolean"
+          ]
+        }
+      },
+      {
+        "role": "input",
+        "id": "force_lossy",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.boolean"
+          ]
+        },
+        "required": true,
+        "default": false,
+        "advanced": true
+      },
+      {
+        "role": "output",
+        "id": "int",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.int"
+          ]
+        },
+        "optional": true
+      },
+      {
+        "role": "output",
+        "id": "float",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.float"
+          ]
+        },
+        "optional": true
+      },
+      {
+        "role": "output",
+        "id": "string",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.string"
+          ]
+        },
+        "optional": true
+      },
+      {
+        "role": "output",
+        "id": "boolean",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.boolean"
+          ]
+        },
+        "optional": true
+      }
+    ]
+  },
+  {
+    "schemaVersion": 38,
+    "nodeType": "dinkster.float",
+    "version": 1,
+    "displayName": "Float",
+    "category": "utilities/primitive",
+    "description": "",
+    "idempotent": true,
+    "interface": [
+      {
+        "role": "input",
+        "id": "value",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.float"
+          ]
+        },
+        "required": false,
+        "default": 0,
+        "widget": {
+          "type": "NUMBER",
+          "step": 0.1
+        },
+        "displayName": "Value"
+      },
+      {
+        "role": "output",
+        "id": "value",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "core.float"
+          ]
+        },
+        "knownValue": {
+          "input": "value"
+        }
+      }
+    ],
+    "searchTerms": [
+      "PrimitiveFloat",
+      "number"
+    ],
+    "aliases": [
+      "PrimitiveFloat"
+    ]
+  }
+]

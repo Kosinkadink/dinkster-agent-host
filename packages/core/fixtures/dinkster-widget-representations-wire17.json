@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "dinkster": {
+    "version": "0.0.1",
+    "schemaWire": 17,
+    "graphFeatures": ["typedLiteral"],
+    "mergeableTypes": ["comfy.IMAGE"]
+  },
+  "nodes": {
+    "dinkster.clip_text_encode": {
+      "aliases": ["CLIPTextEncode"],
+      "category": "model/conditioning",
+      "description": "Encodes a text prompt using a CLIP model into an embedding that can be used to guide the diffusion model towards generating specific images.",
+      "displayName": "CLIP Text Encode",
+      "idempotent": true,
+      "interface": [
+        {
+          "doc": "The text to be encoded.",
+          "id": "text",
+          "required": true,
+          "role": "input",
+          "type": {"kind": "concrete", "types": ["core.string"]},
+          "widget": {
+            "default": "multiline",
+            "representations": [
+              {
+                "displayName": "Single line",
+                "id": "single-line",
+                "widget": {"multiline": false, "type": "STRING"}
+              },
+              {
+                "displayName": "Multiline",
+                "id": "multiline",
+                "widget": {"multiline": true, "type": "STRING"}
+              }
+            ],
+            "type": "REPRESENTATIONS",
+            "userSwitchable": true
+          }
+        },
+        {
+          "doc": "The CLIP model used for encoding the text.",
+          "id": "clip",
+          "required": true,
+          "role": "input",
+          "type": {"kind": "concrete", "types": ["comfy.CLIP"]}
+        },
+        {
+          "id": "conditioning",
+          "role": "output",
+          "type": {"kind": "concrete", "types": ["comfy.CONDITIONING"]}
+        }
+      ],
+      "nodeType": "dinkster.clip_text_encode",
+      "pack": "comfy",
+      "schemaVersion": 17,
+      "searchTerms": [
+        "CLIPTextEncode",
+        "text",
+        "prompt",
+        "text prompt",
+        "positive prompt",
+        "negative prompt",
+        "encode text",
+        "text encoder",
+        "encode prompt"
+      ],
+      "signature": "40d9a01d8cbfcb2965e38d468014dc119da21fe9",
+      "version": 1
+    }
+  }
+}

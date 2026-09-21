@@ -1,0 +1,10 @@
+{
+  "n0": {
+    "class_type": "EmptyImage",
+    "inputs": { "width": 64, "height": 64, "batch_size": 1, "color": 0 }
+  },
+  "n1": {
+    "class_type": "PreviewImage",
+    "inputs": { "images": ["n0", 0] }
+  }
+}

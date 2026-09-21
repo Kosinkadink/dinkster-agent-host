@@ -1,0 +1,115 @@
+{
+  "format": "dinkster-workflow",
+  "formatVersion": 1,
+  "lineage": "lineage-sel",
+  "root": "g0",
+  "graphs": {
+    "g0": {
+      "id": "g0",
+      "name": "root",
+      "nodes": {
+        "n0": {
+          "id": "n0",
+          "type": "EmptyImage",
+          "values": { "width": 64, "height": 64, "batch_size": 1, "color": 0 }
+        },
+        "n1": {
+          "id": "n1",
+          "type": "EmptyImage",
+          "values": { "width": 32, "height": 32, "batch_size": 1, "color": 255 }
+        },
+        "n2": {
+          "id": "n2",
+          "type": "PreviewImage",
+          "values": {}
+        },
+        "n3": {
+          "id": "n3",
+          "type": "PreviewImage",
+          "values": {}
+        },
+        "n4": {
+          "id": "n4",
+          "type": "EmptyLatentImage",
+          "values": { "width": 64, "height": 64, "batch_size": 1 }
+        }
+      },
+      "links": {
+        "l12": {
+          "id": "l12",
+          "from": { "node": "n0", "port": "out0" },
+          "to": { "selector": "s6", "candidate": "c7" }
+        },
+        "l13": {
+          "id": "l13",
+          "from": { "node": "n1", "port": "out0" },
+          "to": { "reroute": "r5" }
+        },
+        "l14": {
+          "id": "l14",
+          "from": { "reroute": "r5" },
+          "to": { "selector": "s6", "candidate": "c8" }
+        },
+        "l15": {
+          "id": "l15",
+          "from": { "selector": "s6" },
+          "to": { "node": "n2", "port": "images" }
+        },
+        "l16": {
+          "id": "l16",
+          "from": { "selector": "s6" },
+          "to": { "node": "n3", "port": "images" }
+        },
+        "l17": {
+          "id": "l17",
+          "from": { "node": "n0", "port": "out0" },
+          "to": { "selector": "s9", "candidate": "c10" }
+        },
+        "l18": {
+          "id": "l18",
+          "from": { "node": "n4", "port": "out0" },
+          "to": { "selector": "s9", "candidate": "c11" }
+        }
+      },
+      "nets": {},
+      "reroutes": {
+        "r5": { "id": "r5" }
+      },
+      "selectors": {
+        "s6": {
+          "id": "s6",
+          "title": "Quality",
+          "candidates": [{ "id": "c7", "title": "full" }, { "id": "c8" }],
+          "policy": { "kind": "fixed", "candidate": "c7" }
+        },
+        "s9": {
+          "id": "s9",
+          "candidates": [{ "id": "c10" }, { "id": "c11" }],
+          "policy": { "kind": "random" }
+        }
+      },
+      "nextOrdinal": 19
+    }
+  },
+  "view": {
+    "graphs": {
+      "g0": {
+        "nodes": {
+          "n0": { "position": { "x": 40, "y": 60 } },
+          "n1": { "position": { "x": 40, "y": 320 } },
+          "n2": { "position": { "x": 720, "y": 80 } },
+          "n3": { "position": { "x": 720, "y": 340 } },
+          "n4": { "position": { "x": 40, "y": 580 } }
+        },
+        "reroutes": {
+          "r5": { "position": { "x": 360, "y": 380 } }
+        },
+        "selectors": {
+          "s6": { "position": { "x": 440, "y": 140 } },
+          "s9": { "position": { "x": 440, "y": 560 } }
+        }
+      }
+    }
+  },
+  "meta": { "title": "Selectors: fixed s6 (IMAGE branches, reroute feed, fan-out) + random s9 (mixed IMAGE/LATENT)" }
+}

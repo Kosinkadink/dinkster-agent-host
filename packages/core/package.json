@@ -1,0 +1,25 @@
+{
+  "name": "@dinkster/core",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Framework-free core: document model, schema registry, identity, contracts (M-1).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run --exclude test/perf.test.ts --exclude test/perf-dispatch.test.ts && vitest run test/perf.test.ts && vitest run test/perf-dispatch.test.ts",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "ajv": "^8.20.0",
+    "fast-check": "^3.23.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  }
+}

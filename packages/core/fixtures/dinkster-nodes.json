@@ -1,0 +1,422 @@
+{
+  "nodes": {
+    "std.math.add_ints": {
+      "category": "math",
+      "description": "",
+      "displayName": "Add Ints",
+      "idempotent": true,
+      "interface": [
+        {
+          "id": "a",
+          "required": true,
+          "role": "input",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          }
+        },
+        {
+          "default": 1,
+          "id": "b",
+          "required": true,
+          "role": "input",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          }
+        },
+        {
+          "id": "sum",
+          "role": "output",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          }
+        }
+      ],
+      "nodeType": "std.math.add_ints",
+      "schemaVersion": 40,
+      "version": 1
+    },
+    "test.absence": {
+      "category": "test",
+      "description": "",
+      "displayName": "Absence",
+      "idempotent": true,
+      "interface": [
+        {
+          "id": "must",
+          "onAbsent": "fail",
+          "required": true,
+          "role": "input",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "std.image"
+            ]
+          }
+        },
+        {
+          "id": "tolerant",
+          "onAbsent": "accept",
+          "required": true,
+          "role": "input",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "std.image"
+            ]
+          }
+        },
+        {
+          "id": "maybe",
+          "required": false,
+          "role": "input",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "std.image"
+            ]
+          }
+        },
+        {
+          "id": "image",
+          "role": "output",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "std.image"
+            ]
+          }
+        },
+        {
+          "doc": "present when detected",
+          "id": "mask",
+          "optional": true,
+          "role": "output",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "std.image"
+            ]
+          }
+        }
+      ],
+      "nodeType": "test.absence",
+      "schemaVersion": 40,
+      "version": 1
+    },
+    "test.families": {
+      "category": "test",
+      "description": "",
+      "displayName": "Families",
+      "idempotent": true,
+      "interface": [
+        {
+          "default": 0,
+          "id": "bias",
+          "required": true,
+          "role": "input",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          }
+        },
+        {
+          "doc": "grows",
+          "id": "operands",
+          "maxMembers": 8,
+          "minMembers": 2,
+          "required": true,
+          "role": "inputFamily",
+          "template": [
+            {
+              "id": "value",
+              "required": true,
+              "role": "input",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "extras",
+          "minMembers": 0,
+          "required": true,
+          "role": "inputFamily",
+          "template": [
+            {
+              "id": "value",
+              "required": true,
+              "role": "input",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "std.image"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "out",
+          "role": "output",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          }
+        },
+        {
+          "id": "parts",
+          "maxMembers": 4,
+          "minMembers": 1,
+          "role": "outputFamily",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.string"
+            ]
+          }
+        }
+      ],
+      "nodeType": "test.families",
+      "schemaVersion": 40,
+      "version": 1
+    },
+    "test.hints": {
+      "category": "test",
+      "description": "",
+      "displayName": "Hints",
+      "idempotent": true,
+      "interface": [
+        {
+          "id": "image",
+          "required": true,
+          "role": "input",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "std.image"
+            ]
+          }
+        },
+        {
+          "id": "out",
+          "role": "output",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "std.image"
+            ]
+          }
+        }
+      ],
+      "nodeType": "test.hints",
+      "occupies": [
+        "gpu"
+      ],
+      "schemaVersion": 40,
+      "version": 1
+    },
+    "test.primitives": {
+      "category": "test",
+      "description": "every widget-derivable primitive",
+      "displayName": "Primitives",
+      "idempotent": true,
+      "interface": [
+        {
+          "default": 4,
+          "doc": "how many",
+          "id": "count",
+          "required": true,
+          "role": "input",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          }
+        },
+        {
+          "default": 0.5,
+          "id": "scale",
+          "required": true,
+          "role": "input",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.float"
+            ]
+          }
+        },
+        {
+          "default": "hi",
+          "id": "label",
+          "required": true,
+          "role": "input",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.string"
+            ]
+          }
+        },
+        {
+          "default": true,
+          "id": "enabled",
+          "required": true,
+          "role": "input",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.boolean"
+            ]
+          }
+        },
+        {
+          "id": "image",
+          "required": false,
+          "role": "input",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "std.image"
+            ]
+          }
+        },
+        {
+          "id": "out",
+          "role": "output",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.string"
+            ]
+          }
+        }
+      ],
+      "nodeType": "test.primitives",
+      "schemaVersion": 40,
+      "version": 1
+    },
+    "test.types": {
+      "category": "test",
+      "description": "",
+      "displayName": "Types",
+      "idempotent": false,
+      "interface": [
+        {
+          "id": "either",
+          "required": true,
+          "role": "input",
+          "type": {
+            "kind": "union",
+            "types": [
+              "core.int",
+              "core.float"
+            ]
+          }
+        },
+        {
+          "id": "anything",
+          "required": true,
+          "role": "input",
+          "type": {
+            "kind": "wildcard"
+          }
+        },
+        {
+          "id": "t_in",
+          "required": true,
+          "role": "input",
+          "type": {
+            "kind": "variable",
+            "templateId": "T"
+          }
+        },
+        {
+          "id": "c_in",
+          "required": true,
+          "role": "input",
+          "type": {
+            "allowed": [
+              "core.int",
+              "core.float"
+            ],
+            "kind": "variable",
+            "templateId": "C"
+          }
+        },
+        {
+          "id": "ints",
+          "required": true,
+          "role": "input",
+          "type": {
+            "element": {
+              "kind": "concrete",
+              "types": [
+                "core.int"
+              ]
+            },
+            "kind": "list"
+          }
+        },
+        {
+          "id": "matrix",
+          "required": true,
+          "role": "input",
+          "type": {
+            "element": {
+              "element": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
+              "kind": "list"
+            },
+            "kind": "list"
+          }
+        },
+        {
+          "id": "items",
+          "required": true,
+          "role": "input",
+          "type": {
+            "element": {
+              "kind": "variable",
+              "templateId": "T"
+            },
+            "kind": "list"
+          }
+        },
+        {
+          "id": "t_out",
+          "role": "output",
+          "type": {
+            "kind": "variable",
+            "templateId": "T"
+          }
+        }
+      ],
+      "nodeType": "test.types",
+      "schemaVersion": 40,
+      "version": 1
+    }
+  },
+  "schemaVersion": 40
+}

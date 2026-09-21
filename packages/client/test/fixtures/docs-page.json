@@ -1,0 +1,52 @@
+{
+  "docs": [
+    {
+      "pack": "dinkster-nodes-foundation",
+      "kind": "guide",
+      "id": "loops-and-subgraphs",
+      "defaultLocale": "en",
+      "order": 20,
+      "tags": ["loops", "subgraphs"],
+      "guideKind": "tour",
+      "locales": {
+        "en": {
+          "title": "Loops and subgraphs",
+          "summary": "Build repeated work with regions.",
+          "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+          "assets": {}
+        },
+        "zh": {
+          "title": "Loops and subgraphs (zh)",
+          "summary": "Build repeated work with regions (zh).",
+          "digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+          "assets": {}
+        }
+      }
+    },
+    {
+      "pack": "dinkster-nodes-foundation",
+      "kind": "node",
+      "id": "std.math.add_ints",
+      "defaultLocale": "en",
+      "locales": {
+        "en": {
+          "title": "Add Integers",
+          "summary": "Adds two integer values.",
+          "schemaVersion": 1,
+          "digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+          "assets": {
+            "assets/addition.webp": {
+              "digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+              "mediaType": "image/webp"
+            },
+            "assets/addition.mp4": {
+              "digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+              "mediaType": "video/mp4"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "cursor": "<opaque-filter-bound-cursor>"
+}

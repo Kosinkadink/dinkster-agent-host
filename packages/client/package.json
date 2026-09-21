@@ -1,0 +1,23 @@
+{
+  "name": "@dinkster/client",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Backend connection service: schema registry, prompt submission, WS event stream, execution store (M0).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dinkster/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  }
+}

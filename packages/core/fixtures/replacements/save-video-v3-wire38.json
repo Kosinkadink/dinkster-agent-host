@@ -1,0 +1,312 @@
+{
+  "category": "video",
+  "description": "",
+  "displayName": "Save Video",
+  "idempotent": false,
+  "interface": [
+    {
+      "id": "video",
+      "required": true,
+      "role": "input",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "comfy.VIDEO"
+        ]
+      }
+    },
+    {
+      "default": {
+        "mount": "comfy-output",
+        "prefix": "video/ComfyUI"
+      },
+      "id": "target",
+      "required": false,
+      "role": "input",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "dinkster.save_target"
+        ]
+      },
+      "widget": {
+        "type": "SAVE_TARGET"
+      }
+    },
+    {
+      "default": "auto",
+      "id": "container",
+      "required": false,
+      "role": "input",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "core.combo"
+        ]
+      },
+      "widget": {
+        "options": [
+          "auto",
+          "mp4",
+          "mkv",
+          "mov",
+          "webm",
+          "avi",
+          "gif"
+        ],
+        "type": "COMBO"
+      }
+    },
+    {
+      "default": "auto",
+      "id": "codec",
+      "required": false,
+      "role": "input",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "core.combo"
+        ]
+      },
+      "widget": {
+        "options": [
+          "auto",
+          "h264",
+          "av1",
+          "vp9"
+        ],
+        "type": "COMBO"
+      }
+    },
+    {
+      "doc": "Omit for stream copy where possible; specifying CRF requests encoding.",
+      "id": "crf",
+      "required": false,
+      "role": "input",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "core.int"
+        ]
+      },
+      "widget": {
+        "max": 63,
+        "min": 0,
+        "step": 1,
+        "type": "NUMBER"
+      }
+    },
+    {
+      "default": "{}",
+      "doc": "JSON object of container metadata tags.",
+      "id": "metadata",
+      "required": false,
+      "role": "input",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "core.string"
+        ]
+      },
+      "widget": {
+        "multiline": true,
+        "type": "STRING"
+      }
+    },
+    {
+      "advanced": true,
+      "doc": "Legacy format; cannot combine with container or codec overrides.",
+      "id": "format",
+      "required": false,
+      "role": "input",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "core.combo"
+        ]
+      },
+      "widget": {
+        "options": [
+          "mp4_h264",
+          "webm_vp9",
+          "webm_av1"
+        ],
+        "type": "COMBO"
+      }
+    },
+    {
+      "id": "video",
+      "role": "output",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "comfy.VIDEO"
+        ]
+      }
+    },
+    {
+      "id": "asset",
+      "preview": true,
+      "role": "output",
+      "type": {
+        "element": {
+          "kind": "concrete",
+          "types": [
+            "comfy.VIDEO"
+          ]
+        },
+        "kind": "asset"
+      }
+    }
+  ],
+  "nodeType": "dinkster.save_video",
+  "outputNode": true,
+  "replacements": [
+    {
+      "cases": [
+        {
+          "inputs": {
+            "assemble:audio": {
+              "input": "audio",
+              "kind": "copy"
+            },
+            "assemble:bit_depth": {
+              "input": "format.bit_depth",
+              "kind": "copy"
+            },
+            "assemble:fps": {
+              "input": "fps",
+              "kind": "copy"
+            },
+            "assemble:images": {
+              "input": "images",
+              "kind": "copy"
+            },
+            "crf": {
+              "input": "format.crf",
+              "kind": "copy"
+            },
+            "format": {
+              "input": "format",
+              "kind": "copy"
+            },
+            "target": {
+              "input": "target",
+              "kind": "copy"
+            }
+          },
+          "links": [
+            {
+              "from": "assemble:video",
+              "to": "video"
+            }
+          ],
+          "nodes": {
+            "assemble": {
+              "type": "dinkster.video.assemble",
+              "values": {
+                "color_space": "sRGB"
+              }
+            }
+          },
+          "outputs": {
+            "asset": "video"
+          },
+          "to": "dinkster.save_video",
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "input": "format.crf",
+                "kind": "valuePresent"
+              },
+              {
+                "input": "format.crf",
+                "kind": "inputConnected"
+              },
+              {
+                "input": "format.bit_depth",
+                "kind": "valuePresent"
+              },
+              {
+                "input": "format.bit_depth",
+                "kind": "inputConnected"
+              }
+            ]
+          }
+        },
+        {
+          "inputs": {
+            "assemble:audio": {
+              "input": "audio",
+              "kind": "copy"
+            },
+            "assemble:bit_depth": {
+              "input": "bit_depth",
+              "kind": "copy"
+            },
+            "assemble:fps": {
+              "input": "fps",
+              "kind": "copy"
+            },
+            "assemble:images": {
+              "input": "images",
+              "kind": "copy"
+            },
+            "crf": {
+              "input": "crf",
+              "kind": "copy"
+            },
+            "format": {
+              "input": "format",
+              "kind": "copy"
+            },
+            "target": {
+              "input": "target",
+              "kind": "copy"
+            }
+          },
+          "links": [
+            {
+              "from": "assemble:video",
+              "to": "video"
+            }
+          ],
+          "nodes": {
+            "assemble": {
+              "type": "dinkster.video.assemble",
+              "values": {
+                "color_space": "sRGB"
+              }
+            }
+          },
+          "outputs": {
+            "asset": "video"
+          },
+          "to": "dinkster.save_video"
+        }
+      ],
+      "from": "dinkster.save_video",
+      "migration": {
+        "historicalInputs": [
+          "images",
+          "fps",
+          "audio",
+          "bit_depth",
+          "format.crf",
+          "format.bit_depth"
+        ]
+      }
+    }
+  ],
+  "schemaVersion": 38,
+  "searchTerms": [
+    "video encoder",
+    "mp4",
+    "webm",
+    "H.264",
+    "VP9",
+    "AV1"
+  ],
+  "version": 3
+}

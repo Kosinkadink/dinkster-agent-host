@@ -1,0 +1,4516 @@
+{
+  "format": "dinkster-comfy-alias/1",
+  "sourceSchemas": [
+    {
+      "schemaVersion": 38,
+      "nodeType": "comfy.SaveVideo",
+      "version": 1,
+      "displayName": "Save Video",
+      "category": "comfy/video",
+      "description": "Saves the input videos to your ComfyUI output directory.",
+      "idempotent": false,
+      "interface": [
+        {
+          "role": "input",
+          "id": "video",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "comfy.VIDEO"
+            ]
+          },
+          "required": true,
+          "doc": "The video to save."
+        },
+        {
+          "role": "input",
+          "id": "filename_prefix",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.string"
+            ]
+          },
+          "required": false,
+          "default": "video/ComfyUI",
+          "widget": {
+            "type": "STRING",
+            "multiline": false
+          },
+          "doc": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or %Empty Latent Image.width% to include values from nodes."
+        },
+        {
+          "role": "input",
+          "id": "encoding",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.combo"
+            ]
+          },
+          "required": false,
+          "widget": {
+            "type": "COMBO",
+            "options": [
+              "auto",
+              "re-encode"
+            ]
+          },
+          "forceInput": true
+        },
+        {
+          "role": "input",
+          "id": "encoding.crf",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.float"
+            ]
+          },
+          "required": false,
+          "forceInput": true
+        },
+        {
+          "role": "input",
+          "id": "crf",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.float"
+            ]
+          },
+          "required": false,
+          "forceInput": true
+        },
+        {
+          "role": "input",
+          "id": "metadata",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.string"
+            ]
+          },
+          "required": false,
+          "forceInput": true
+        },
+        {
+          "role": "dynamicCombo",
+          "id": "format",
+          "options": [
+            {
+              "key": "auto",
+              "inputs": [
+                {
+                  "role": "dynamicCombo",
+                  "id": "codec",
+                  "options": [
+                    {
+                      "key": "auto",
+                      "inputs": []
+                    },
+                    {
+                      "key": "h264",
+                      "inputs": [
+                        {
+                          "role": "dynamicCombo",
+                          "id": "encoding",
+                          "options": [
+                            {
+                              "key": "auto",
+                              "inputs": []
+                            },
+                            {
+                              "key": "re-encode",
+                              "inputs": [
+                                {
+                                  "role": "input",
+                                  "id": "crf",
+                                  "type": {
+                                    "kind": "concrete",
+                                    "types": [
+                                      "core.float"
+                                    ]
+                                  },
+                                  "required": false,
+                                  "default": 23,
+                                  "widget": {
+                                    "type": "NUMBER",
+                                    "min": 0,
+                                    "max": 51,
+                                    "step": 1
+                                  },
+                                  "doc": "Lower values produce higher quality and larger files."
+                                }
+                              ]
+                            }
+                          ],
+                          "required": false,
+                          "doc": "Automatic preserves compatible H.264 streams. Re-encode applies custom encoding options.",
+                          "displayName": "encoding mode"
+                        }
+                      ]
+                    },
+                    {
+                      "key": "av1",
+                      "inputs": [
+                        {
+                          "role": "dynamicCombo",
+                          "id": "encoding",
+                          "options": [
+                            {
+                              "key": "auto",
+                              "inputs": []
+                            },
+                            {
+                              "key": "re-encode",
+                              "inputs": [
+                                {
+                                  "role": "input",
+                                  "id": "crf",
+                                  "type": {
+                                    "kind": "concrete",
+                                    "types": [
+                                      "core.float"
+                                    ]
+                                  },
+                                  "required": false,
+                                  "default": 30,
+                                  "widget": {
+                                    "type": "NUMBER",
+                                    "min": 0,
+                                    "max": 63,
+                                    "step": 1
+                                  },
+                                  "doc": "Lower values produce higher quality and larger files."
+                                }
+                              ]
+                            }
+                          ],
+                          "required": false,
+                          "doc": "Automatic preserves compatible AV1 streams. Re-encode applies custom encoding options.",
+                          "displayName": "encoding mode"
+                        }
+                      ]
+                    }
+                  ],
+                  "required": true,
+                  "doc": "The output video codec. Auto preserves a compatible source stream. H.264 and AV1 re-encoding support SDR, HDR (HLG), and HDR PQ."
+                }
+              ]
+            },
+            {
+              "key": "mp4",
+              "inputs": [
+                {
+                  "role": "dynamicCombo",
+                  "id": "codec",
+                  "options": [
+                    {
+                      "key": "auto",
+                      "inputs": []
+                    },
+                    {
+                      "key": "h264",
+                      "inputs": [
+                        {
+                          "role": "dynamicCombo",
+                          "id": "encoding",
+                          "options": [
+                            {
+                              "key": "auto",
+                              "inputs": []
+                            },
+                            {
+                              "key": "re-encode",
+                              "inputs": [
+                                {
+                                  "role": "input",
+                                  "id": "crf",
+                                  "type": {
+                                    "kind": "concrete",
+                                    "types": [
+                                      "core.float"
+                                    ]
+                                  },
+                                  "required": false,
+                                  "default": 23,
+                                  "widget": {
+                                    "type": "NUMBER",
+                                    "min": 0,
+                                    "max": 51,
+                                    "step": 1
+                                  },
+                                  "doc": "Lower values produce higher quality and larger files."
+                                }
+                              ]
+                            }
+                          ],
+                          "required": false,
+                          "doc": "Automatic preserves compatible H.264 streams. Re-encode applies custom encoding options.",
+                          "displayName": "encoding mode"
+                        }
+                      ]
+                    },
+                    {
+                      "key": "av1",
+                      "inputs": [
+                        {
+                          "role": "dynamicCombo",
+                          "id": "encoding",
+                          "options": [
+                            {
+                              "key": "auto",
+                              "inputs": []
+                            },
+                            {
+                              "key": "re-encode",
+                              "inputs": [
+                                {
+                                  "role": "input",
+                                  "id": "crf",
+                                  "type": {
+                                    "kind": "concrete",
+                                    "types": [
+                                      "core.float"
+                                    ]
+                                  },
+                                  "required": false,
+                                  "default": 30,
+                                  "widget": {
+                                    "type": "NUMBER",
+                                    "min": 0,
+                                    "max": 63,
+                                    "step": 1
+                                  },
+                                  "doc": "Lower values produce higher quality and larger files."
+                                }
+                              ]
+                            }
+                          ],
+                          "required": false,
+                          "doc": "Automatic preserves compatible AV1 streams. Re-encode applies custom encoding options.",
+                          "displayName": "encoding mode"
+                        }
+                      ]
+                    }
+                  ],
+                  "required": true,
+                  "doc": "The output video codec. Auto preserves a compatible source stream. H.264 and AV1 re-encoding support SDR, HDR (HLG), and HDR PQ."
+                }
+              ]
+            },
+            {
+              "key": "mkv",
+              "inputs": [
+                {
+                  "role": "dynamicCombo",
+                  "id": "codec",
+                  "options": [
+                    {
+                      "key": "auto",
+                      "inputs": []
+                    },
+                    {
+                      "key": "h264",
+                      "inputs": [
+                        {
+                          "role": "dynamicCombo",
+                          "id": "encoding",
+                          "options": [
+                            {
+                              "key": "auto",
+                              "inputs": []
+                            },
+                            {
+                              "key": "re-encode",
+                              "inputs": [
+                                {
+                                  "role": "input",
+                                  "id": "crf",
+                                  "type": {
+                                    "kind": "concrete",
+                                    "types": [
+                                      "core.float"
+                                    ]
+                                  },
+                                  "required": false,
+                                  "default": 23,
+                                  "widget": {
+                                    "type": "NUMBER",
+                                    "min": 0,
+                                    "max": 51,
+                                    "step": 1
+                                  },
+                                  "doc": "Lower values produce higher quality and larger files."
+                                }
+                              ]
+                            }
+                          ],
+                          "required": false,
+                          "doc": "Automatic preserves compatible H.264 streams. Re-encode applies custom encoding options.",
+                          "displayName": "encoding mode"
+                        }
+                      ]
+                    },
+                    {
+                      "key": "av1",
+                      "inputs": [
+                        {
+                          "role": "dynamicCombo",
+                          "id": "encoding",
+                          "options": [
+                            {
+                              "key": "auto",
+                              "inputs": []
+                            },
+                            {
+                              "key": "re-encode",
+                              "inputs": [
+                                {
+                                  "role": "input",
+                                  "id": "crf",
+                                  "type": {
+                                    "kind": "concrete",
+                                    "types": [
+                                      "core.float"
+                                    ]
+                                  },
+                                  "required": false,
+                                  "default": 30,
+                                  "widget": {
+                                    "type": "NUMBER",
+                                    "min": 0,
+                                    "max": 63,
+                                    "step": 1
+                                  },
+                                  "doc": "Lower values produce higher quality and larger files."
+                                }
+                              ]
+                            }
+                          ],
+                          "required": false,
+                          "doc": "Automatic preserves compatible AV1 streams. Re-encode applies custom encoding options.",
+                          "displayName": "encoding mode"
+                        }
+                      ]
+                    }
+                  ],
+                  "required": true,
+                  "doc": "The output video codec. Auto preserves a compatible source stream. H.264 and AV1 re-encoding support SDR, HDR (HLG), and HDR PQ."
+                }
+              ]
+            },
+            {
+              "key": "webm",
+              "inputs": [
+                {
+                  "role": "dynamicCombo",
+                  "id": "codec",
+                  "options": [
+                    {
+                      "key": "auto",
+                      "inputs": []
+                    },
+                    {
+                      "key": "av1",
+                      "inputs": [
+                        {
+                          "role": "dynamicCombo",
+                          "id": "encoding",
+                          "options": [
+                            {
+                              "key": "auto",
+                              "inputs": []
+                            },
+                            {
+                              "key": "re-encode",
+                              "inputs": [
+                                {
+                                  "role": "input",
+                                  "id": "crf",
+                                  "type": {
+                                    "kind": "concrete",
+                                    "types": [
+                                      "core.float"
+                                    ]
+                                  },
+                                  "required": false,
+                                  "default": 30,
+                                  "widget": {
+                                    "type": "NUMBER",
+                                    "min": 0,
+                                    "max": 63,
+                                    "step": 1
+                                  },
+                                  "doc": "Lower values produce higher quality and larger files."
+                                }
+                              ]
+                            }
+                          ],
+                          "required": false,
+                          "doc": "Automatic preserves compatible AV1 streams. Re-encode applies custom encoding options.",
+                          "displayName": "encoding mode"
+                        }
+                      ]
+                    }
+                  ],
+                  "required": true,
+                  "doc": "The output video codec. Auto preserves a compatible source stream. H.264 and AV1 re-encoding support SDR, HDR (HLG), and HDR PQ."
+                }
+              ]
+            }
+          ],
+          "required": true,
+          "doc": "The output container. Auto uses MP4 for Auto/H.264 and WebM for AV1. MP4, MKV, and WebM select a specific container."
+        },
+        {
+          "role": "dynamicCombo",
+          "id": "codec",
+          "options": [
+            {
+              "key": "auto",
+              "inputs": []
+            },
+            {
+              "key": "h264",
+              "inputs": [
+                {
+                  "role": "dynamicCombo",
+                  "id": "encoding",
+                  "options": [
+                    {
+                      "key": "auto",
+                      "inputs": []
+                    },
+                    {
+                      "key": "re-encode",
+                      "inputs": [
+                        {
+                          "role": "input",
+                          "id": "crf",
+                          "type": {
+                            "kind": "concrete",
+                            "types": [
+                              "core.float"
+                            ]
+                          },
+                          "required": false,
+                          "default": 23,
+                          "widget": {
+                            "type": "NUMBER",
+                            "min": 0,
+                            "max": 51,
+                            "step": 1
+                          },
+                          "doc": "Lower values produce higher quality and larger files."
+                        }
+                      ]
+                    }
+                  ],
+                  "required": false,
+                  "doc": "Automatic preserves compatible H.264 streams. Re-encode applies custom encoding options.",
+                  "displayName": "encoding mode"
+                }
+              ]
+            },
+            {
+              "key": "av1",
+              "inputs": [
+                {
+                  "role": "dynamicCombo",
+                  "id": "encoding",
+                  "options": [
+                    {
+                      "key": "auto",
+                      "inputs": []
+                    },
+                    {
+                      "key": "re-encode",
+                      "inputs": [
+                        {
+                          "role": "input",
+                          "id": "crf",
+                          "type": {
+                            "kind": "concrete",
+                            "types": [
+                              "core.float"
+                            ]
+                          },
+                          "required": false,
+                          "default": 30,
+                          "widget": {
+                            "type": "NUMBER",
+                            "min": 0,
+                            "max": 63,
+                            "step": 1
+                          },
+                          "doc": "Lower values produce higher quality and larger files."
+                        }
+                      ]
+                    }
+                  ],
+                  "required": false,
+                  "doc": "Automatic preserves compatible AV1 streams. Re-encode applies custom encoding options.",
+                  "displayName": "encoding mode"
+                }
+              ]
+            }
+          ],
+          "required": false,
+          "doc": "The output video codec. Auto preserves a compatible source stream. H.264 and AV1 re-encoding support SDR, HDR (HLG), and HDR PQ."
+        },
+        {
+          "role": "output",
+          "id": "video",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "comfy.VIDEO"
+            ]
+          },
+          "doc": "The input video, unchanged."
+        }
+      ],
+      "aliases": [
+        "SaveVideo"
+      ],
+      "outputNode": true
+    }
+  ],
+  "records": [
+    {
+      "id": "comfy_alias:comfy-core/SaveVideo",
+      "mappingKind": "op",
+      "carrier": "dinkster.save_video",
+      "source": {
+        "pack": "comfy-core",
+        "nodeClass": "SaveVideo",
+        "nodeType": "comfy.SaveVideo",
+        "revision": "15eb748b"
+      },
+      "replacement": {
+        "from": "comfy.SaveVideo",
+        "note": "Auto container lowers to WebM for AV1, otherwise MP4, not native source-preserving auto. All container/codec/encoding selections carry over, including historical flat controls. CRF passes through an explicit Convert Value node to integer, truncating fractional values toward zero (force_lossy=true); integer CRFs are unchanged. Specifying CRF requests encoding. Invalid codec/container combinations fail at execution, not translation. VIDEO passthrough and filename_prefix survive. Explicit metadata JSON carries over; hidden prompt/extra_pnginfo are not source ports and must be supplied as metadata by the importer. Mount authorization and the encoded-output bound apply. Safe stream copy exceeds ComfyUI, not parity.",
+        "cases": [
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "format.codec"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "format.codec"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "format.codec.encoding.crf"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "format.codec.encoding.crf"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "valueEquals",
+                      "input": "format.codec",
+                      "value": "av1"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "webm",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "format.codec.encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "format.codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "format.codec"
+                    }
+                  ]
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "format.codec.encoding.crf"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "format.codec.encoding.crf"
+                    }
+                  ]
+                },
+                {
+                  "kind": "valueEquals",
+                  "input": "format.codec",
+                  "value": "av1"
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "webm"
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "format.codec.encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "format.codec"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "format.codec"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "format.codec.encoding.crf"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "format.codec.encoding.crf"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "mp4",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "format.codec.encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "format.codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "format.codec"
+                    }
+                  ]
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "format.codec.encoding.crf"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "format.codec.encoding.crf"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "mp4"
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "format.codec.encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "format.codec"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "format.codec"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "encoding.crf"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "encoding.crf"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "valueEquals",
+                      "input": "format.codec",
+                      "value": "av1"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "webm",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "format.codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "format.codec"
+                    }
+                  ]
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "encoding.crf"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "encoding.crf"
+                    }
+                  ]
+                },
+                {
+                  "kind": "valueEquals",
+                  "input": "format.codec",
+                  "value": "av1"
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "webm"
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "format.codec"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "format.codec"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "encoding.crf"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "encoding.crf"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "mp4",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "format.codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "format.codec"
+                    }
+                  ]
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "encoding.crf"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "encoding.crf"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "mp4"
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "format.codec"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "format.codec"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "crf"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "crf"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "valueEquals",
+                      "input": "format.codec",
+                      "value": "av1"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "webm",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "format.codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "format.codec"
+                    }
+                  ]
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "crf"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "crf"
+                    }
+                  ]
+                },
+                {
+                  "kind": "valueEquals",
+                  "input": "format.codec",
+                  "value": "av1"
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "webm"
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "format.codec"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "format.codec"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "crf"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "crf"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "mp4",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "format.codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "format.codec"
+                    }
+                  ]
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "crf"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "crf"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "mp4"
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "valueEquals",
+                      "input": "format.codec",
+                      "value": "av1"
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valueEquals",
+                          "input": "format.codec.encoding",
+                          "value": "re-encode"
+                        },
+                        {
+                          "kind": "valueEquals",
+                          "input": "encoding",
+                          "value": "re-encode"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "webm",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf": {
+                "kind": "constant",
+                "value": 30
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valueEquals",
+                  "input": "format.codec",
+                  "value": "av1"
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valueEquals",
+                      "input": "format.codec.encoding",
+                      "value": "re-encode"
+                    },
+                    {
+                      "kind": "valueEquals",
+                      "input": "encoding",
+                      "value": "re-encode"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "webm"
+              },
+              "crf": {
+                "kind": "constant",
+                "value": 30
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "valueEquals",
+                      "input": "format.codec",
+                      "value": "h264"
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valueEquals",
+                          "input": "format.codec.encoding",
+                          "value": "re-encode"
+                        },
+                        {
+                          "kind": "valueEquals",
+                          "input": "encoding",
+                          "value": "re-encode"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "mp4",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf": {
+                "kind": "constant",
+                "value": 23
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valueEquals",
+                  "input": "format.codec",
+                  "value": "h264"
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valueEquals",
+                      "input": "format.codec.encoding",
+                      "value": "re-encode"
+                    },
+                    {
+                      "kind": "valueEquals",
+                      "input": "encoding",
+                      "value": "re-encode"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "mp4"
+              },
+              "crf": {
+                "kind": "constant",
+                "value": 23
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "valueEquals",
+                  "input": "format.codec",
+                  "value": "av1"
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "webm",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "valueEquals",
+              "input": "format.codec",
+              "value": "av1"
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "webm"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "format.codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "format.codec"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "mp4",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "any",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format.codec"
+                },
+                {
+                  "kind": "inputConnected",
+                  "input": "format.codec"
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "format.codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "mp4"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "codec"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "codec"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "codec.encoding.crf"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "codec.encoding.crf"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "valueEquals",
+                      "input": "codec",
+                      "value": "av1"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "webm",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "codec.encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "codec"
+                    }
+                  ]
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "codec.encoding.crf"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "codec.encoding.crf"
+                    }
+                  ]
+                },
+                {
+                  "kind": "valueEquals",
+                  "input": "codec",
+                  "value": "av1"
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "webm"
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "codec.encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "codec"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "codec"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "codec.encoding.crf"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "codec.encoding.crf"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "mp4",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "codec.encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "codec"
+                    }
+                  ]
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "codec.encoding.crf"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "codec.encoding.crf"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "mp4"
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "codec.encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "codec"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "codec"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "encoding.crf"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "encoding.crf"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "valueEquals",
+                      "input": "codec",
+                      "value": "av1"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "webm",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "codec"
+                    }
+                  ]
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "encoding.crf"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "encoding.crf"
+                    }
+                  ]
+                },
+                {
+                  "kind": "valueEquals",
+                  "input": "codec",
+                  "value": "av1"
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "webm"
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "codec"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "codec"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "encoding.crf"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "encoding.crf"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "mp4",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "codec"
+                    }
+                  ]
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "encoding.crf"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "encoding.crf"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "mp4"
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "encoding.crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "codec"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "codec"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "crf"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "crf"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "valueEquals",
+                      "input": "codec",
+                      "value": "av1"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "webm",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "codec"
+                    }
+                  ]
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "crf"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "crf"
+                    }
+                  ]
+                },
+                {
+                  "kind": "valueEquals",
+                  "input": "codec",
+                  "value": "av1"
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "webm"
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "codec"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "codec"
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valuePresent",
+                          "input": "crf"
+                        },
+                        {
+                          "kind": "inputConnected",
+                          "input": "crf"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "mp4",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "codec"
+                    }
+                  ]
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "crf"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "crf"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              },
+              "crf_value": {
+                "type": "dinkster.float"
+              },
+              "crf": {
+                "type": "dinkster.value.convert",
+                "values": {
+                  "target": "int",
+                  "force_lossy": true
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "mp4"
+              },
+              "crf_value:value": {
+                "kind": "copy",
+                "input": "crf"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              },
+              {
+                "from": "crf_value:value",
+                "to": "crf:value"
+              },
+              {
+                "from": "crf:int",
+                "to": "crf"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "valueEquals",
+                      "input": "codec",
+                      "value": "av1"
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valueEquals",
+                          "input": "codec.encoding",
+                          "value": "re-encode"
+                        },
+                        {
+                          "kind": "valueEquals",
+                          "input": "encoding",
+                          "value": "re-encode"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "webm",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf": {
+                "kind": "constant",
+                "value": 30
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valueEquals",
+                  "input": "codec",
+                  "value": "av1"
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valueEquals",
+                      "input": "codec.encoding",
+                      "value": "re-encode"
+                    },
+                    {
+                      "kind": "valueEquals",
+                      "input": "encoding",
+                      "value": "re-encode"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "webm"
+              },
+              "crf": {
+                "kind": "constant",
+                "value": 30
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "all",
+                  "of": [
+                    {
+                      "kind": "valueEquals",
+                      "input": "codec",
+                      "value": "h264"
+                    },
+                    {
+                      "kind": "any",
+                      "of": [
+                        {
+                          "kind": "valueEquals",
+                          "input": "codec.encoding",
+                          "value": "re-encode"
+                        },
+                        {
+                          "kind": "valueEquals",
+                          "input": "encoding",
+                          "value": "re-encode"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "mp4",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              },
+              "crf": {
+                "kind": "constant",
+                "value": 23
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valueEquals",
+                  "input": "codec",
+                  "value": "h264"
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valueEquals",
+                      "input": "codec.encoding",
+                      "value": "re-encode"
+                    },
+                    {
+                      "kind": "valueEquals",
+                      "input": "encoding",
+                      "value": "re-encode"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "mp4"
+              },
+              "crf": {
+                "kind": "constant",
+                "value": 23
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "valueEquals",
+                  "input": "codec",
+                  "value": "av1"
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "webm",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "valueEquals",
+              "input": "codec",
+              "value": "av1"
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "webm"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "any",
+                  "of": [
+                    {
+                      "kind": "valuePresent",
+                      "input": "codec"
+                    },
+                    {
+                      "kind": "inputConnected",
+                      "input": "codec"
+                    }
+                  ]
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "mp4",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "any",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "codec"
+                },
+                {
+                  "kind": "inputConnected",
+                  "input": "codec"
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "mp4"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "when": {
+              "kind": "all",
+              "of": [
+                {
+                  "kind": "valuePresent",
+                  "input": "format"
+                },
+                {
+                  "kind": "always"
+                }
+              ]
+            },
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "value",
+                "input": "format",
+                "transform": {
+                  "kind": "enumRename",
+                  "map": {
+                    "auto": "mp4",
+                    "mp4": "mp4",
+                    "mkv": "mkv",
+                    "webm": "webm"
+                  }
+                }
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          },
+          {
+            "to": "dinkster.save_video",
+            "nodes": {
+              "save_target": {
+                "type": "dinkster.set_save_target_prefix",
+                "values": {
+                  "target": {
+                    "mount": "comfy-output",
+                    "prefix": "video/ComfyUI"
+                  }
+                }
+              }
+            },
+            "inputs": {
+              "video": {
+                "kind": "copy",
+                "input": "video"
+              },
+              "save_target:prefix": {
+                "kind": "copy",
+                "input": "filename_prefix"
+              },
+              "codec": {
+                "kind": "copy",
+                "input": "codec"
+              },
+              "metadata": {
+                "kind": "copy",
+                "input": "metadata"
+              },
+              "container": {
+                "kind": "constant",
+                "value": "mp4"
+              }
+            },
+            "links": [
+              {
+                "from": "save_target:save_target",
+                "to": "target"
+              }
+            ],
+            "outputs": {
+              "video": "video"
+            }
+          }
+        ]
+      },
+      "confidence": {
+        "tier": "parametric",
+        "evidence": [
+          "tests/test_video_alias_templates.py::test_video_alias_branches_execute",
+          "tests/test_video_alias_templates.py::test_save_video_all_source_branches",
+          "tests/test_video_alias_templates.py::test_save_video_omitted_format_uses_source_default",
+          "tests/test_video_alias_templates.py::test_crf_link_uses_explicit_integer_conversion"
+        ]
+      }
+    }
+  ]
+}

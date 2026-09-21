@@ -1,0 +1,248 @@
+{
+  "scenario": "cached",
+  "clientId": "dinkster-recorder",
+  "submits": [
+    {
+      "status": 200,
+      "body": {
+        "prompt_id": "be7b2281-c667-4f7f-909d-63201cc7415b",
+        "number": 1,
+        "node_errors": {}
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "prompt_id": "1114d16f-8b35-4410-b7b1-992669f0f225",
+        "number": 2,
+        "node_errors": {}
+      }
+    }
+  ],
+  "messages": [
+    {
+      "t": 2,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 0
+          }
+        },
+        "sid": "dinkster-recorder"
+      }
+    },
+    {
+      "t": 3,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 1
+          }
+        }
+      }
+    },
+    {
+      "t": 3,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 1
+          }
+        }
+      }
+    },
+    {
+      "t": 3,
+      "type": "execution_start",
+      "data": {
+        "prompt_id": "be7b2281-c667-4f7f-909d-63201cc7415b",
+        "timestamp": 1784336859452
+      }
+    },
+    {
+      "t": 3,
+      "type": "execution_cached",
+      "data": {
+        "nodes": [
+          "1",
+          "2"
+        ],
+        "prompt_id": "be7b2281-c667-4f7f-909d-63201cc7415b",
+        "timestamp": 1784336859453
+      }
+    },
+    {
+      "t": 3,
+      "type": "executed",
+      "data": {
+        "node": "2",
+        "display_node": "2",
+        "output": {
+          "images": [
+            {
+              "filename": "ComfyUI_temp_zvcsn_00001_.png",
+              "subfolder": "",
+              "type": "temp"
+            }
+          ]
+        },
+        "prompt_id": "be7b2281-c667-4f7f-909d-63201cc7415b"
+      }
+    },
+    {
+      "t": 3,
+      "type": "progress_state",
+      "data": {
+        "prompt_id": "be7b2281-c667-4f7f-909d-63201cc7415b",
+        "nodes": {
+          "2": {
+            "value": 1,
+            "max": 1,
+            "state": "finished",
+            "node_id": "2",
+            "prompt_id": "be7b2281-c667-4f7f-909d-63201cc7415b",
+            "display_node_id": "2",
+            "parent_node_id": null,
+            "real_node_id": "2"
+          }
+        }
+      }
+    },
+    {
+      "t": 4,
+      "type": "execution_success",
+      "data": {
+        "prompt_id": "be7b2281-c667-4f7f-909d-63201cc7415b",
+        "timestamp": 1784336859453
+      }
+    },
+    {
+      "t": 4,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 0
+          }
+        }
+      }
+    },
+    {
+      "t": 4,
+      "type": "executing",
+      "data": {
+        "node": null,
+        "prompt_id": "be7b2281-c667-4f7f-909d-63201cc7415b"
+      }
+    },
+    {
+      "t": 605,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 1
+          }
+        }
+      }
+    },
+    {
+      "t": 605,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 1
+          }
+        }
+      }
+    },
+    {
+      "t": 606,
+      "type": "execution_start",
+      "data": {
+        "prompt_id": "1114d16f-8b35-4410-b7b1-992669f0f225",
+        "timestamp": 1784336860055
+      }
+    },
+    {
+      "t": 606,
+      "type": "execution_cached",
+      "data": {
+        "nodes": [
+          "1",
+          "2"
+        ],
+        "prompt_id": "1114d16f-8b35-4410-b7b1-992669f0f225",
+        "timestamp": 1784336860055
+      }
+    },
+    {
+      "t": 606,
+      "type": "executed",
+      "data": {
+        "node": "2",
+        "display_node": "2",
+        "output": {
+          "images": [
+            {
+              "filename": "ComfyUI_temp_zvcsn_00001_.png",
+              "subfolder": "",
+              "type": "temp"
+            }
+          ]
+        },
+        "prompt_id": "1114d16f-8b35-4410-b7b1-992669f0f225"
+      }
+    },
+    {
+      "t": 606,
+      "type": "progress_state",
+      "data": {
+        "prompt_id": "1114d16f-8b35-4410-b7b1-992669f0f225",
+        "nodes": {
+          "2": {
+            "value": 1,
+            "max": 1,
+            "state": "finished",
+            "node_id": "2",
+            "prompt_id": "1114d16f-8b35-4410-b7b1-992669f0f225",
+            "display_node_id": "2",
+            "parent_node_id": null,
+            "real_node_id": "2"
+          }
+        }
+      }
+    },
+    {
+      "t": 606,
+      "type": "execution_success",
+      "data": {
+        "prompt_id": "1114d16f-8b35-4410-b7b1-992669f0f225",
+        "timestamp": 1784336860055
+      }
+    },
+    {
+      "t": 606,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 0
+          }
+        }
+      }
+    },
+    {
+      "t": 606,
+      "type": "executing",
+      "data": {
+        "node": null,
+        "prompt_id": "1114d16f-8b35-4410-b7b1-992669f0f225"
+      }
+    }
+  ]
+}

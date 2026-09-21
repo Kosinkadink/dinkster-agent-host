@@ -1,0 +1,477 @@
+{
+  "schemas": [
+    {
+      "schemaVersion": 28,
+      "nodeType": "fixture.dynamic-legacy",
+      "displayName": "Dynamic Legacy",
+      "category": "fixture",
+      "interface": [
+        {
+          "role": "input",
+          "id": "color_value",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          },
+          "required": false,
+          "default": 0
+        },
+        {
+          "role": "input",
+          "id": "tolerance",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.float"
+            ]
+          },
+          "required": false,
+          "default": 0.1,
+          "widget": { "type": "NUMBER", "controlAfterGenerate": "fixed" }
+        },
+        {
+          "role": "input",
+          "id": "metric",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.string"
+            ]
+          },
+          "required": false,
+          "default": "rgb"
+        },
+        {
+          "role": "inputFamily",
+          "id": "samples",
+          "memberPrefix": "sample",
+          "maxMembers": 4,
+          "template": [
+            {
+              "role": "input",
+              "id": "weight",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.float"
+                ]
+              },
+              "required": false,
+              "default": 1,
+              "widget": { "type": "NUMBER", "controlAfterGenerate": "fixed" }
+            },
+            {
+              "role": "input",
+              "id": "label",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.string"
+                ]
+              },
+              "required": false,
+              "default": "sample"
+            }
+          ]
+        },
+        {
+          "role": "output",
+          "id": "result",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "comfy.IMAGE"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "schemaVersion": 28,
+      "nodeType": "fixture.dynamic-modern",
+      "displayName": "Dynamic Modern",
+      "category": "fixture",
+      "interface": [
+        {
+          "role": "dynamicCombo",
+          "id": "policy",
+          "required": false,
+          "options": [
+            {
+              "key": "exact",
+              "inputs": []
+            },
+            {
+              "key": "tolerance_color",
+              "inputs": [
+                {
+                  "role": "dynamicSlot",
+                  "id": "color_source",
+                  "required": false,
+                  "variants": [
+                    {
+                      "key": "integer",
+                      "type": {
+                        "kind": "concrete",
+                        "types": [
+                          "core.int"
+                        ]
+                      },
+                      "inputs": [
+                        {
+                          "role": "input",
+                          "id": "color_value",
+                          "type": {
+                            "kind": "concrete",
+                            "types": [
+                              "core.int"
+                            ]
+                          },
+                          "required": false,
+                          "default": 16
+                        }
+                      ]
+                    },
+                    {
+                      "key": "text",
+                      "type": {
+                        "kind": "concrete",
+                        "types": [
+                          "core.string"
+                        ]
+                      },
+                      "inputs": []
+                    }
+                  ]
+                },
+                {
+                  "role": "input",
+                  "id": "tolerance",
+                  "type": {
+                    "kind": "concrete",
+                    "types": [
+                      "core.float"
+                    ]
+                  },
+                  "required": false,
+                  "default": 0.25,
+                  "widget": { "type": "NUMBER", "controlAfterGenerate": "fixed" }
+                },
+                {
+                  "role": "input",
+                  "id": "metric",
+                  "type": {
+                    "kind": "concrete",
+                    "types": [
+                      "core.string"
+                    ]
+                  },
+                  "required": false,
+                  "default": "ciede2000"
+                },
+                {
+                  "role": "input",
+                  "id": "alpha",
+                  "type": {
+                    "kind": "concrete",
+                    "types": [
+                      "core.float"
+                    ]
+                  },
+                  "required": false,
+                  "default": 0.5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "role": "inputFamily",
+          "id": "samples",
+          "memberPrefix": "sample",
+          "maxMembers": 4,
+          "template": [
+            {
+              "role": "input",
+              "id": "weight",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.float"
+                ]
+              },
+              "required": false,
+              "default": 1,
+              "widget": { "type": "NUMBER", "controlAfterGenerate": "fixed" }
+            },
+            {
+              "role": "input",
+              "id": "label",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.string"
+                ]
+              },
+              "required": false,
+              "default": "sample"
+            }
+          ]
+        },
+        {
+          "role": "output",
+          "id": "result",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "comfy.IMAGE"
+            ]
+          }
+        }
+      ],
+      "replacements": [
+        {
+          "from": "fixture.dynamic-legacy",
+          "cases": [
+            {
+              "to": "fixture.dynamic-modern",
+              "nodes": {
+                "audit": {
+                  "type": "fixture.dynamic-helper",
+                  "values": {
+                    "mode.label": "migration"
+                  }
+                }
+              },
+              "inputs": {
+                "policy.color_source.color_value": {
+                  "kind": "value",
+                  "input": "color_value"
+                },
+                "policy.tolerance": {
+                  "kind": "value",
+                  "input": "tolerance"
+                },
+                "policy.metric": {
+                  "kind": "value",
+                  "input": "metric"
+                }
+              },
+              "inputFamilies": {
+                "samples": {
+                  "kind": "copy",
+                  "sourceFamily": "samples",
+                  "inputs": {
+                    "weight": {
+                      "kind": "copy",
+                      "input": "weight"
+                    },
+                    "label": {
+                      "kind": "copy",
+                      "input": "label"
+                    }
+                  }
+                }
+              },
+              "links": [
+                {
+                  "from": "result",
+                  "to": "audit:mode.source"
+                }
+              ],
+              "outputs": {
+                "result": "result"
+              },
+              "slotVariants": {
+                "policy": "tolerance_color",
+                "policy.color_source": "integer",
+                "audit:mode": "details"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 28,
+      "nodeType": "fixture.dynamic-helper",
+      "displayName": "Dynamic Helper",
+      "category": "fixture",
+      "interface": [
+        {
+          "role": "dynamicCombo",
+          "id": "mode",
+          "required": false,
+          "options": [
+            {
+              "key": "summary",
+              "inputs": []
+            },
+            {
+              "key": "details",
+              "inputs": [
+                {
+                  "role": "input",
+                  "id": "source",
+                  "type": {
+                    "kind": "concrete",
+                    "types": [
+                      "comfy.IMAGE"
+                    ]
+                  },
+                  "required": true
+                },
+                {
+                  "role": "input",
+                  "id": "label",
+                  "type": {
+                    "kind": "concrete",
+                    "types": [
+                      "core.string"
+                    ]
+                  },
+                  "required": false,
+                  "default": "audit"
+                },
+                {
+                  "role": "input",
+                  "id": "enabled",
+                  "type": {
+                    "kind": "concrete",
+                    "types": [
+                      "core.boolean"
+                    ]
+                  },
+                  "required": false,
+                  "default": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schemaVersion": 28,
+      "nodeType": "fixture.mask-source",
+      "displayName": "Mask Source",
+      "category": "fixture",
+      "interface": [
+        {
+          "role": "output",
+          "id": "mask",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "comfy.MASK"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "schemaVersion": 28,
+      "nodeType": "fixture.slot-legacy",
+      "displayName": "Slot Legacy",
+      "category": "fixture",
+      "interface": [
+        {
+          "role": "input",
+          "id": "mask",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "comfy.MASK"
+            ]
+          },
+          "required": false
+        },
+        {
+          "role": "input",
+          "id": "mask_polarity",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.string"
+            ]
+          },
+          "required": false,
+          "default": "white"
+        }
+      ]
+    },
+    {
+      "schemaVersion": 28,
+      "nodeType": "fixture.slot-modern",
+      "displayName": "Slot Modern",
+      "category": "fixture",
+      "interface": [
+        {
+          "role": "dynamicSlot",
+          "id": "mask",
+          "required": false,
+          "variants": [
+            {
+              "key": "mask",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "comfy.MASK"
+                ]
+              },
+              "inputs": [
+                {
+                  "role": "input",
+                  "id": "mask_polarity",
+                  "type": {
+                    "kind": "concrete",
+                    "types": [
+                      "core.string"
+                    ]
+                  },
+                  "required": false,
+                  "default": "black"
+                }
+              ]
+            },
+            {
+              "key": "image",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "comfy.IMAGE"
+                ]
+              },
+              "inputs": []
+            }
+          ]
+        }
+      ],
+      "replacements": [
+        {
+          "from": "fixture.slot-legacy",
+          "cases": [
+            {
+              "to": "fixture.slot-modern",
+              "inputs": {
+                "mask": {
+                  "kind": "link",
+                  "input": "mask"
+                },
+                "mask.mask_polarity": {
+                  "kind": "copy",
+                  "input": "mask_polarity"
+                }
+              },
+              "slotVariants": {
+                "mask": "mask"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

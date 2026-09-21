@@ -1,0 +1,158 @@
+{
+  "format": "dinkster-workflow",
+  "formatVersion": 1,
+  "lineage": "lineage1",
+  "root": "g0",
+  "graphs": {
+    "g0": {
+      "id": "g0",
+      "name": "root",
+      "nodes": {
+        "n0": {
+          "id": "n0",
+          "type": "EmptyLatentImage",
+          "values": { "width": 512, "height": 512, "batch_size": 1 }
+        },
+        "n1": {
+          "id": "n1",
+          "type": "#g1",
+          "values": { "seed": 42 },
+          "controllers": { "seed": "randomize" },
+          "title": "Sampler block"
+        },
+        "n2": {
+          "id": "n2",
+          "type": "PreviewImage",
+          "values": {},
+          "mode": "muted"
+        }
+      },
+      "links": {
+        "l3": {
+          "id": "l3",
+          "from": { "node": "n0", "port": "out0" },
+          "to": { "node": "n1", "port": "latent" }
+        },
+        "l4": {
+          "id": "l4",
+          "from": { "node": "n1", "port": "image" },
+          "to": { "node": "n2", "port": "images" }
+        }
+      },
+      "nets": {},
+      "reroutes": {},
+      "nextOrdinal": 5
+    },
+    "g1": {
+      "id": "g1",
+      "name": "Sampler block",
+      "nodes": {
+        "n0": {
+          "id": "n0",
+          "type": "KSampler",
+          "values": { "seed": 0, "steps": 20, "cfg": 7.5 },
+          "controllers": { "seed": "fixed" },
+          "ext": { "vhs": { "note": "extension data round-trips" } }
+        },
+        "n1": {
+          "id": "n1",
+          "type": "VAEDecode",
+          "values": {}
+        },
+        "n2": {
+          "id": "n2",
+          "type": "ImpactSwitch",
+          "values": { "select": 1 },
+          "dynamic": {
+            "input": { "members": ["m0", "m1"], "selected": "m0" }
+          }
+        }
+      },
+      "links": {
+        "l3": {
+          "id": "l3",
+          "from": { "node": "n0", "port": "out0" },
+          "to": { "node": "n1", "port": "samples" }
+        }
+      },
+      "nets": {
+        "net4": {
+          "id": "net4",
+          "name": "vae",
+          "source": { "node": "n1", "port": "out0" },
+          "sinks": [
+            { "node": "n2", "port": "input.input", "members": ["m0"] }
+          ]
+        }
+      },
+      "reroutes": {},
+      "boundary": {
+        "inputs": [
+          {
+            "id": "latent",
+            "displayName": "Latent",
+            "binds": { "kind": "port", "node": "n0", "port": "latent_image" }
+          },
+          {
+            "id": "seed",
+            "binds": { "kind": "port", "node": "n0", "port": "seed" },
+            "promoted": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "image",
+            "displayName": "Image",
+            "binds": { "kind": "port", "node": "n1", "port": "out0" }
+          }
+        ]
+      },
+      "nextOrdinal": 5
+    }
+  },
+  "surfaces": {
+    "s0": {
+      "id": "s0",
+      "type": "core.modePanel",
+      "config": { "targets": ["n2"], "graph": "g0" }
+    }
+  },
+  "view": {
+    "graphs": {
+      "g0": {
+        "nodes": {
+          "n0": { "position": { "x": 60, "y": 200 } },
+          "n1": {
+            "position": { "x": 380, "y": 180 },
+            "size": { "width": 240, "height": 160 },
+            "views": { "seed": "core.int.compact" }
+          },
+          "n2": { "position": { "x": 720, "y": 200 }, "collapsed": true }
+        },
+        "groups": {
+          "grp0": {
+            "id": "grp0",
+            "title": "Main flow",
+            "bounds": { "x": 40, "y": 140, "width": 760, "height": 300 }
+          }
+        }
+      },
+      "g1": {
+        "nodes": {
+          "n0": { "position": { "x": 100, "y": 100 } },
+          "n1": { "position": { "x": 420, "y": 100 } },
+          "n2": { "position": { "x": 420, "y": 320 } }
+        },
+        "collapsedNets": ["net4"]
+      }
+    },
+    "surfaces": {
+      "s0": { "dock": "right" }
+    }
+  },
+  "meta": {
+    "title": "Subgraph + named net + dynamic state",
+    "description": "Exercises every optional construct in format v1."
+  },
+  "ext": { "myPack": { "custom": true } }
+}
