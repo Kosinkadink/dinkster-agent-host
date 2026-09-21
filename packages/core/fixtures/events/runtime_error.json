@@ -1,0 +1,149 @@
+{
+  "scenario": "runtime_error",
+  "clientId": "dinkster-recorder",
+  "submits": [
+    {
+      "status": 200,
+      "body": {
+        "prompt_id": "ce25530a-7e75-417f-8342-0df497342991",
+        "number": 3,
+        "node_errors": {}
+      }
+    }
+  ],
+  "messages": [
+    {
+      "t": 1,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 0
+          }
+        },
+        "sid": "dinkster-recorder"
+      }
+    },
+    {
+      "t": 2,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 1
+          }
+        }
+      }
+    },
+    {
+      "t": 2,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 1
+          }
+        }
+      }
+    },
+    {
+      "t": 2,
+      "type": "execution_start",
+      "data": {
+        "prompt_id": "ce25530a-7e75-417f-8342-0df497342991",
+        "timestamp": 1784336860658
+      }
+    },
+    {
+      "t": 3,
+      "type": "execution_cached",
+      "data": {
+        "nodes": [
+          "1"
+        ],
+        "prompt_id": "ce25530a-7e75-417f-8342-0df497342991",
+        "timestamp": 1784336860659
+      }
+    },
+    {
+      "t": 3,
+      "type": "progress_state",
+      "data": {
+        "prompt_id": "ce25530a-7e75-417f-8342-0df497342991",
+        "nodes": {
+          "2": {
+            "value": 0,
+            "max": 1,
+            "state": "running",
+            "node_id": "2",
+            "prompt_id": "ce25530a-7e75-417f-8342-0df497342991",
+            "display_node_id": "2",
+            "parent_node_id": null,
+            "real_node_id": "2"
+          }
+        }
+      }
+    },
+    {
+      "t": 3,
+      "type": "executing",
+      "data": {
+        "node": "2",
+        "display_node": "2",
+        "prompt_id": "ce25530a-7e75-417f-8342-0df497342991"
+      }
+    },
+    {
+      "t": 5,
+      "type": "execution_error",
+      "data": {
+        "prompt_id": "ce25530a-7e75-417f-8342-0df497342991",
+        "node_id": "2",
+        "node_type": "DinksterRaiseError",
+        "executed": [],
+        "exception_message": "dinkster fixture error\n",
+        "exception_type": "RuntimeError",
+        "traceback": [
+          "  File \"/home/kosin/comfy-vibe-station/pr-tracker/stations/station9/ComfyUI/execution.py\", line 543, in execute\n    output_data, output_ui, has_subgraph, has_pending_tasks = await get_output_data(prompt_id, unique_id, obj, input_data_all, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb, v3_data=v3_data)\n                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+          "  File \"/home/kosin/comfy-vibe-station/pr-tracker/stations/station9/ComfyUI/execution.py\", line 342, in get_output_data\n    return_values = await _async_map_node_over_list(prompt_id, unique_id, obj, input_data_all, obj.FUNCTION, allow_interrupt=True, execution_block_cb=execution_block_cb, pre_execute_cb=pre_execute_cb, v3_data=v3_data)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+          "  File \"/home/kosin/comfy-vibe-station/pr-tracker/stations/station9/ComfyUI/execution.py\", line 316, in _async_map_node_over_list\n    await process_inputs(input_dict, i)\n",
+          "  File \"/home/kosin/comfy-vibe-station/pr-tracker/stations/station9/ComfyUI/execution.py\", line 304, in process_inputs\n    result = f(**inputs)\n             ^^^^^^^^^^^\n",
+          "  File \"/home/kosin/comfy-vibe-station/pr-tracker/stations/station9/ComfyUI/custom_nodes/dinkster_test_nodes/__init__.py\", line 24, in run\n    raise RuntimeError(message)\n"
+        ],
+        "current_inputs": {
+          "image": [
+            "tensor([[[[0., 0., 0.],\n          [0., 0., 0.],\n          [0., 0., 0.],\n          ...,\n          [0., 0., 0.],\n          [0., 0., 0.],\n          [0., 0., 0.]],\n\n         [[0., 0., 0.],\n          [0., 0., 0.],\n          [0., 0., 0.],\n          ...,\n          [0., 0., 0.],\n          [0., 0., 0.],\n          [0., 0., 0.]],\n\n         [[0., 0., 0.],\n          [0., 0., 0.],\n          [0., 0., 0.],\n          ...,\n          [0., 0., 0.],\n          [0., 0., 0.],\n          [0., 0., 0.]],\n\n         ...,\n\n         [[0., 0., 0.],\n          [0., 0., 0.],\n          [0., 0., 0.],\n          ...,\n          [0., 0., 0.],\n          [0., 0., 0.],\n          [0., 0., 0.]],\n\n         [[0., 0., 0.],\n          [0., 0., 0.],\n          [0., 0., 0.],\n          ...,\n          [0., 0., 0.],\n          [0., 0., 0.],\n          [0., 0., 0.]],\n\n         [[0., 0., 0.],\n          [0., 0., 0.],\n          [0., 0., 0.],\n          ...,\n          [0., 0., 0.],\n          [0., 0., 0.],\n          [0., 0., 0.]]]])"
+          ],
+          "message": [
+            "dinkster fixture error"
+          ]
+        },
+        "current_outputs": [
+          "1",
+          "2",
+          "3"
+        ],
+        "timestamp": 1784336860661
+      }
+    },
+    {
+      "t": 5,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 0
+          }
+        }
+      }
+    },
+    {
+      "t": 5,
+      "type": "executing",
+      "data": {
+        "node": null,
+        "prompt_id": "ce25530a-7e75-417f-8342-0df497342991"
+      }
+    }
+  ]
+}

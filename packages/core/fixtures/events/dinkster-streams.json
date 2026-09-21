@@ -1,0 +1,613 @@
+{
+ "streams": [
+  {
+   "job": {
+    "cached": [],
+    "clientId": "client-a",
+    "executed": [
+     "m",
+     "a",
+     "p",
+     "r"
+    ],
+    "finishedAt": 0.0,
+    "jobId": "job-1",
+    "nodeStates": {
+     "a": "completed",
+     "m": "completed",
+     "p": "completed",
+     "r": "completed"
+    },
+    "outputs": {
+     "p": {
+      "out": {
+       "fingerprint": "d3bd071f57261ad68a78f7f5573ef556a590b097",
+       "meta": {},
+       "typeId": "core.int"
+      }
+     },
+     "r": {
+      "items": {
+       "fingerprint": "970bec76dd0c2f7a8a00be7cc7c0c13b3c2ca2a7",
+       "length": 3,
+       "meta": {
+        "length": 3
+       },
+       "typeId": "list<core.int>"
+      }
+     }
+    },
+    "priority": 0,
+    "runId": "run-success",
+    "skipped": [],
+    "startedAt": 0.0,
+    "state": "completed",
+    "submittedAt": 0.0
+   },
+   "messages": [
+    {
+     "clientId": "client-a",
+     "jobId": "job-1",
+     "runId": "run-success",
+     "state": "running",
+     "type": "job_state"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "planned": [
+       "m",
+       "a",
+       "p",
+       "r"
+      ]
+     },
+     "jobId": "job-1",
+     "runId": "run-success",
+     "type": "run_started"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "executionArm": "native"
+     },
+     "jobId": "job-1",
+     "nodeId": "m",
+     "runId": "run-success",
+     "type": "node_started"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "cache_key": "e030b1410195bdc0cbe1b9703c5258eabea4c3b2",
+      "duration_ms": 0.0,
+      "executionArm": "native",
+      "outputs": {
+       "value": {
+        "typeId": "core.int",
+        "value": 7
+       }
+      }
+     },
+     "jobId": "job-1",
+     "nodeId": "m",
+     "runId": "run-success",
+     "type": "node_finished"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "executionArm": "native"
+     },
+     "jobId": "job-1",
+     "nodeId": "a",
+     "runId": "run-success",
+     "type": "node_started"
+    },
+    {
+     "clientId": "client-a",
+     "data": {
+      "step": 1,
+      "text": "adding",
+      "total": 2
+     },
+     "event": "progress",
+     "jobId": "job-1",
+     "nodeId": "a",
+     "runId": "run-success",
+     "type": "node_event"
+    },
+    {
+     "clientId": "client-a",
+     "data": {
+      "step": 2,
+      "total": 2
+     },
+     "event": "progress",
+     "jobId": "job-1",
+     "nodeId": "a",
+     "runId": "run-success",
+     "type": "node_event"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "cache_key": "8061e6cbb9919666476d4078786324a65be72dc1",
+      "duration_ms": 0.0,
+      "executionArm": "native",
+      "outputs": {
+       "out": {
+        "typeId": "core.int",
+        "value": 8
+       }
+      }
+     },
+     "jobId": "job-1",
+     "nodeId": "a",
+     "runId": "run-success",
+     "type": "node_finished"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "executionArm": "native"
+     },
+     "jobId": "job-1",
+     "nodeId": "p",
+     "runId": "run-success",
+     "type": "node_started"
+    },
+    {
+     "_binary": true,
+     "_blobBase64": "/9hmYWtlanBlZw==",
+     "clientId": "client-a",
+     "data": {
+      "height": 8,
+      "mime": "image/jpeg",
+      "width": 8
+     },
+     "event": "preview",
+     "jobId": "job-1",
+     "nodeId": "p",
+     "runId": "run-success",
+     "type": "node_event"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "cache_key": "31b0ea0c426e9c9a2bc39ddd6667efad5c3ebaaa",
+      "duration_ms": 0.0,
+      "executionArm": "native",
+      "outputs": {
+       "out": {
+        "typeId": "core.int",
+        "value": 8
+       }
+      }
+     },
+     "jobId": "job-1",
+     "nodeId": "p",
+     "runId": "run-success",
+     "type": "node_finished"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "executionArm": "native"
+     },
+     "jobId": "job-1",
+     "nodeId": "r",
+     "runId": "run-success",
+     "type": "node_started"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "cache_key": "992941f4b395da25c6f6f8ed433a9a113b91bb92",
+      "duration_ms": 0.0,
+      "executionArm": "native",
+      "outputs": {
+       "items": {
+        "length": 3,
+        "typeId": "list<core.int>"
+       }
+      }
+     },
+     "jobId": "job-1",
+     "nodeId": "r",
+     "runId": "run-success",
+     "type": "node_finished"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "cached": 0,
+      "executed": 4,
+      "skipped": 0
+     },
+     "jobId": "job-1",
+     "runId": "run-success",
+     "type": "run_finished"
+    },
+    {
+     "clientId": "client-a",
+     "jobId": "job-1",
+     "runId": "run-success",
+     "state": "completed",
+     "type": "job_state"
+    }
+   ],
+   "scenario": "success"
+  },
+  {
+   "job": {
+    "cached": [
+     "m",
+     "a",
+     "p",
+     "r"
+    ],
+    "clientId": "client-a",
+    "executed": [],
+    "finishedAt": 0.0,
+    "jobId": "job-2",
+    "nodeStates": {
+     "a": "cached",
+     "m": "cached",
+     "p": "cached",
+     "r": "cached"
+    },
+    "outputs": {
+     "p": {
+      "out": {
+       "fingerprint": "d3bd071f57261ad68a78f7f5573ef556a590b097",
+       "meta": {},
+       "typeId": "core.int"
+      }
+     },
+     "r": {
+      "items": {
+       "fingerprint": "970bec76dd0c2f7a8a00be7cc7c0c13b3c2ca2a7",
+       "length": 3,
+       "meta": {
+        "length": 3
+       },
+       "typeId": "list<core.int>"
+      }
+     }
+    },
+    "priority": 0,
+    "runId": "run-cached",
+    "skipped": [],
+    "startedAt": 0.0,
+    "state": "completed",
+    "submittedAt": 0.0
+   },
+   "messages": [
+    {
+     "clientId": "client-a",
+     "jobId": "job-2",
+     "runId": "run-cached",
+     "state": "running",
+     "type": "job_state"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "planned": [
+       "m",
+       "a",
+       "p",
+       "r"
+      ]
+     },
+     "jobId": "job-2",
+     "runId": "run-cached",
+     "type": "run_started"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "cache_key": "e030b1410195bdc0cbe1b9703c5258eabea4c3b2",
+      "executionArm": "native",
+      "outputs": {
+       "value": {
+        "typeId": "core.int",
+        "value": 7
+       }
+      }
+     },
+     "jobId": "job-2",
+     "nodeId": "m",
+     "runId": "run-cached",
+     "type": "node_cached"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "cache_key": "8061e6cbb9919666476d4078786324a65be72dc1",
+      "executionArm": "native",
+      "outputs": {
+       "out": {
+        "typeId": "core.int",
+        "value": 8
+       }
+      }
+     },
+     "jobId": "job-2",
+     "nodeId": "a",
+     "runId": "run-cached",
+     "type": "node_cached"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "cache_key": "31b0ea0c426e9c9a2bc39ddd6667efad5c3ebaaa",
+      "executionArm": "native",
+      "outputs": {
+       "out": {
+        "typeId": "core.int",
+        "value": 8
+       }
+      }
+     },
+     "jobId": "job-2",
+     "nodeId": "p",
+     "runId": "run-cached",
+     "type": "node_cached"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "cache_key": "992941f4b395da25c6f6f8ed433a9a113b91bb92",
+      "executionArm": "native",
+      "outputs": {
+       "items": {
+        "length": 3,
+        "typeId": "list<core.int>"
+       }
+      }
+     },
+     "jobId": "job-2",
+     "nodeId": "r",
+     "runId": "run-cached",
+     "type": "node_cached"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "cached": 4,
+      "executed": 0,
+      "skipped": 0
+     },
+     "jobId": "job-2",
+     "runId": "run-cached",
+     "type": "run_finished"
+    },
+    {
+     "clientId": "client-a",
+     "jobId": "job-2",
+     "runId": "run-cached",
+     "state": "completed",
+     "type": "job_state"
+    }
+   ],
+   "scenario": "cached"
+  },
+  {
+   "job": {
+    "cached": [],
+    "clientId": "client-a",
+    "executed": [
+     "m"
+    ],
+    "finishedAt": 0.0,
+    "jobId": "job-3",
+    "nodeStates": {
+     "a": "skipped",
+     "b": "skipped",
+     "m": "completed"
+    },
+    "outputs": {
+     "b": {
+      "out": {
+       "fingerprint": "9bd4f8c0b46d154196e40026e752ea6b425629cd",
+       "meta": {
+        "absent.origin": "m/value",
+        "absent.reason": "",
+        "absent.standsFor": "core.int"
+       },
+       "typeId": "core.absent"
+      }
+     }
+    },
+    "priority": 0,
+    "runId": "run-skip-cascade",
+    "skipped": [
+     "a",
+     "b"
+    ],
+    "startedAt": 0.0,
+    "state": "completed",
+    "submittedAt": 0.0
+   },
+   "messages": [
+    {
+     "clientId": "client-a",
+     "jobId": "job-3",
+     "runId": "run-skip-cascade",
+     "state": "running",
+     "type": "job_state"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "planned": [
+       "m",
+       "a",
+       "b"
+      ]
+     },
+     "jobId": "job-3",
+     "runId": "run-skip-cascade",
+     "type": "run_started"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "executionArm": "native"
+     },
+     "jobId": "job-3",
+     "nodeId": "m",
+     "runId": "run-skip-cascade",
+     "type": "node_started"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "cache_key": "6fe65d7e189b36dd4840286633334fc50ef0ff8b",
+      "duration_ms": 0.0,
+      "executionArm": "native",
+      "outputs": {
+       "value": {
+        "typeId": "core.absent"
+       }
+      }
+     },
+     "jobId": "job-3",
+     "nodeId": "m",
+     "runId": "run-skip-cascade",
+     "type": "node_finished"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "input": "value",
+      "origin": "m/value",
+      "reason": ""
+     },
+     "jobId": "job-3",
+     "nodeId": "a",
+     "runId": "run-skip-cascade",
+     "type": "node_skipped"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "input": "value",
+      "origin": "m/value",
+      "reason": ""
+     },
+     "jobId": "job-3",
+     "nodeId": "b",
+     "runId": "run-skip-cascade",
+     "type": "node_skipped"
+    },
+    {
+     "clientId": "client-a",
+     "detail": {
+      "cached": 0,
+      "executed": 1,
+      "skipped": 2
+     },
+     "jobId": "job-3",
+     "runId": "run-skip-cascade",
+     "type": "run_finished"
+    },
+    {
+     "clientId": "client-a",
+     "jobId": "job-3",
+     "runId": "run-skip-cascade",
+     "state": "completed",
+     "type": "job_state"
+    }
+   ],
+   "scenario": "skip-cascade"
+  },
+  {
+   "job": {
+    "clientId": "client-b",
+    "error": {
+     "kind": "execution",
+     "message": "input 'value' is absent - no value was produced by m/value - and this input declares on_absent='fail'",
+     "nodeId": "s",
+     "nodeType": "test.strict",
+     "traceback": ""
+    },
+    "finishedAt": 0.0,
+    "jobId": "job-4",
+    "nodeStates": {
+     "m": "completed"
+    },
+    "priority": 0,
+    "runId": "run-failure",
+    "startedAt": 0.0,
+    "state": "failed",
+    "submittedAt": 0.0
+   },
+   "messages": [
+    {
+     "clientId": "client-b",
+     "jobId": "job-4",
+     "runId": "run-failure",
+     "state": "running",
+     "type": "job_state"
+    },
+    {
+     "clientId": "client-b",
+     "detail": {
+      "planned": [
+       "m",
+       "s"
+      ]
+     },
+     "jobId": "job-4",
+     "runId": "run-failure",
+     "type": "run_started"
+    },
+    {
+     "clientId": "client-b",
+     "detail": {
+      "executionArm": "native"
+     },
+     "jobId": "job-4",
+     "nodeId": "m",
+     "runId": "run-failure",
+     "type": "node_started"
+    },
+    {
+     "clientId": "client-b",
+     "detail": {
+      "cache_key": "6fe65d7e189b36dd4840286633334fc50ef0ff8b",
+      "duration_ms": 0.0,
+      "executionArm": "native",
+      "outputs": {
+       "value": {
+        "typeId": "core.absent"
+       }
+      }
+     },
+     "jobId": "job-4",
+     "nodeId": "m",
+     "runId": "run-failure",
+     "type": "node_finished"
+    },
+    {
+     "clientId": "client-b",
+     "error": {
+      "kind": "execution",
+      "message": "input 'value' is absent - no value was produced by m/value - and this input declares on_absent='fail'",
+      "nodeId": "s",
+      "nodeType": "test.strict",
+      "traceback": ""
+     },
+     "jobId": "job-4",
+     "runId": "run-failure",
+     "state": "failed",
+     "type": "job_state"
+    }
+   ],
+   "scenario": "failure"
+  }
+ ]
+}

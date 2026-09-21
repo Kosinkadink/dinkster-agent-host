@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 41,
+  "nodeType": "test.stream_contract",
+  "version": 1,
+  "displayName": "",
+  "category": "",
+  "description": "",
+  "idempotent": true,
+  "interface": [
+    {
+      "role": "input",
+      "id": "image",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "dinkster.image"
+        ]
+      },
+      "required": true,
+      "acceptsStorage": true,
+      "acceptsStream": true
+    },
+    {
+      "role": "output",
+      "id": "image",
+      "type": {
+        "kind": "stream",
+        "element": {
+          "kind": "concrete",
+          "types": [
+            "dinkster.image"
+          ]
+        }
+      }
+    }
+  ],
+  "chunkSafe": {
+    "inputs": [
+      "image"
+    ],
+    "outputs": [
+      "image"
+    ]
+  }
+}

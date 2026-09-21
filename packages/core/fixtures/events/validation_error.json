@@ -1,0 +1,32 @@
+{
+  "scenario": "validation_error",
+  "clientId": "dinkster-recorder",
+  "submits": [
+    {
+      "status": 400,
+      "body": {
+        "error": {
+          "type": "prompt_no_outputs",
+          "message": "Prompt has no outputs",
+          "details": "",
+          "extra_info": {}
+        },
+        "node_errors": {}
+      }
+    }
+  ],
+  "messages": [
+    {
+      "t": 1,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 0
+          }
+        },
+        "sid": "dinkster-recorder"
+      }
+    }
+  ]
+}

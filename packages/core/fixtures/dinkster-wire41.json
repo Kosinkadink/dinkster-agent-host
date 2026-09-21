@@ -1,0 +1,150 @@
+[
+  {
+    "schemaVersion": 41,
+    "nodeType": "test.stream_source",
+    "version": 1,
+    "displayName": "",
+    "category": "",
+    "description": "",
+    "idempotent": true,
+    "interface": [
+      {
+        "role": "output",
+        "id": "image",
+        "type": {
+          "kind": "stream",
+          "element": {
+            "kind": "concrete",
+            "types": [
+              "dinkster.image"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "schemaVersion": 41,
+    "nodeType": "test.stream_sink",
+    "version": 1,
+    "displayName": "",
+    "category": "",
+    "description": "",
+    "idempotent": true,
+    "interface": [
+      {
+        "role": "input",
+        "id": "image",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "dinkster.image"
+          ]
+        },
+        "required": true,
+        "acceptsStorage": true,
+        "acceptsStream": true
+      }
+    ]
+  },
+  {
+    "schemaVersion": 41,
+    "nodeType": "test.chunk_map",
+    "version": 1,
+    "displayName": "",
+    "category": "",
+    "description": "",
+    "idempotent": true,
+    "interface": [
+      {
+        "role": "input",
+        "id": "image",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "dinkster.image"
+          ]
+        },
+        "required": true
+      },
+      {
+        "role": "output",
+        "id": "image",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "dinkster.image"
+          ]
+        }
+      }
+    ],
+    "chunkSafe": {
+      "inputs": [
+        "image"
+      ],
+      "outputs": [
+        "image"
+      ]
+    }
+  },
+  {
+    "schemaVersion": 41,
+    "nodeType": "test.scoped",
+    "version": 1,
+    "displayName": "",
+    "category": "",
+    "description": "",
+    "idempotent": true,
+    "interface": [
+      {
+        "role": "input",
+        "id": "image",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "dinkster.image"
+          ]
+        },
+        "required": true
+      },
+      {
+        "role": "dynamicCombo",
+        "id": "operation",
+        "options": [
+          {
+            "key": "map",
+            "inputs": []
+          },
+          {
+            "key": "reverse",
+            "inputs": []
+          }
+        ],
+        "required": true
+      },
+      {
+        "role": "output",
+        "id": "image",
+        "type": {
+          "kind": "concrete",
+          "types": [
+            "dinkster.image"
+          ]
+        }
+      }
+    ],
+    "chunkSafe": {
+      "inputs": [
+        "image"
+      ],
+      "outputs": [
+        "image"
+      ],
+      "applies": {
+        "operation": [
+          "map"
+        ]
+      }
+    }
+  }
+]

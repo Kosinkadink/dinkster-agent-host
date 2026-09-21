@@ -1,0 +1,34 @@
+{
+  "name": "@dinkster/agent-host",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Programmatic, MCP, and CLI access to shared collaborative workflow sessions.",
+  "bin": {
+    "dinkster-agent": "src/main.ts",
+    "dinkster-agent-mcp": "src/mcp-main.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./catalog": "./src/catalog.ts",
+    "./mcp": "./src/mcp.ts"
+  },
+  "scripts": {
+    "start": "tsx src/main.ts",
+    "start:mcp": "tsx src/mcp-main.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dinkster/client": "workspace:*",
+    "@dinkster/core": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  }
+}

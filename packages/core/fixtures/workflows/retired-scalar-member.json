@@ -1,0 +1,84 @@
+{
+  "format": "dinkster-workflow",
+  "formatVersion": 1,
+  "lineage": "lineage-retired",
+  "root": "g0",
+  "graphs": {
+    "g0": {
+      "id": "g0",
+      "name": "root",
+      "nodes": {
+        "n0": {
+          "id": "n0",
+          "type": "VAEDecode",
+          "values": {}
+        },
+        "n1": {
+          "id": "n1",
+          "type": "ImpactSwitch",
+          "values": { "select": 1 },
+          "dynamic": {
+            "input": { "members": ["m0", "m1"], "selected": "m0" }
+          }
+        },
+        "n2": {
+          "id": "n2",
+          "type": "#g1",
+          "values": {}
+        }
+      },
+      "links": {
+        "l3": {
+          "id": "l3",
+          "from": { "node": "n0", "port": "out0" },
+          "to": { "node": "n1", "port": "input.input", "member": "m1" }
+        }
+      },
+      "nets": {
+        "net4": {
+          "id": "net4",
+          "name": "vae",
+          "source": { "node": "n0", "port": "out0" },
+          "sinks": [
+            { "node": "n1", "port": "input.input", "member": "m0" }
+          ]
+        }
+      },
+      "reroutes": {},
+      "nextOrdinal": 5
+    },
+    "g1": {
+      "id": "g1",
+      "name": "Switch block",
+      "nodes": {
+        "n0": {
+          "id": "n0",
+          "type": "ImpactSwitch",
+          "values": { "select": 1 },
+          "dynamic": {
+            "input": { "members": ["m0"], "selected": "m0" }
+          }
+        }
+      },
+      "links": {},
+      "nets": {},
+      "reroutes": {},
+      "boundary": {
+        "inputs": [
+          {
+            "id": "first",
+            "binds": { "node": "n0", "port": "input.input", "member": "m0" }
+          }
+        ],
+        "outputs": []
+      },
+      "nextOrdinal": 1
+    }
+  },
+  "surfaces": {},
+  "view": { "graphs": {} },
+  "meta": {
+    "title": "Retired scalar member shape",
+    "description": "Pre-release document saved before PortRef.member became the members path array; exercises canonicalization of link endpoints, net sinks, and boundary binds."
+  }
+}

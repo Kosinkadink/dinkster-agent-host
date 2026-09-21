@@ -1,0 +1,663 @@
+{
+  "schemaVersion": 28,
+  "nodeType": "dinkster.image.to_mask",
+  "displayName": "Image to Mask",
+  "category": "fixture",
+  "interface": [
+    {
+      "role": "input",
+      "id": "image",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "comfy.IMAGE"
+        ]
+      },
+      "required": true
+    },
+    {
+      "role": "dynamicCombo",
+      "id": "policy",
+      "required": true,
+      "options": [
+        {
+          "key": "channel",
+          "inputs": [
+            {
+              "role": "input",
+              "id": "channel",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.combo"
+                ]
+              },
+              "required": false,
+              "default": "red",
+              "widget": {
+                "type": "COMBO",
+                "options": [
+                  "red",
+                  "green",
+                  "blue",
+                  "alpha"
+                ],
+                "controlAfterGenerate": "fixed"
+              }
+            }
+          ]
+        },
+        {
+          "key": "exact_color",
+          "inputs": [
+            {
+              "role": "dynamicCombo",
+              "id": "color_source",
+              "required": true,
+              "options": [
+                {
+                  "key": "hex",
+                  "inputs": [
+                    {
+                      "role": "input",
+                      "id": "color",
+                      "type": {
+                        "kind": "concrete",
+                        "types": [
+                          "core.string"
+                        ]
+                      },
+                      "required": false,
+                      "default": "#ffffff"
+                    }
+                  ]
+                },
+                {
+                  "key": "integer",
+                  "inputs": [
+                    {
+                      "role": "input",
+                      "id": "color_value",
+                      "type": {
+                        "kind": "concrete",
+                        "types": [
+                          "core.int"
+                        ]
+                      },
+                      "required": false,
+                      "default": 16777215,
+                      "widget": {
+                        "type": "NUMBER",
+                        "controlAfterGenerate": "fixed"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "key": "channels",
+                  "inputs": [
+                    {
+                      "role": "input",
+                      "id": "red",
+                      "type": {
+                        "kind": "concrete",
+                        "types": [
+                          "core.int"
+                        ]
+                      },
+                      "required": false,
+                      "default": 255
+                    },
+                    {
+                      "role": "input",
+                      "id": "green",
+                      "type": {
+                        "kind": "concrete",
+                        "types": [
+                          "core.int"
+                        ]
+                      },
+                      "required": false,
+                      "default": 255
+                    },
+                    {
+                      "role": "input",
+                      "id": "blue",
+                      "type": {
+                        "kind": "concrete",
+                        "types": [
+                          "core.int"
+                        ]
+                      },
+                      "required": false,
+                      "default": 255
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "key": "tolerance_color",
+          "inputs": [
+            {
+              "role": "dynamicCombo",
+              "id": "color_source",
+              "required": true,
+              "options": [
+                {
+                  "key": "hex",
+                  "inputs": [
+                    {
+                      "role": "input",
+                      "id": "color",
+                      "type": {
+                        "kind": "concrete",
+                        "types": [
+                          "core.string"
+                        ]
+                      },
+                      "required": false,
+                      "default": "#ffffff"
+                    }
+                  ]
+                },
+                {
+                  "key": "integer",
+                  "inputs": [
+                    {
+                      "role": "input",
+                      "id": "color_value",
+                      "type": {
+                        "kind": "concrete",
+                        "types": [
+                          "core.int"
+                        ]
+                      },
+                      "required": false,
+                      "default": 16777215,
+                      "widget": {
+                        "type": "NUMBER",
+                        "controlAfterGenerate": "fixed"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "key": "channels",
+                  "inputs": [
+                    {
+                      "role": "input",
+                      "id": "red",
+                      "type": {
+                        "kind": "concrete",
+                        "types": [
+                          "core.int"
+                        ]
+                      },
+                      "required": false,
+                      "default": 255
+                    },
+                    {
+                      "role": "input",
+                      "id": "green",
+                      "type": {
+                        "kind": "concrete",
+                        "types": [
+                          "core.int"
+                        ]
+                      },
+                      "required": false,
+                      "default": 255
+                    },
+                    {
+                      "role": "input",
+                      "id": "blue",
+                      "type": {
+                        "kind": "concrete",
+                        "types": [
+                          "core.int"
+                        ]
+                      },
+                      "required": false,
+                      "default": 255
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "role": "input",
+              "id": "tolerance",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.float"
+                ]
+              },
+              "required": false,
+              "default": 0.01
+            },
+            {
+              "role": "input",
+              "id": "metric",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.string"
+                ]
+              },
+              "required": false,
+              "default": "max_channel"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "role": "input",
+      "id": "invert",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "core.boolean"
+        ]
+      },
+      "required": false,
+      "default": false
+    },
+    {
+      "role": "output",
+      "id": "mask",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "comfy.MASK"
+        ]
+      }
+    }
+  ],
+  "replacements": [
+    {
+      "from": "dinkster.image.to_mask",
+      "migration": {
+        "historicalInputs": [
+          "policy",
+          "channel",
+          "color_source",
+          "color",
+          "color_value",
+          "red",
+          "green",
+          "blue",
+          "tolerance",
+          "metric"
+        ]
+      },
+      "cases": [
+        {
+          "to": "dinkster.image.to_mask",
+          "when": {
+            "kind": "any",
+            "of": [
+              {
+                "kind": "not",
+                "of": {
+                  "kind": "valuePresent",
+                  "input": "policy"
+                }
+              },
+              {
+                "kind": "valueEquals",
+                "input": "policy",
+                "value": "channel"
+              }
+            ]
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "policy.channel": {
+              "kind": "copy",
+              "input": "channel"
+            },
+            "invert": {
+              "kind": "copy",
+              "input": "invert"
+            }
+          },
+          "outputs": {
+            "mask": "mask"
+          },
+          "slotVariants": {
+            "policy": "channel"
+          }
+        },
+        {
+          "to": "dinkster.image.to_mask",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "valueEquals",
+                "input": "policy",
+                "value": "exact_color"
+              },
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "not",
+                    "of": {
+                      "kind": "valuePresent",
+                      "input": "color_source"
+                    }
+                  },
+                  {
+                    "kind": "valueEquals",
+                    "input": "color_source",
+                    "value": "hex"
+                  }
+                ]
+              }
+            ]
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "policy.color_source.color": {
+              "kind": "copy",
+              "input": "color"
+            },
+            "invert": {
+              "kind": "copy",
+              "input": "invert"
+            }
+          },
+          "outputs": {
+            "mask": "mask"
+          },
+          "slotVariants": {
+            "policy": "exact_color",
+            "policy.color_source": "hex"
+          }
+        },
+        {
+          "to": "dinkster.image.to_mask",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "valueEquals",
+                "input": "policy",
+                "value": "exact_color"
+              },
+              {
+                "kind": "valueEquals",
+                "input": "color_source",
+                "value": "integer"
+              }
+            ]
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "policy.color_source.color_value": {
+              "kind": "copy",
+              "input": "color_value"
+            },
+            "invert": {
+              "kind": "copy",
+              "input": "invert"
+            }
+          },
+          "outputs": {
+            "mask": "mask"
+          },
+          "slotVariants": {
+            "policy": "exact_color",
+            "policy.color_source": "integer"
+          }
+        },
+        {
+          "to": "dinkster.image.to_mask",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "valueEquals",
+                "input": "policy",
+                "value": "exact_color"
+              },
+              {
+                "kind": "valueEquals",
+                "input": "color_source",
+                "value": "channels"
+              }
+            ]
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "policy.color_source.red": {
+              "kind": "copy",
+              "input": "red"
+            },
+            "policy.color_source.green": {
+              "kind": "copy",
+              "input": "green"
+            },
+            "policy.color_source.blue": {
+              "kind": "copy",
+              "input": "blue"
+            },
+            "invert": {
+              "kind": "copy",
+              "input": "invert"
+            }
+          },
+          "outputs": {
+            "mask": "mask"
+          },
+          "slotVariants": {
+            "policy": "exact_color",
+            "policy.color_source": "channels"
+          }
+        },
+        {
+          "to": "dinkster.image.to_mask",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "valueEquals",
+                "input": "policy",
+                "value": "tolerance_color"
+              },
+              {
+                "kind": "any",
+                "of": [
+                  {
+                    "kind": "not",
+                    "of": {
+                      "kind": "valuePresent",
+                      "input": "color_source"
+                    }
+                  },
+                  {
+                    "kind": "valueEquals",
+                    "input": "color_source",
+                    "value": "hex"
+                  }
+                ]
+              }
+            ]
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "policy.color_source.color": {
+              "kind": "copy",
+              "input": "color"
+            },
+            "policy.tolerance": {
+              "kind": "copy",
+              "input": "tolerance"
+            },
+            "policy.metric": {
+              "kind": "copy",
+              "input": "metric"
+            },
+            "invert": {
+              "kind": "copy",
+              "input": "invert"
+            }
+          },
+          "outputs": {
+            "mask": "mask"
+          },
+          "slotVariants": {
+            "policy": "tolerance_color",
+            "policy.color_source": "hex"
+          }
+        },
+        {
+          "to": "dinkster.image.to_mask",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "valueEquals",
+                "input": "policy",
+                "value": "tolerance_color"
+              },
+              {
+                "kind": "valueEquals",
+                "input": "color_source",
+                "value": "integer"
+              }
+            ]
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "policy.color_source.color_value": {
+              "kind": "copy",
+              "input": "color_value"
+            },
+            "policy.tolerance": {
+              "kind": "copy",
+              "input": "tolerance"
+            },
+            "policy.metric": {
+              "kind": "copy",
+              "input": "metric"
+            },
+            "invert": {
+              "kind": "copy",
+              "input": "invert"
+            }
+          },
+          "outputs": {
+            "mask": "mask"
+          },
+          "slotVariants": {
+            "policy": "tolerance_color",
+            "policy.color_source": "integer"
+          }
+        },
+        {
+          "to": "dinkster.image.to_mask",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "valueEquals",
+                "input": "policy",
+                "value": "tolerance_color"
+              },
+              {
+                "kind": "valueEquals",
+                "input": "color_source",
+                "value": "channels"
+              }
+            ]
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "policy.color_source.red": {
+              "kind": "copy",
+              "input": "red"
+            },
+            "policy.color_source.green": {
+              "kind": "copy",
+              "input": "green"
+            },
+            "policy.color_source.blue": {
+              "kind": "copy",
+              "input": "blue"
+            },
+            "policy.tolerance": {
+              "kind": "copy",
+              "input": "tolerance"
+            },
+            "policy.metric": {
+              "kind": "copy",
+              "input": "metric"
+            },
+            "invert": {
+              "kind": "copy",
+              "input": "invert"
+            }
+          },
+          "outputs": {
+            "mask": "mask"
+          },
+          "slotVariants": {
+            "policy": "tolerance_color",
+            "policy.color_source": "channels"
+          }
+        },
+        {
+          "to": "dinkster.image.to_mask",
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "policy.channel": {
+              "kind": "copy",
+              "input": "channel"
+            },
+            "invert": {
+              "kind": "copy",
+              "input": "invert"
+            }
+          },
+          "outputs": {
+            "mask": "mask"
+          },
+          "slotVariants": {
+            "policy": "channel"
+          }
+        }
+      ]
+    }
+  ]
+}

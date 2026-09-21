@@ -1,0 +1,465 @@
+{
+  "valid": {
+    "prefix-family": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "inputFamily",
+          "id": "images",
+          "template": [
+            { "role": "input", "id": "image", "type": { "kind": "concrete", "types": ["comfy.IMAGE"] }, "required": true }
+          ],
+          "memberPrefix": "image",
+          "minMembers": 1,
+          "maxMembers": 8
+        }
+      ]
+    },
+    "names-and-native-families": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "inputFamily",
+          "id": "channels",
+          "template": [
+            { "role": "input", "id": "gain", "type": { "kind": "concrete", "types": ["core.float"] }, "required": false }
+          ],
+          "memberNames": ["left", "right"],
+          "minMembers": 1
+        },
+        {
+          "role": "inputFamily",
+          "id": "empty",
+          "template": [
+            { "role": "input", "id": "value", "type": { "kind": "concrete", "types": ["core.int"] }, "required": false }
+          ],
+          "memberNames": []
+        },
+        {
+          "role": "inputFamily",
+          "id": "native",
+          "template": [
+            { "role": "input", "id": "value", "type": { "kind": "concrete", "types": ["core.string"] }, "required": false }
+          ],
+          "minMembers": 1,
+          "maxMembers": 3
+        }
+      ]
+    },
+    "grouped-and-nested-families": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "inputFamily",
+          "id": "pairs",
+          "template": [
+            { "role": "input", "id": "image", "type": { "kind": "concrete", "types": ["comfy.IMAGE"] }, "required": true },
+            { "role": "input", "id": "mask", "type": { "kind": "concrete", "types": ["comfy.MASK"] }, "required": false }
+          ],
+          "memberPrefix": "pair",
+          "maxMembers": 4
+        },
+        {
+          "role": "inputFamily",
+          "id": "outer",
+          "template": [
+            {
+              "role": "inputFamily",
+              "id": "inner",
+              "template": [
+                { "role": "input", "id": "value", "type": { "kind": "concrete", "types": ["core.int"] }, "required": false }
+              ],
+              "memberPrefix": "sub",
+              "maxMembers": 2
+            }
+          ],
+          "memberPrefix": "row",
+          "maxMembers": 3
+        }
+      ]
+    },
+    "recursive-combos": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "dynamicCombo",
+          "id": "mode",
+          "options": [
+            { "key": "none", "inputs": [] },
+            {
+              "key": "batch",
+              "inputs": [
+                {
+                  "role": "inputFamily",
+                  "id": "frames",
+                  "template": [
+                    { "role": "input", "id": "image", "type": { "kind": "concrete", "types": ["comfy.IMAGE"] }, "required": true }
+                  ],
+                  "memberPrefix": "image",
+                  "maxMembers": 8
+                },
+                {
+                  "role": "dynamicCombo",
+                  "id": "quality",
+                  "options": [
+                    { "key": "fast", "inputs": [] },
+                    {
+                      "key": "full",
+                      "inputs": [
+                        { "role": "input", "id": "steps", "type": { "kind": "concrete", "types": ["core.int"] }, "required": false }
+                      ]
+                    }
+                  ],
+                  "default": "fast"
+                }
+              ]
+            }
+          ],
+          "default": "none",
+          "required": true
+        },
+        { "role": "dynamicCombo", "id": "zero", "options": [], "required": false }
+      ]
+    },
+    "punctuation-option-keys": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "dynamicCombo",
+          "id": "mode",
+          "options": [
+            {
+              "key": "Flux.2 [pro]",
+              "inputs": [
+                { "role": "input", "id": "scale", "type": { "kind": "concrete", "types": ["core.float"] }, "required": false }
+              ]
+            },
+            { "key": "Flux.2 [max]", "inputs": [] },
+            { "key": "Flux.2 [Pro]", "inputs": [] }
+          ],
+          "default": "Flux.2 [pro]"
+        }
+      ]
+    },
+    "variant-slot": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "dynamicSlot",
+          "id": "source",
+          "inputs": [
+            { "role": "input", "id": "strength", "type": { "kind": "concrete", "types": ["core.float"] }, "required": false }
+          ],
+          "variants": [
+            {
+              "key": "mask",
+              "type": { "kind": "concrete", "types": ["comfy.MASK"] },
+              "inputs": [
+                { "role": "input", "id": "invert", "type": { "kind": "concrete", "types": ["core.boolean"] }, "required": false }
+              ],
+              "doc": "Mask specialization"
+            },
+            { "key": "image", "type": { "kind": "concrete", "types": ["comfy.IMAGE"] }, "inputs": [] }
+          ],
+          "required": false,
+          "doc": "Typed source"
+        }
+      ]
+    },
+    "open-slot": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "dynamicSlot",
+          "id": "model",
+          "slotType": { "kind": "concrete", "types": ["comfy.MODEL"] },
+          "inputs": [
+            { "role": "input", "id": "weight", "type": { "kind": "concrete", "types": ["core.float"] }, "required": false }
+          ],
+          "required": false,
+          "forceInput": true,
+          "displayName": "Model"
+        }
+      ]
+    },
+    "variables-everywhere": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "input",
+          "id": "top",
+          "type": { "kind": "variable", "templateId": "T", "allowed": ["core.int", "core.float"] },
+          "required": false,
+          "forceInput": true,
+          "advanced": true,
+          "futureField": "ignored"
+        },
+        {
+          "role": "inputFamily",
+          "id": "items",
+          "template": [
+            { "role": "input", "id": "item", "type": { "kind": "variable", "templateId": "T" }, "required": true }
+          ],
+          "memberPrefix": "item"
+        },
+        {
+          "role": "dynamicCombo",
+          "id": "choice",
+          "options": [
+            {
+              "key": "many",
+              "inputs": [
+                { "role": "input", "id": "values", "type": { "kind": "list", "element": { "kind": "variable", "templateId": "T" } }, "required": true }
+              ]
+            }
+          ],
+          "required": false
+        },
+        {
+          "role": "dynamicSlot",
+          "id": "variant_source",
+          "inputs": [
+            { "role": "input", "id": "shared", "type": { "kind": "variable", "templateId": "T" }, "required": false }
+          ],
+          "variants": [
+            {
+              "key": "typed",
+              "type": { "kind": "asset", "element": { "kind": "concrete", "types": ["core.string"] } },
+              "inputs": [
+                { "role": "input", "id": "dependent", "type": { "kind": "asset", "element": { "kind": "variable", "templateId": "T" } }, "required": false }
+              ]
+            }
+          ],
+          "required": false
+        },
+        {
+          "role": "dynamicSlot",
+          "id": "open_source",
+          "slotType": { "kind": "list", "element": { "kind": "variable", "templateId": "T" } },
+          "inputs": [
+            { "role": "input", "id": "dependent", "type": { "kind": "variable", "templateId": "T" }, "required": false }
+          ],
+          "required": false
+        },
+        { "role": "output", "id": "out", "type": { "kind": "variable", "templateId": "T", "allowed": ["core.int", "core.float"] } }
+      ]
+    },
+    "ordinary-nonsegment-ids": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "input", "id": "input_blocks.0.", "type": { "kind": "concrete", "types": ["core.float"] }, "required": true, "default": 1.0 },
+        { "role": "input", "id": "time_embed.", "type": { "kind": "concrete", "types": ["core.float"] }, "required": true },
+        { "role": "output", "id": "Audio VAE", "type": { "kind": "concrete", "types": ["comfy.VAE"] } }
+      ]
+    }
+  },
+  "invalid": {
+    "combo-key-leading-space": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicCombo", "id": "mode", "options": [{ "key": " x", "inputs": [] }] }
+      ]
+    },
+    "combo-key-trailing-space": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicCombo", "id": "mode", "options": [{ "key": "x ", "inputs": [] }] }
+      ]
+    },
+    "combo-key-consecutive-spaces": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicCombo", "id": "mode", "options": [{ "key": "a  b", "inputs": [] }] }
+      ]
+    },
+    "combo-key-empty": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicCombo", "id": "mode", "options": [{ "key": "", "inputs": [] }] }
+      ]
+    },
+    "combo-key-final-newline": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicCombo", "id": "mode", "options": [{ "key": "x\n", "inputs": [] }] }
+      ]
+    },
+    "combo-default-case-mismatch": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicCombo", "id": "mode", "options": [{ "key": "Flux.2 [pro]", "inputs": [] }], "default": "Flux.2 [Pro]" }
+      ]
+    },
+    "variant-key-with-space": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicSlot", "id": "slot", "variants": [{ "key": "with space", "type": { "kind": "concrete", "types": ["core.int"] }, "inputs": [] }], "required": false }
+      ]
+    },
+    "member-name-with-space": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "inputFamily", "id": "items", "template": [{ "role": "input", "id": "value", "type": { "kind": "concrete", "types": ["core.int"] }, "required": false }], "memberNames": ["with space"] }
+      ]
+    },
+    "slot-both-discriminants": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicSlot", "id": "slot", "slotType": { "kind": "concrete", "types": ["comfy.IMAGE"] }, "variants": [], "inputs": [], "required": false }
+      ]
+    },
+    "slot-neither-discriminant": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicSlot", "id": "slot", "inputs": [], "required": false }
+      ]
+    },
+    "variable-open-slot-type": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicSlot", "id": "slot", "slotType": { "kind": "variable", "templateId": "T" }, "inputs": [], "required": false }
+      ]
+    },
+    "variable-variant-type": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "dynamicSlot",
+          "id": "slot",
+          "variants": [
+            { "key": "typed", "type": { "kind": "variable", "templateId": "T" } }
+          ],
+          "required": false
+        }
+      ]
+    },
+    "open-slot-missing-required": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicSlot", "id": "slot", "slotType": { "kind": "concrete", "types": ["comfy.IMAGE"] }, "inputs": [] }
+      ]
+    },
+    "open-slot-required": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicSlot", "id": "slot", "slotType": { "kind": "concrete", "types": ["comfy.IMAGE"] }, "inputs": [], "required": true }
+      ]
+    },
+    "variant-slot-missing-required": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicSlot", "id": "slot", "variants": [] }
+      ]
+    },
+    "family-template-and-type": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "inputFamily",
+          "id": "items",
+          "type": { "kind": "concrete", "types": ["core.int"] },
+          "template": [
+            { "role": "input", "id": "item", "type": { "kind": "concrete", "types": ["core.int"] }, "required": false }
+          ],
+          "memberPrefix": "item"
+        }
+      ]
+    },
+    "bad-identifier": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicCombo", "id": "bad.id", "options": [] }
+      ]
+    },
+    "nested-nonsegment-id": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "inputFamily",
+          "id": "items",
+          "template": [
+            { "role": "input", "id": "bad.leaf", "type": { "kind": "concrete", "types": ["core.int"] }, "required": false }
+          ],
+          "memberPrefix": "item"
+        }
+      ]
+    },
+    "bad-family-identifier": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "inputFamily",
+          "id": "bad.family",
+          "template": [
+            { "role": "input", "id": "item", "type": { "kind": "concrete", "types": ["core.int"] }, "required": false }
+          ],
+          "memberPrefix": "item"
+        }
+      ]
+    },
+    "bad-slot-identifier": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "dynamicSlot", "id": "bad slot", "slotType": { "kind": "concrete", "types": ["comfy.IMAGE"] }, "inputs": [], "required": false }
+      ]
+    },
+    "bad-output-family-identifier": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "outputFamily", "id": "bad.outputs", "type": { "kind": "concrete", "types": ["comfy.IMAGE"] } }
+      ]
+    },
+    "empty-template": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "inputFamily", "id": "items", "template": [], "memberPrefix": "item" }
+      ]
+    },
+    "both-family-vocabularies": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "inputFamily",
+          "id": "items",
+          "template": [
+            { "role": "input", "id": "item", "type": { "kind": "concrete", "types": ["core.int"] }, "required": false }
+          ],
+          "memberPrefix": "item",
+          "memberNames": ["first"]
+        }
+      ]
+    },
+    "names-min-over-capacity": {
+      "schemaVersion": 15,
+      "interface": [
+        {
+          "role": "inputFamily",
+          "id": "items",
+          "template": [
+            { "role": "input", "id": "item", "type": { "kind": "concrete", "types": ["core.int"] }, "required": false }
+          ],
+          "memberNames": ["first"],
+          "minMembers": 2
+        }
+      ]
+    },
+    "unknown-structural-kind": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "futureDynamic", "id": "future", "inputs": [] }
+      ]
+    },
+    "legacy-variable-types-field": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "output", "id": "out", "type": { "kind": "variable", "templateId": "T", "types": ["core.int"] } }
+      ]
+    },
+    "non-string-concrete-name": {
+      "schemaVersion": 15,
+      "interface": [
+        { "role": "output", "id": "out", "type": { "kind": "concrete", "types": [7] } }
+      ]
+    }
+  }
+}

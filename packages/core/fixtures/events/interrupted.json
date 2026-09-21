@@ -1,0 +1,186 @@
+{
+  "scenario": "interrupted",
+  "clientId": "dinkster-recorder",
+  "submits": [
+    {
+      "status": 200,
+      "body": {
+        "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e",
+        "number": 4,
+        "node_errors": {}
+      }
+    }
+  ],
+  "messages": [
+    {
+      "t": 2,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 0
+          }
+        },
+        "sid": "dinkster-recorder"
+      }
+    },
+    {
+      "t": 3,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 1
+          }
+        }
+      }
+    },
+    {
+      "t": 3,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 1
+          }
+        }
+      }
+    },
+    {
+      "t": 3,
+      "type": "execution_start",
+      "data": {
+        "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e",
+        "timestamp": 1784336861262
+      }
+    },
+    {
+      "t": 3,
+      "type": "execution_cached",
+      "data": {
+        "nodes": [
+          "1"
+        ],
+        "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e",
+        "timestamp": 1784336861262
+      }
+    },
+    {
+      "t": 3,
+      "type": "progress_state",
+      "data": {
+        "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e",
+        "nodes": {
+          "2": {
+            "value": 0,
+            "max": 1,
+            "state": "running",
+            "node_id": "2",
+            "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e",
+            "display_node_id": "2",
+            "parent_node_id": null,
+            "real_node_id": "2"
+          }
+        }
+      }
+    },
+    {
+      "t": 3,
+      "type": "executing",
+      "data": {
+        "node": "2",
+        "display_node": "2",
+        "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e"
+      }
+    },
+    {
+      "t": 8004,
+      "type": "progress_state",
+      "data": {
+        "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e",
+        "nodes": {
+          "2": {
+            "value": 1,
+            "max": 1,
+            "state": "finished",
+            "node_id": "2",
+            "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e",
+            "display_node_id": "2",
+            "parent_node_id": null,
+            "real_node_id": "2"
+          }
+        }
+      }
+    },
+    {
+      "t": 8004,
+      "type": "progress_state",
+      "data": {
+        "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e",
+        "nodes": {
+          "2": {
+            "value": 1,
+            "max": 1,
+            "state": "finished",
+            "node_id": "2",
+            "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e",
+            "display_node_id": "2",
+            "parent_node_id": null,
+            "real_node_id": "2"
+          },
+          "3": {
+            "value": 0,
+            "max": 1,
+            "state": "running",
+            "node_id": "3",
+            "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e",
+            "display_node_id": "3",
+            "parent_node_id": null,
+            "real_node_id": "3"
+          }
+        }
+      }
+    },
+    {
+      "t": 8190,
+      "type": "executing",
+      "data": {
+        "node": "3",
+        "display_node": "3",
+        "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e"
+      }
+    },
+    {
+      "t": 8191,
+      "type": "execution_interrupted",
+      "data": {
+        "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e",
+        "node_id": "3",
+        "node_type": "PreviewImage",
+        "executed": [
+          "2"
+        ],
+        "timestamp": 1784336869263
+      }
+    },
+    {
+      "t": 8191,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 0
+          }
+        }
+      }
+    },
+    {
+      "t": 8191,
+      "type": "executing",
+      "data": {
+        "node": null,
+        "prompt_id": "745213b8-1ee5-4577-8c7c-07994ab50a4e"
+      }
+    }
+  ]
+}

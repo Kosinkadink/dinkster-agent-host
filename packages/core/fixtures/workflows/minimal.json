@@ -1,0 +1,45 @@
+{
+  "format": "dinkster-workflow",
+  "formatVersion": 1,
+  "lineage": "lineage0",
+  "root": "g0",
+  "graphs": {
+    "g0": {
+      "id": "g0",
+      "name": "root",
+      "nodes": {
+        "n0": {
+          "id": "n0",
+          "type": "CheckpointLoaderSimple",
+          "values": { "ckpt_name": "v1-5-pruned-emaonly.safetensors" }
+        },
+        "n1": {
+          "id": "n1",
+          "type": "CLIPTextEncode",
+          "values": { "text": "a photo of a cat" }
+        }
+      },
+      "links": {
+        "l2": {
+          "id": "l2",
+          "from": { "node": "n0", "port": "out1" },
+          "to": { "node": "n1", "port": "clip" }
+        }
+      },
+      "nets": {},
+      "reroutes": {},
+      "nextOrdinal": 3
+    }
+  },
+  "view": {
+    "graphs": {
+      "g0": {
+        "nodes": {
+          "n0": { "position": { "x": 80, "y": 120 } },
+          "n1": { "position": { "x": 420, "y": 120 } }
+        }
+      }
+    }
+  },
+  "meta": { "title": "Minimal two-node workflow" }
+}

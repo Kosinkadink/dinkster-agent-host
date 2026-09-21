@@ -1,0 +1,13 @@
+{
+  "name": "dinkster-agent-host-workspace",
+  "private": true,
+  "version": "0.0.1",
+  "description": "External API, MCP and CLI client for agents driving Dinkster shared sessions.",
+  "type": "module",
+  "scripts": {
+    "test": "pnpm verify:pins && pnpm --filter @dinkster/agent-host test",
+    "typecheck": "pnpm verify:pins && pnpm --filter @dinkster/agent-host typecheck",
+    "verify:pins": "node scripts/verify-pinned-sources.mjs"
+  },
+  "packageManager": "pnpm@10.31.0"
+}

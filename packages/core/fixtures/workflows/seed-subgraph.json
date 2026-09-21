@@ -1,0 +1,83 @@
+{
+  "format": "dinkster-workflow",
+  "formatVersion": 1,
+  "lineage": "lineage-seed-subgraph",
+  "root": "g0",
+  "graphs": {
+    "g0": {
+      "id": "g0",
+      "name": "root",
+      "nodes": {
+        "n0": {
+          "id": "n0",
+          "type": "#g1",
+          "values": { "color": 123 }
+        },
+        "n1": {
+          "id": "n1",
+          "type": "PreviewImage",
+          "values": {}
+        }
+      },
+      "links": {
+        "l2": {
+          "id": "l2",
+          "from": { "node": "n0", "port": "image" },
+          "to": { "node": "n1", "port": "images" }
+        }
+      },
+      "nets": {},
+      "reroutes": {},
+      "nextOrdinal": 3
+    },
+    "g1": {
+      "id": "g1",
+      "name": "Image source",
+      "nodes": {
+        "n0": {
+          "id": "n0",
+          "type": "EmptyImage",
+          "values": { "width": 64, "height": 64, "batch_size": 1, "color": 0 }
+        }
+      },
+      "links": {},
+      "nets": {},
+      "reroutes": {},
+      "boundary": {
+        "inputs": [
+          {
+            "id": "color",
+            "binds": { "kind": "port", "node": "n0", "port": "color" },
+            "promoted": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "image",
+            "binds": { "kind": "port", "node": "n0", "port": "out0" }
+          }
+        ]
+      },
+      "nextOrdinal": 1
+    }
+  },
+  "view": {
+    "graphs": {
+      "g0": {
+        "nodes": {
+          "n0": { "position": { "x": 80, "y": 120 } },
+          "n1": { "position": { "x": 420, "y": 120 } }
+        }
+      },
+      "g1": {
+        "nodes": {
+          "n0": { "position": { "x": 100, "y": 100 } }
+        }
+      }
+    }
+  },
+  "meta": {
+    "title": "Subgraph: instance flattening + promoted widget",
+    "description": "Legacy-form seed: bare class types and positional out0 ports run as-is on V1 ComfyUI backends and auto-migrate to canonical native schemas on open against a Dinkster backend. The #g1 instance's promoted 'color' value (123) overrides the inner node's stored 0 at compile time."
+  }
+}

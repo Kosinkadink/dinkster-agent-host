@@ -1,0 +1,476 @@
+{
+  "candidatesRequest": {
+    "context": {
+      "accept": [
+        "application/octet-stream"
+      ],
+      "assetKind": "model/checkpoint",
+      "schema": {
+        "inputId": "ckpt_name",
+        "nodeType": "CheckpointLoaderSimple",
+        "typeId": "COMBO"
+      }
+    },
+    "contractVersion": 1,
+    "cursor": "next.opaque",
+    "expected": {
+      "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "size": 123
+    },
+    "hints": {
+      "displayName": "Alpha",
+      "loaderPath": "models/alpha.safetensors",
+      "modelType": "checkpoint",
+      "reference": "alpha.safetensors",
+      "source": "comfy"
+    },
+    "limit": 2,
+    "scope": "workspace",
+    "selection": {
+      "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "logicalId": "alpha",
+      "source": {
+        "providerId": "alpha",
+        "sourceId": "local"
+      },
+      "variantId": "fp16"
+    }
+  },
+  "candidatesResponse": {
+    "contractVersion": 1,
+    "items": [
+      {
+        "assetKind": "model/checkpoint",
+        "assetRef": {
+          "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "mediaType": "application/octet-stream",
+          "name": "alpha.safetensors",
+          "size": 123,
+          "virtualPath": "models/alpha.safetensors"
+        },
+        "availability": {
+          "reason": "",
+          "status": "local"
+        },
+        "compatibility": {
+          "reason": "",
+          "status": "compatible"
+        },
+        "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "dtype": "fp16",
+        "family": "flux",
+        "format": "safetensors",
+        "logicalId": "alpha",
+        "mediaType": "application/octet-stream",
+        "providerSources": [
+          {
+            "reason": "",
+            "requires": {
+              "license": "apache-2.0"
+            },
+            "source": {
+              "providerId": "alpha",
+              "sourceId": "local"
+            },
+            "status": "available"
+          }
+        ],
+        "quantization": "none",
+        "requirements": {
+          "hardware": [
+            "16gb-vram"
+          ],
+          "loaders": [
+            "CheckpointLoaderSimple"
+          ],
+          "runtimes": [
+            "cuda"
+          ]
+        },
+        "role": "base",
+        "size": 123,
+        "variantId": "fp16"
+      },
+      {
+        "assetKind": "model/checkpoint",
+        "availability": {
+          "reason": "remote",
+          "status": "downloadable"
+        },
+        "compatibility": {
+          "reason": "",
+          "status": "compatible"
+        },
+        "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "dtype": "fp16",
+        "family": "flux",
+        "format": "safetensors",
+        "logicalId": "beta",
+        "mediaType": "application/octet-stream",
+        "providerSources": [
+          {
+            "reason": "",
+            "requires": {
+              "license": "apache-2.0"
+            },
+            "source": {
+              "providerId": "zeta",
+              "sourceId": "registry"
+            },
+            "status": "available"
+          }
+        ],
+        "quantization": "none",
+        "requirements": {
+          "hardware": [
+            "16gb-vram"
+          ],
+          "loaders": [
+            "CheckpointLoaderSimple"
+          ],
+          "runtimes": [
+            "cuda"
+          ]
+        },
+        "role": "base",
+        "size": 123,
+        "variantId": "fp8"
+      }
+    ],
+    "nextCursor": "candidate.next",
+    "selectedCandidate": {
+      "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "logicalId": "alpha",
+      "reason": "explicit-selection",
+      "source": {
+        "providerId": "alpha",
+        "sourceId": "local"
+      },
+      "variantId": "fp16"
+    },
+    "status": "resolved"
+  },
+  "catalogRequest": {
+    "assetKind": "model/checkpoint",
+    "availability": [
+      "local",
+      "downloadable"
+    ],
+    "compatibility": [
+      "compatible"
+    ],
+    "context": {
+      "accept": [
+        "application/octet-stream"
+      ],
+      "assetKind": "model/checkpoint",
+      "schema": {
+        "inputId": "ckpt_name",
+        "nodeType": "CheckpointLoaderSimple",
+        "typeId": "COMBO"
+      }
+    },
+    "contractVersion": 1,
+    "cursor": "opaque.+/==",
+    "limit": 2,
+    "query": "flux",
+    "scope": "workspace"
+  },
+  "catalogResponse": {
+    "contractVersion": 1,
+    "items": [
+      {
+        "assetKind": "model/checkpoint",
+        "assetRef": {
+          "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "mediaType": "application/octet-stream",
+          "name": "alpha.safetensors",
+          "size": 123,
+          "virtualPath": "models/alpha.safetensors"
+        },
+        "availability": {
+          "reason": "",
+          "status": "local"
+        },
+        "compatibility": {
+          "reason": "",
+          "status": "compatible"
+        },
+        "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "dtype": "fp16",
+        "family": "flux",
+        "format": "safetensors",
+        "logicalId": "alpha",
+        "mediaType": "application/octet-stream",
+        "providerSources": [
+          {
+            "reason": "",
+            "requires": {
+              "license": "apache-2.0"
+            },
+            "source": {
+              "providerId": "alpha",
+              "sourceId": "local"
+            },
+            "status": "available"
+          }
+        ],
+        "quantization": "none",
+        "requirements": {
+          "hardware": [
+            "16gb-vram"
+          ],
+          "loaders": [
+            "CheckpointLoaderSimple"
+          ],
+          "runtimes": [
+            "cuda"
+          ]
+        },
+        "role": "base",
+        "size": 123,
+        "variantId": "fp16"
+      },
+      {
+        "assetKind": "model/checkpoint",
+        "availability": {
+          "reason": "remote",
+          "status": "downloadable"
+        },
+        "compatibility": {
+          "reason": "",
+          "status": "compatible"
+        },
+        "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "dtype": "fp16",
+        "family": "flux",
+        "format": "safetensors",
+        "logicalId": "beta",
+        "mediaType": "application/octet-stream",
+        "providerSources": [
+          {
+            "reason": "",
+            "requires": {
+              "license": "apache-2.0"
+            },
+            "source": {
+              "providerId": "zeta",
+              "sourceId": "registry"
+            },
+            "status": "available"
+          }
+        ],
+        "quantization": "none",
+        "requirements": {
+          "hardware": [
+            "16gb-vram"
+          ],
+          "loaders": [
+            "CheckpointLoaderSimple"
+          ],
+          "runtimes": [
+            "cuda"
+          ]
+        },
+        "role": "base",
+        "size": 123,
+        "variantId": "fp8"
+      }
+    ],
+    "nextCursor": "opaque.next"
+  },
+  "errors": {
+    "authentication401": {
+      "contractVersion": 1,
+      "error": {
+        "code": "authentication-required",
+        "reason": "token required"
+      }
+    },
+    "forbidden403": {
+      "contractVersion": 1,
+      "error": {
+        "code": "forbidden",
+        "reason": "scope denied"
+      }
+    },
+    "integrityMismatch422": {
+      "contractVersion": 1,
+      "error": {
+        "code": "integrity-mismatch",
+        "expectedDigest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "observedDigest": "blake3:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    },
+    "invalidRequest400": {
+      "contractVersion": 1,
+      "error": {
+        "code": "invalid-request",
+        "field": "limit",
+        "reason": "bad limit"
+      }
+    },
+    "selectionRequired409": {
+      "contractVersion": 1,
+      "error": {
+        "candidates": [
+          {
+            "assetKind": "model/checkpoint",
+            "assetRef": {
+              "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "mediaType": "application/octet-stream",
+              "name": "alpha.safetensors",
+              "size": 123,
+              "virtualPath": "models/alpha.safetensors"
+            },
+            "availability": {
+              "reason": "",
+              "status": "local"
+            },
+            "compatibility": {
+              "reason": "",
+              "status": "compatible"
+            },
+            "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "dtype": "fp16",
+            "family": "flux",
+            "format": "safetensors",
+            "logicalId": "alpha",
+            "mediaType": "application/octet-stream",
+            "providerSources": [
+              {
+                "reason": "",
+                "requires": {
+                  "license": "apache-2.0"
+                },
+                "source": {
+                  "providerId": "alpha",
+                  "sourceId": "local"
+                },
+                "status": "available"
+              }
+            ],
+            "quantization": "none",
+            "requirements": {
+              "hardware": [
+                "16gb-vram"
+              ],
+              "loaders": [
+                "CheckpointLoaderSimple"
+              ],
+              "runtimes": [
+                "cuda"
+              ]
+            },
+            "role": "base",
+            "size": 123,
+            "variantId": "fp16"
+          },
+          {
+            "assetKind": "model/checkpoint",
+            "availability": {
+              "reason": "remote",
+              "status": "downloadable"
+            },
+            "compatibility": {
+              "reason": "",
+              "status": "compatible"
+            },
+            "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "dtype": "fp16",
+            "family": "flux",
+            "format": "safetensors",
+            "logicalId": "beta",
+            "mediaType": "application/octet-stream",
+            "providerSources": [
+              {
+                "reason": "",
+                "requires": {
+                  "license": "apache-2.0"
+                },
+                "source": {
+                  "providerId": "zeta",
+                  "sourceId": "registry"
+                },
+                "status": "available"
+              }
+            ],
+            "quantization": "none",
+            "requirements": {
+              "hardware": [
+                "16gb-vram"
+              ],
+              "loaders": [
+                "CheckpointLoaderSimple"
+              ],
+              "runtimes": [
+                "cuda"
+              ]
+            },
+            "role": "base",
+            "size": 123,
+            "variantId": "fp8"
+          }
+        ],
+        "code": "selection-required",
+        "reason": "different-digest",
+        "truncated": false
+      }
+    }
+  },
+  "provenance": {
+    "backendCommit": "83fd0288d835039ff82ae796d426537b87dbf788",
+    "module": "packages/dinkster-server/src/dinkster_server/federated_assets_v1.py"
+  },
+  "resolveResponse": {
+    "contractVersion": 1,
+    "repair": {
+      "atomic": true,
+      "documentDigest": "revision:7",
+      "preconditions": [
+        {
+          "equals": {
+            "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "mediaType": "application/octet-stream",
+            "name": "alpha.safetensors",
+            "size": 123,
+            "virtualPath": "models/alpha.safetensors"
+          },
+          "pointer": "/nodes/0/inputs/model"
+        }
+      ],
+      "replacements": [
+        {
+          "pointer": "/nodes/0/inputs/model",
+          "value": {
+            "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "mediaType": "application/octet-stream",
+            "name": "alpha.safetensors",
+            "size": 123,
+            "virtualPath": "models/alpha.safetensors"
+          }
+        }
+      ],
+      "type": "asset-ref-repair",
+      "version": 1
+    },
+    "selected": {
+      "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "mediaType": "application/octet-stream",
+      "name": "alpha.safetensors",
+      "size": 123,
+      "virtualPath": "models/alpha.safetensors"
+    },
+    "selectedCandidate": {
+      "digest": "blake3:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "logicalId": "alpha",
+      "reason": "explicit-selection",
+      "source": {
+        "providerId": "alpha",
+        "sourceId": "local"
+      },
+      "variantId": "fp16"
+    },
+    "status": "resolved-remapped"
+  }
+}

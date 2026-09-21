@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 16,
+  "dinkster": {
+    "version": "wire16-golden",
+    "schemaWire": 16
+  },
+  "nodes": {
+    "test.lazy_matrix": {
+      "schemaVersion": 16,
+      "displayName": "Lazy Matrix",
+      "category": "test",
+      "interface": [
+        {
+          "role": "input",
+          "id": "absent",
+          "type": { "kind": "concrete", "types": ["core.int"] },
+          "required": true,
+          "futureField": { "additive": true }
+        },
+        {
+          "role": "input",
+          "id": "false",
+          "type": { "kind": "concrete", "types": ["core.int"] },
+          "required": false,
+          "lazy": false,
+          "onAbsent": "omit"
+        },
+        {
+          "role": "input",
+          "id": "true",
+          "type": { "kind": "concrete", "types": ["core.int"] },
+          "required": false,
+          "lazy": true,
+          "forceInput": true,
+          "advanced": true,
+          "widget": { "type": "NUMBER", "min": 0, "max": 10 }
+        },
+        {
+          "role": "inputFamily",
+          "id": "family",
+          "memberPrefix": "member",
+          "required": false,
+          "template": [
+            {
+              "role": "input",
+              "id": "leaf",
+              "type": { "kind": "concrete", "types": ["core.string"] },
+              "required": false,
+              "lazy": true
+            }
+          ]
+        },
+        {
+          "role": "dynamicCombo",
+          "id": "choice",
+          "required": false,
+          "options": [
+            {
+              "key": "enabled",
+              "inputs": [
+                {
+                  "role": "input",
+                  "id": "leaf",
+                  "type": { "kind": "concrete", "types": ["core.float"] },
+                  "required": false,
+                  "lazy": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "role": "dynamicSlot",
+          "id": "variant_slot",
+          "required": false,
+          "inputs": [
+            {
+              "role": "input",
+              "id": "shared",
+              "type": { "kind": "concrete", "types": ["core.float"] },
+              "required": false,
+              "lazy": true
+            }
+          ],
+          "variants": [
+            {
+              "key": "image",
+              "type": { "kind": "concrete", "types": ["comfy.IMAGE"] },
+              "inputs": [
+                {
+                  "role": "input",
+                  "id": "variant",
+                  "type": { "kind": "concrete", "types": ["core.boolean"] },
+                  "required": false,
+                  "lazy": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "role": "dynamicSlot",
+          "id": "open_slot",
+          "required": false,
+          "slotType": { "kind": "concrete", "types": ["comfy.IMAGE"] },
+          "inputs": [
+            {
+              "role": "input",
+              "id": "dependent",
+              "type": { "kind": "concrete", "types": ["core.float"] },
+              "required": false,
+              "lazy": true
+            }
+          ]
+        },
+        {
+          "role": "output",
+          "id": "result",
+          "type": { "kind": "concrete", "types": ["core.int"] }
+        },
+        {
+          "role": "output",
+          "id": "preview_false",
+          "type": { "kind": "concrete", "types": ["core.int"] },
+          "preview": false
+        },
+        {
+          "role": "output",
+          "id": "preview_true",
+          "type": { "kind": "concrete", "types": ["core.int"] },
+          "preview": true
+        },
+        {
+          "role": "outputFamily",
+          "id": "preview_family",
+          "type": { "kind": "concrete", "types": ["core.int"] },
+          "memberPrefix": "member",
+          "preview": true
+        }
+      ]
+    }
+  }
+}

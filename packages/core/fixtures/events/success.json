@@ -1,0 +1,226 @@
+{
+  "scenario": "success",
+  "clientId": "dinkster-recorder",
+  "submits": [
+    {
+      "status": 200,
+      "body": {
+        "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+        "number": 0,
+        "node_errors": {}
+      }
+    }
+  ],
+  "messages": [
+    {
+      "t": 8,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 0
+          }
+        },
+        "sid": "dinkster-recorder"
+      }
+    },
+    {
+      "t": 8,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 1
+          }
+        }
+      }
+    },
+    {
+      "t": 8,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 1
+          }
+        }
+      }
+    },
+    {
+      "t": 8,
+      "type": "execution_start",
+      "data": {
+        "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+        "timestamp": 1784336858845
+      }
+    },
+    {
+      "t": 9,
+      "type": "execution_cached",
+      "data": {
+        "nodes": [],
+        "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+        "timestamp": 1784336858846
+      }
+    },
+    {
+      "t": 9,
+      "type": "progress_state",
+      "data": {
+        "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+        "nodes": {
+          "1": {
+            "value": 0,
+            "max": 1,
+            "state": "running",
+            "node_id": "1",
+            "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+            "display_node_id": "1",
+            "parent_node_id": null,
+            "real_node_id": "1"
+          }
+        }
+      }
+    },
+    {
+      "t": 9,
+      "type": "executing",
+      "data": {
+        "node": "1",
+        "display_node": "1",
+        "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b"
+      }
+    },
+    {
+      "t": 9,
+      "type": "progress_state",
+      "data": {
+        "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+        "nodes": {
+          "1": {
+            "value": 1,
+            "max": 1,
+            "state": "finished",
+            "node_id": "1",
+            "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+            "display_node_id": "1",
+            "parent_node_id": null,
+            "real_node_id": "1"
+          }
+        }
+      }
+    },
+    {
+      "t": 9,
+      "type": "progress_state",
+      "data": {
+        "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+        "nodes": {
+          "1": {
+            "value": 1,
+            "max": 1,
+            "state": "finished",
+            "node_id": "1",
+            "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+            "display_node_id": "1",
+            "parent_node_id": null,
+            "real_node_id": "1"
+          },
+          "2": {
+            "value": 0,
+            "max": 1,
+            "state": "running",
+            "node_id": "2",
+            "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+            "display_node_id": "2",
+            "parent_node_id": null,
+            "real_node_id": "2"
+          }
+        }
+      }
+    },
+    {
+      "t": 9,
+      "type": "executing",
+      "data": {
+        "node": "2",
+        "display_node": "2",
+        "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b"
+      }
+    },
+    {
+      "t": 9,
+      "type": "executed",
+      "data": {
+        "node": "2",
+        "display_node": "2",
+        "output": {
+          "images": [
+            {
+              "filename": "ComfyUI_temp_zvcsn_00001_.png",
+              "subfolder": "",
+              "type": "temp"
+            }
+          ]
+        },
+        "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b"
+      }
+    },
+    {
+      "t": 10,
+      "type": "progress_state",
+      "data": {
+        "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+        "nodes": {
+          "1": {
+            "value": 1,
+            "max": 1,
+            "state": "finished",
+            "node_id": "1",
+            "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+            "display_node_id": "1",
+            "parent_node_id": null,
+            "real_node_id": "1"
+          },
+          "2": {
+            "value": 1,
+            "max": 1,
+            "state": "finished",
+            "node_id": "2",
+            "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+            "display_node_id": "2",
+            "parent_node_id": null,
+            "real_node_id": "2"
+          }
+        }
+      }
+    },
+    {
+      "t": 10,
+      "type": "execution_success",
+      "data": {
+        "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b",
+        "timestamp": 1784336858848
+      }
+    },
+    {
+      "t": 10,
+      "type": "status",
+      "data": {
+        "status": {
+          "exec_info": {
+            "queue_remaining": 0
+          }
+        }
+      }
+    },
+    {
+      "t": 201,
+      "type": "executing",
+      "data": {
+        "node": null,
+        "prompt_id": "f4c1367d-082a-487c-a20e-d1bb27b6798b"
+      }
+    }
+  ]
+}
