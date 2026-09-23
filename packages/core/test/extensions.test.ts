@@ -206,6 +206,29 @@ it('registers a synthetic pack virtual node and exposes its renderer', () => {
   expect(rendered).toEqual([])
 })
 
+it('registers and gates a synthetic canvas layer', () => {
+  const layers: string[] = []
+  const h = new ExtensionHost({
+    menus: createMenuRegistry(),
+    widgets: fakeWidgets(),
+    registerCanvasLayer: (layer) => {
+      layers.push(layer.id)
+      return () => void layers.splice(layers.indexOf(layer.id), 1)
+    },
+  })
+  expect(h.register({
+    id: 'overlay',
+    contributions: [{ id: 'overlay.guides', category: 'canvasLayer' }],
+  }, (api) => api.canvasLayer('overlay.guides', {
+    id: 'overlay.guides', position: 'foreground', order: 10, draw: () => {},
+  }))).toEqual([])
+  expect(layers).toEqual(['overlay.guides'])
+  h.setContributionEnabled('overlay.guides', false)
+  expect(layers).toEqual([])
+  h.setContributionEnabled('overlay.guides', true)
+  expect(layers).toEqual(['overlay.guides'])
+})
+
 it('rejects virtual node kinds without a virtual port-free schema', () => {
   const base: VirtualNodeKind = {
     id: 'notes.callout', title: 'Callout', defaultValues: {},

@@ -15,15 +15,14 @@ import {
   compile,
   loadDocument,
   type NormalizedEvent,
-  type ObjectInfoEntry,
   type WorkflowDocument,
 } from '@dinkster/core'
+import type { ObjectInfoEntry } from '@dinkster/core/comfy-v1'
 import {
-  BackendConnection,
-  buildSchemaRegistry,
   type FetchLike,
   type WebSocketLike,
 } from '../src/index.js'
+import { BackendConnection, buildSchemaRegistry } from '../src/comfy-v1.js'
 
 const coreRoot = join(dirname(fileURLToPath(import.meta.url)), '../../core')
 const readJson = (rel: string): unknown => JSON.parse(readFileSync(join(coreRoot, rel), 'utf8'))

@@ -1,7 +1,7 @@
 {
   "schemas": [
     {
-      "schemaVersion": 28,
+      "schemaVersion": 1,
       "nodeType": "fixture.dynamic-legacy",
       "displayName": "Dynamic Legacy",
       "category": "fixture",
@@ -29,7 +29,10 @@
           },
           "required": false,
           "default": 0.1,
-          "widget": { "type": "NUMBER", "controlAfterGenerate": "fixed" }
+          "widget": {
+            "type": "NUMBER",
+            "controlAfterGenerate": "fixed"
+          }
         },
         {
           "role": "input",
@@ -60,7 +63,10 @@
               },
               "required": false,
               "default": 1,
-              "widget": { "type": "NUMBER", "controlAfterGenerate": "fixed" }
+              "widget": {
+                "type": "NUMBER",
+                "controlAfterGenerate": "fixed"
+              }
             },
             {
               "role": "input",
@@ -89,7 +95,7 @@
       ]
     },
     {
-      "schemaVersion": 28,
+      "schemaVersion": 1,
       "nodeType": "fixture.dynamic-modern",
       "displayName": "Dynamic Modern",
       "category": "fixture",
@@ -157,7 +163,10 @@
                   },
                   "required": false,
                   "default": 0.25,
-                  "widget": { "type": "NUMBER", "controlAfterGenerate": "fixed" }
+                  "widget": {
+                    "type": "NUMBER",
+                    "controlAfterGenerate": "fixed"
+                  }
                 },
                 {
                   "role": "input",
@@ -204,7 +213,10 @@
               },
               "required": false,
               "default": 1,
-              "widget": { "type": "NUMBER", "controlAfterGenerate": "fixed" }
+              "widget": {
+                "type": "NUMBER",
+                "controlAfterGenerate": "fixed"
+              }
             },
             {
               "role": "input",
@@ -295,7 +307,7 @@
       ]
     },
     {
-      "schemaVersion": 28,
+      "schemaVersion": 1,
       "nodeType": "fixture.dynamic-helper",
       "displayName": "Dynamic Helper",
       "category": "fixture",
@@ -354,7 +366,7 @@
       ]
     },
     {
-      "schemaVersion": 28,
+      "schemaVersion": 1,
       "nodeType": "fixture.mask-source",
       "displayName": "Mask Source",
       "category": "fixture",
@@ -372,7 +384,7 @@
       ]
     },
     {
-      "schemaVersion": 28,
+      "schemaVersion": 1,
       "nodeType": "fixture.slot-legacy",
       "displayName": "Slot Legacy",
       "category": "fixture",
@@ -403,7 +415,7 @@
       ]
     },
     {
-      "schemaVersion": 28,
+      "schemaVersion": 1,
       "nodeType": "fixture.slot-modern",
       "displayName": "Slot Modern",
       "category": "fixture",

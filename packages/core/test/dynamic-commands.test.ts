@@ -21,7 +21,7 @@ import {
   materializeFramesOf,
   type ElaboratedInput,
 } from '../src/schema/elaborate.js'
-import { parseDinksterSchemaWire15 } from '../src/schema/dinkster-wire.js'
+import { parseDinksterSchema } from '../src/schema/dinkster-wire.js'
 import type { InputSpec, InterfaceItem, NodeSchema } from '../src/schema/model.js'
 
 // ---------------------------------------------------------------------------
@@ -587,8 +587,8 @@ describe('dynamic.compact', () => {
   })
 
   it('advances a named-family ghost after the retained member on compaction', () => {
-    const schema = parseDinksterSchemaWire15('Math Expression', {
-      schemaVersion: 15,
+    const schema = parseDinksterSchema('Math Expression', {
+      schemaVersion: 1,
       interface: [{
         role: 'inputFamily', id: 'values', memberNames: ['a', 'b', 'c'], minMembers: 1,
         template: [{
@@ -995,8 +995,8 @@ describe('materializeFramesOf', () => {
   })
 
   it('keeps nested wire-15 materialization in flattened document paths', () => {
-    const schema = parseDinksterSchemaWire15('nested-wire15', {
-      schemaVersion: 15,
+    const schema = parseDinksterSchema('nested-wire15', {
+      schemaVersion: 1,
       interface: [{
         role: 'inputFamily', id: 'outer', memberPrefix: 'row', minMembers: 1, maxMembers: 3,
         template: [{

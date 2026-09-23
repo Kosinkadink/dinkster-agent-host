@@ -1,6 +1,6 @@
 [
   {
-    "schemaVersion": 41,
+    "schemaVersion": 1,
     "nodeType": "test.stream_source",
     "version": 1,
     "displayName": "",
@@ -24,7 +24,7 @@
     ]
   },
   {
-    "schemaVersion": 41,
+    "schemaVersion": 1,
     "nodeType": "test.stream_sink",
     "version": 1,
     "displayName": "",
@@ -48,7 +48,7 @@
     ]
   },
   {
-    "schemaVersion": 41,
+    "schemaVersion": 1,
     "nodeType": "test.chunk_map",
     "version": 1,
     "displayName": "",
@@ -88,7 +88,7 @@
     }
   },
   {
-    "schemaVersion": 41,
+    "schemaVersion": 1,
     "nodeType": "test.scoped",
     "version": 1,
     "displayName": "",

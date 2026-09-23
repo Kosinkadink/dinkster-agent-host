@@ -85,7 +85,7 @@ const packs = new Map<string, PackInfo>([
 const source: EnvironmentSource = {
   resolve: (type) => schemas[type],
   packs,
-  server: { version: '0.9.0', schemaWire: 3 },
+  server: { version: '0.9.0', schemaWire: 1 },
   frontendVersion: '0.1.0',
 }
 
@@ -114,7 +114,7 @@ describe('stampEnvironment', () => {
         publisher: 'kosinkadink',
       },
     })
-    expect(stamp.dinkster).toEqual({ version: '0.9.0', schemaWire: 3 })
+    expect(stamp.dinkster).toEqual({ version: '0.9.0', schemaWire: 1 })
     expect(stamp.frontend).toEqual({ version: '0.1.0' })
   })
 
@@ -187,7 +187,7 @@ describe('stampEnvironment', () => {
 
 describe('sanitizeEnvironment', () => {
   const fullStamp = {
-    dinkster: { version: '0.9.0', schemaWire: 3 },
+    dinkster: { version: '0.9.0', schemaWire: 1 },
     frontend: { version: '0.1.0' },
     packs: { core: { version: '1.2.0' }, dev: {} },
     nodes: { 'core.add': { pack: 'core', signature: 'sig-add-1' } },
@@ -281,7 +281,7 @@ describe('loadDocument with environment stamps', () => {
   it('a valid stamp survives loading', () => {
     const json = baseJson()
     json['environment'] = {
-      dinkster: { version: '0.9.0', schemaWire: 3 },
+      dinkster: { version: '0.9.0', schemaWire: 1 },
       packs: { core: { version: '1.2.0' } },
       nodes: { 'core.add': { pack: 'core', signature: 'sig-add-1' } },
     }

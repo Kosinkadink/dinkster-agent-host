@@ -42,7 +42,7 @@ import { diag, type Diagnostic, type DiagnosticAnchor } from '../diagnostics.js'
 import type { Json } from '../format/document.js'
 import type { PortRef } from '../ids.js'
 import { canonicalTypeIdOf, parseAssetTypeId, parseListTypeId, parseStreamTypeId, type TypeExpr } from '../schema/model.js'
-import { DINKSTER_SCHEMA_WIRE_VERSION, typeExprFromDinksterWire } from '../schema/dinkster-wire.js'
+import { typeExprFromDinksterWire } from '../schema/dinkster-wire.js'
 import { isCanonicalUnsafeInteger } from '../schema/numeric-step.js'
 
 // ---------------------------------------------------------------------------
@@ -211,7 +211,7 @@ export const asDinksterLink = (v: DinksterInputWire): DinksterLinkWire['$link'] 
  * is rejected at construction), so those encode to nothing rather than to a
  * wire the server would reject.
  */
-export function typeExprToDinksterWire(t: TypeExpr, wireVersion = DINKSTER_SCHEMA_WIRE_VERSION): Json | undefined {
+export function typeExprToDinksterWire(t: TypeExpr): Json | undefined {
   switch (t.kind) {
     case 'concrete':
       // One-representation invariant: a structured type is {kind:'list'} /
@@ -244,8 +244,7 @@ export function typeExprToDinksterWire(t: TypeExpr, wireVersion = DINKSTER_SCHEM
     case 'list':
     case 'asset':
     case 'stream': {
-      if (t.kind === 'stream' && wireVersion < 41) return undefined
-      const element = typeExprToDinksterWire(t.element, wireVersion)
+      const element = typeExprToDinksterWire(t.element)
       return element === undefined ? undefined : { kind: t.kind, element }
     }
   }

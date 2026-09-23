@@ -23,7 +23,7 @@ import {
   elabKeyOf,
   elaborateInterface,
 } from './schema/elaborate.js'
-import { atomNamesOf } from './schema/compat.js'
+import { atomNamesOf } from './schema/type-compatibility.js'
 import { inputsOf, typeExprFromTypeId, type InputSpec, type NodeSchema, type TypeExpr, type WidgetSpec } from './schema/model.js'
 
 type LinkDataOf = GraphDef['links'][string]

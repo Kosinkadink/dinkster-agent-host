@@ -31,8 +31,7 @@ import {
   comfyGroupCatalogFromDinksterWire,
   decodeEffectiveExtensionSnapshot,
   diag,
-  DINKSTER_ACCEPTED_WIRE_VERSIONS,
-  DINKSTER_ADVERTISED_WIRE_VERSIONS,
+  DINKSTER_SCHEMA_WIRE_VERSION,
   DINKSTER_GRAPH_FEATURE_REGIONS,
   DinksterNormalizer,
   decodeDinksterBinaryFrame,
@@ -47,6 +46,7 @@ import {
   mergeableTypesFromDinksterWire,
   serverInfoFromDinksterWire,
   parseOccurrenceKey,
+  schemaForEditorRole,
   validateDinksterGraph,
   type CompileArtifact,
   type ConnectionId,
@@ -72,7 +72,7 @@ import {
   type WorkflowDocument,
   loadDocument,
 } from '@dinkster/core'
-import type { FetchLike, SchemaRegistry, SubmitResult } from './connection.js'
+import type { FetchLike, SchemaRegistry, SubmitResult } from './connection-contract.js'
 import type { ExecutionArtifact, ExecutionSubmitter } from './execution-store.js'
 import { EngineNotReadyError, parseEngineNotReady } from './supervisor.js'
 import {
@@ -322,6 +322,52 @@ export interface CompatSkip {
 export interface DinksterDiagnostics {
   readonly replacementProblems: readonly ReplacementProblem[]
   readonly compatSkips: readonly CompatSkip[]
+  readonly packInferenceUnavailable: readonly PackInferenceUnavailable[]
+}
+
+/**
+ * A pack whose declared inference entries could not bind: its nodes, routes
+ * and events composed normally, but no native sampling worker was live at
+ * composition, so plan-time use of its sampler/scheduler ids is refused at
+ * composition time (the server's inference.worker-required doctor finding).
+ * Decoded from /api/diagnostics' packInferenceUnavailable list; each row names
+ * its pack in its own ``packId`` field.
+ */
+export interface PackInferenceUnavailable {
+  readonly pack: string
+  readonly reason: string
+  readonly entry?: string
+  readonly worker?: string
+  readonly providers: readonly { readonly registry: string; readonly id: string }[]
+}
+
+function emptyDiagnostics(): DinksterDiagnostics {
+  return { replacementProblems: [], compatSkips: [], packInferenceUnavailable: [] }
+}
+
+function readUnavailableInference(value: unknown): Omit<PackInferenceUnavailable, 'pack'> | undefined {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return undefined
+  const record = value as Record<string, unknown>
+  if (typeof record['reason'] !== 'string') return undefined
+  if (record['entry'] !== undefined && typeof record['entry'] !== 'string') return undefined
+  if (record['worker'] !== undefined && typeof record['worker'] !== 'string') return undefined
+  const providers = record['providers']
+  if (!Array.isArray(providers)) return undefined
+  const readable = providers.every((provider) => {
+    if (typeof provider !== 'object' || provider === null || Array.isArray(provider)) return false
+    const row = provider as Record<string, unknown>
+    return typeof row['registry'] === 'string' && typeof row['id'] === 'string'
+  })
+  if (!readable) return undefined
+  return {
+    reason: record['reason'],
+    ...(typeof record['entry'] === 'string' ? { entry: record['entry'] } : {}),
+    ...(typeof record['worker'] === 'string' ? { worker: record['worker'] } : {}),
+    providers: providers.map((provider) => {
+      const row = provider as { registry: string; id: string }
+      return { registry: row.registry, id: row.id }
+    }),
+  }
 }
 
 /** One process-lifetime pack failure retained by GET /api/composition. */
@@ -350,6 +396,87 @@ export interface RuntimeSettings {
     readonly available: readonly string[]
   }
   readonly settings: Readonly<Record<string, RuntimeSettingSection>>
+}
+
+export interface PackSettingSchema {
+  readonly type: 'string' | 'integer' | 'number' | 'boolean'
+  readonly title: string
+  readonly description?: string
+  readonly default: string | number | boolean
+  readonly enum?: readonly string[]
+  readonly minimum?: number
+  readonly maximum?: number
+  readonly multipleOf?: number
+}
+
+export interface PackSettings {
+  readonly packId: string
+  readonly displayName: string
+  readonly schema: {
+    readonly type: 'object'
+    readonly additionalProperties: false
+    readonly properties: Readonly<Record<string, PackSettingSchema>>
+    readonly required: readonly string[]
+  }
+  readonly values: Readonly<Record<string, string | number | boolean>>
+}
+
+function validPackSettingValue(field: PackSettingSchema, value: unknown): value is string | number | boolean {
+  if (field.type === 'string') return typeof value === 'string' && (field.enum === undefined || field.enum.includes(value))
+  if (field.type === 'boolean') return typeof value === 'boolean'
+  if (typeof value !== 'number' || !Number.isFinite(value) || (field.type === 'integer' && !Number.isSafeInteger(value))) return false
+  return (field.minimum === undefined || value >= field.minimum)
+    && (field.maximum === undefined || value <= field.maximum)
+    && (field.multipleOf === undefined || Math.abs(value / field.multipleOf - Math.round(value / field.multipleOf)) <= 1e-12)
+}
+
+function decodePackSettings(raw: unknown): PackSettings | undefined {
+  if (!record(raw) || !exactKeys(raw, ['packId', 'displayName', 'schema', 'values'])
+    || typeof raw['packId'] !== 'string' || raw['packId'] === ''
+    || typeof raw['displayName'] !== 'string' || raw['displayName'] === ''
+    || !record(raw['schema']) || !record(raw['values'])) return undefined
+  const schema = raw['schema']
+  if (!exactKeys(schema, ['type', 'additionalProperties', 'properties', 'required'])
+    || schema['type'] !== 'object' || schema['additionalProperties'] !== false
+    || !record(schema['properties']) || !Array.isArray(schema['required'])) return undefined
+  const schemaProperties = schema['properties']
+  const required = schema['required']
+  if (!required.every((name): name is string => typeof name === 'string')
+    || required.length !== Object.keys(schemaProperties).length
+    || required.some((name, index) => name !== Object.keys(schemaProperties)[index])) return undefined
+  const properties: Record<string, PackSettingSchema> = {}
+  for (const [name, candidate] of Object.entries(schemaProperties)) {
+    if (!record(candidate)
+      || !requiredAndOptionalKeys(candidate, ['type', 'title', 'default'], ['description', 'enum', 'minimum', 'maximum', 'multipleOf'])
+      || typeof candidate['title'] !== 'string' || candidate['title'] === ''
+      || !['string', 'integer', 'number', 'boolean'].includes(String(candidate['type']))
+      || !Object.hasOwn(candidate, 'default')) return undefined
+    const type = candidate['type'] as PackSettingSchema['type']
+    if ((candidate['description'] !== undefined && typeof candidate['description'] !== 'string')
+      || (candidate['enum'] !== undefined && (!Array.isArray(candidate['enum']) || !candidate['enum'].every((value) => typeof value === 'string')))
+      || (candidate['enum'] !== undefined && (type !== 'string' || new Set(candidate['enum']).size !== candidate['enum'].length))
+      || ['minimum', 'maximum', 'multipleOf'].some((key) => candidate[key] !== undefined && (typeof candidate[key] !== 'number' || !Number.isFinite(candidate[key])))
+      || (type === 'string' || type === 'boolean') && ['minimum', 'maximum', 'multipleOf'].some((key) => candidate[key] !== undefined)
+      || typeof candidate['multipleOf'] === 'number' && candidate['multipleOf'] <= 0
+      || typeof candidate['minimum'] === 'number' && typeof candidate['maximum'] === 'number' && candidate['minimum'] > candidate['maximum']) return undefined
+    const field = candidate as unknown as PackSettingSchema
+    if (!validPackSettingValue(field, candidate['default'])) return undefined
+    properties[name] = field
+  }
+  const values: Record<string, string | number | boolean> = {}
+  if (Object.keys(raw['values']).length !== required.length) return undefined
+  for (const name of required) {
+    const field = properties[name]
+    const value = raw['values'][name]
+    if (field === undefined || !validPackSettingValue(field, value)) return undefined
+    values[name] = value
+  }
+  return {
+    packId: raw['packId'],
+    displayName: raw['displayName'],
+    schema: { type: 'object', additionalProperties: false, properties, required },
+    values,
+  }
 }
 
 export interface P2PSettings {
@@ -1087,11 +1214,24 @@ export interface MountDescriptor {
    */
   readonly mode: 'read' | 'readwrite'
   readonly state: string
+  readonly path?: string
   /** Optional semantic scope for homogeneous mounts (for example model/checkpoint). */
   readonly kind?: string
   /** Server-reported catalog size when the mount index provides it. */
   readonly entryCount?: number
   readonly scanProgress?: MountScanProgress
+}
+
+export interface MountSettings {
+  readonly mounts: readonly MountDescriptor[]
+  readonly outputMount?: string
+  /**
+   * Server's gate on mutating mount configuration (add/remove grants,
+   * select the output mount). A response that omits it (an older backend)
+   * decodes as false so such servers degrade safely to read-only; a
+   * present non-boolean is malformed, never a silent default.
+   */
+  readonly mountChangesAllowed: boolean
 }
 
 export interface MountScanProgress {
@@ -1493,6 +1633,9 @@ export interface TemplateDescriptor {
   readonly name: string
   readonly description?: string
   readonly tags?: readonly string[]
+  readonly family?: string
+  readonly models?: readonly string[]
+  readonly thumbnail?: { readonly digest: string; readonly mediaType: string }
   /** Pack-local asset ids, joined against PackInfo.assets by consumers. */
   readonly assets?: readonly string[]
   readonly digest: string
@@ -1513,6 +1656,13 @@ const templateDescriptor = (value: unknown): TemplateDescriptor | undefined => {
     pack: r['pack'], id: r['id'], name: r['name'], digest: r['digest'],
     ...(typeof r['description'] === 'string' ? { description: r['description'] } : {}),
     ...(strings(r['tags']) !== undefined ? { tags: strings(r['tags'])! } : {}),
+    ...(typeof r['family'] === 'string' ? { family: r['family'] } : {}),
+    ...(strings(r['models']) !== undefined ? { models: strings(r['models'])! } : {}),
+    ...(typeof r['thumbnail'] === 'object' && r['thumbnail'] !== null &&
+      typeof (r['thumbnail'] as Record<string, unknown>)['digest'] === 'string' &&
+      typeof (r['thumbnail'] as Record<string, unknown>)['mediaType'] === 'string'
+      ? { thumbnail: r['thumbnail'] as { digest: string; mediaType: string } }
+      : {}),
     ...(strings(r['assets']) !== undefined ? { assets: strings(r['assets'])! } : {}),
   }
 }
@@ -1869,11 +2019,9 @@ export class DinksterConnection {
 
   // -- Schemas ----------------------------------------------------------------
 
-  async fetchSchemas(
-    requestedWireVersions: readonly number[] = DINKSTER_ADVERTISED_WIRE_VERSIONS,
-  ): Promise<SchemaRegistry> {
+  async fetchSchemas(): Promise<SchemaRegistry> {
     const generation = ++this.schemaRequestGeneration
-    const promise = this.fetchSchemasPass(generation, requestedWireVersions)
+    const promise = this.fetchSchemasPass(generation)
     this.newestSchemaFetch = { generation, promise }
     // A superseded invocation must hand back the registry the connection
     // actually committed, not its own stale decode: follow the newest fetch
@@ -1900,34 +2048,15 @@ export class DinksterConnection {
 
   private async fetchSchemasPass(
     generation: number,
-    requestedWireVersions: readonly number[],
     pairingAttempts = 3,
   ): Promise<SchemaRegistry> {
-    // ?wire= (Dinkster 3a858e5): advertise the versions requested by this document.
-    // The server answers with one version it can encode, or a machine-
-    // readable 406 refusal - loud and diagnosable instead of a decode
-    // failure. Pre-negotiation servers ignore the parameter unchanged.
-    const res = await this.fetchFn(
-      `${this.baseUrl}/api/nodes?wire=${requestedWireVersions.join(',')}`,
-    )
+    const res = await this.fetchFn(`${this.baseUrl}/api/nodes`)
     if (res.status === 503) {
       // A supervisor gates every proxied route with 503 engine-not-ready
       // until the engine answers healthy. Surface that as its own error so
       // the app renders "starting", never a connection failure.
       const gate = parseEngineNotReady(await res.json().catch(() => undefined))
       if (gate) throw new EngineNotReadyError(gate.state)
-    }
-    if (res.status === 406) {
-      const refusal = (await res.json().catch(() => undefined)) as
-        | Record<string, unknown>
-        | undefined
-      const supported = Array.isArray(refusal?.['supported'])
-        ? (refusal['supported'] as unknown[]).filter((v) => typeof v === 'number').join(', ')
-        : undefined
-      throw new Error(
-        `schema wire version mismatch: this build decodes ${requestedWireVersions.join(', ')}` +
-          (supported !== undefined ? `; the server encodes ${supported}` : ''),
-      )
     }
     if (!res.ok) throw new Error(`GET /api/nodes failed: ${res.status}`)
     const raw: unknown = await res.json()
@@ -1939,9 +2068,9 @@ export class DinksterConnection {
     // top-level schemaVersion is the API surface version there. Older shapes
     // carry the wire version top-level. Same resolution as parseDinksterNodes.
     const wireVersion = serverInfoFromDinksterWire(payload)?.schemaWire ?? payload.schemaVersion
-    if (!requestedWireVersions.includes(wireVersion as number)) {
+    if (wireVersion !== DINKSTER_SCHEMA_WIRE_VERSION) {
       throw new Error(
-        `schema wire version mismatch: this build decodes ${requestedWireVersions.join(', ')}; the server encodes ${String(wireVersion)}`,
+        `schema wire version mismatch: this build decodes ${DINKSTER_SCHEMA_WIRE_VERSION}; the server encodes ${String(wireVersion)}`,
       )
     }
     if (typeof payload.nodes !== 'object' || payload.nodes === null || Array.isArray(payload.nodes)) {
@@ -1960,7 +2089,7 @@ export class DinksterConnection {
       const actualDigest = await sha256Digest(snapshotBuffer)
       if (actualDigest !== extensionSnapshotDigest) {
         if (pairingAttempts > 1) {
-          return this.fetchSchemasPass(generation, requestedWireVersions, pairingAttempts - 1)
+          return this.fetchSchemasPass(generation, pairingAttempts - 1)
         }
         throw new Error(`schema/snapshot pairing failed: schema names '${extensionSnapshotDigest}', snapshot hashes to '${actualDigest}'`)
       }
@@ -1979,12 +2108,11 @@ export class DinksterConnection {
       this.id,
       payload,
       extensionSnapshotPair,
-      requestedWireVersions,
     )
     if (registry.diagnostics.some((entry) => entry.code === 'schema.dinkster.wireVersion')) {
       const selected = serverInfoFromDinksterWire(payload)?.schemaWire ?? payload.schemaVersion
       throw new Error(
-        `schema wire version mismatch: this build decodes ${requestedWireVersions.join(', ')}; the server encodes ${String(selected)}`,
+        `schema wire version mismatch: this build decodes ${DINKSTER_SCHEMA_WIRE_VERSION}; the server encodes ${String(selected)}`,
       )
     }
     if (generation === this.schemaRequestGeneration) {
@@ -2035,8 +2163,25 @@ export class DinksterConnection {
   async fetchDiagnostics(): Promise<DinksterDiagnostics> {
     try {
       const res = await this.fetchFn(`${this.baseUrl}/api/diagnostics`)
-      if (!res.ok) return { replacementProblems: [], compatSkips: [] }
-      const raw = (await res.json()) as { replacementProblems?: unknown; compatSkips?: unknown }
+      if (!res.ok) return emptyDiagnostics()
+      const raw = (await res.json()) as {
+        replacementProblems?: unknown
+        compatSkips?: unknown
+        packInferenceUnavailable?: unknown
+      }
+      const packInferenceUnavailable: PackInferenceUnavailable[] = []
+      if (Array.isArray(raw.packInferenceUnavailable)) {
+        for (const value of raw.packInferenceUnavailable) {
+          if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+            continue
+          }
+          const pack = (value as Record<string, unknown>)['packId']
+          const payload = readUnavailableInference(value)
+          if (payload !== undefined && typeof pack === 'string' && pack !== '') {
+            packInferenceUnavailable.push({ pack, ...payload })
+          }
+        }
+      }
       return {
         replacementProblems: Array.isArray(raw.replacementProblems)
           ? raw.replacementProblems.filter(isReplacementProblem)
@@ -2044,9 +2189,10 @@ export class DinksterConnection {
         compatSkips: Array.isArray(raw.compatSkips)
           ? raw.compatSkips.filter(isCompatSkip)
           : [],
+        packInferenceUnavailable,
       }
     } catch {
-      return { replacementProblems: [], compatSkips: [] }
+      return emptyDiagnostics()
     }
   }
 
@@ -2087,6 +2233,32 @@ export class DinksterConnection {
     const res = await this.fetchFn(`${this.baseUrl}/api/settings`)
     if (!res.ok) throw new RuntimeSettingsError(res.status, undefined)
     return await res.json() as RuntimeSettings
+  }
+
+  async fetchPackSettings(packId: string): Promise<PackSettings> {
+    const res = await this.fetchFn(`${this.baseUrl}/api/packs/${encodeURIComponent(packId)}/settings`)
+    if (!res.ok) throw new Error(`pack settings request failed: ${res.status}`)
+    const decoded = decodePackSettings(await res.json())
+    if (decoded === undefined) throw new Error('pack settings response is malformed')
+    return decoded
+  }
+
+  async updatePackSettings(
+    packId: string,
+    values: Readonly<Record<string, string | number | boolean>>,
+  ): Promise<PackSettings> {
+    const res = await this.fetchFn(`${this.baseUrl}/api/packs/${encodeURIComponent(packId)}/settings`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    })
+    if (!res.ok) {
+      const body = await res.json().catch(() => undefined) as { error?: unknown } | undefined
+      throw new Error(typeof body?.error === 'string' ? body.error : `pack settings update failed: ${res.status}`)
+    }
+    const decoded = decodePackSettings(await res.json())
+    if (decoded === undefined) throw new Error('pack settings response is malformed')
+    return decoded
   }
 
   async fetchP2PStatus(): Promise<P2PStatus> {
@@ -2734,12 +2906,18 @@ export class DinksterConnection {
     return `${this.baseUrl}/api/assets/${encodeURIComponent(digest)}`
   }
 
-  async listMounts(): Promise<readonly MountDescriptor[]> {
+  async fetchMountSettings(): Promise<MountSettings> {
     const res = await this.fetchFn(`${this.baseUrl}/api/mounts`)
     if (!res.ok) throw new Error(`GET /api/mounts failed: ${res.status}`)
-    const rows = (await res.json() as { mounts?: unknown }).mounts
+    const payload = await res.json() as { mounts?: unknown; outputMount?: unknown; mountChangesAllowed?: unknown }
+    // Compatibility: a response without the field (older backend) decodes
+    // as false - read-only; a present non-boolean is a protocol error.
+    if (payload.mountChangesAllowed !== undefined && typeof payload.mountChangesAllowed !== 'boolean') {
+      throw new Error('GET /api/mounts: malformed mountChangesAllowed')
+    }
+    const rows = payload.mounts
     if (!Array.isArray(rows)) throw new Error('GET /api/mounts: malformed response')
-    return rows.filter((value): value is MountDescriptor => {
+    const mounts = rows.filter((value): value is MountDescriptor => {
       if (typeof value !== 'object' || value === null) return false
       const row = value as Record<string, unknown>
       const scanProgress = row['scanProgress']
@@ -2754,9 +2932,29 @@ export class DinksterConnection {
         progress['elapsedSeconds'] >= 0 && (progress['filesDone'] as number) <= (progress['filesTotal'] as number) &&
         (progress['bytesDone'] as number) <= (progress['bytesTotal'] as number))
       return typeof row['id'] === 'string' && (row['mode'] === 'read' || row['mode'] === 'readwrite') &&
-        typeof row['state'] === 'string' && (row['kind'] === undefined || typeof row['kind'] === 'string') &&
+        typeof row['state'] === 'string' && (row['path'] === undefined || typeof row['path'] === 'string') &&
+        (row['kind'] === undefined || typeof row['kind'] === 'string') &&
         (row['entryCount'] === undefined || (typeof row['entryCount'] === 'number' && Number.isSafeInteger(row['entryCount']) && row['entryCount'] >= 0)) && validProgress
     })
+    if (payload.outputMount !== undefined && typeof payload.outputMount !== 'string') throw new Error('GET /api/mounts: malformed output mount')
+    return {
+      mounts,
+      mountChangesAllowed: payload.mountChangesAllowed === undefined ? false : payload.mountChangesAllowed,
+      ...(typeof payload.outputMount === 'string' ? { outputMount: payload.outputMount } : {}),
+    }
+  }
+
+  async listMounts(): Promise<readonly MountDescriptor[]> {
+    return (await this.fetchMountSettings()).mounts
+  }
+
+  async selectOutputMount(id: string): Promise<void> {
+    const res = await this.fetchFn(`${this.baseUrl}/api/mounts/output`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    if (!res.ok) throw new Error(`PUT /api/mounts/output failed: ${res.status}`)
   }
 
   async addMount(id: string, path: string, mode: 'read' | 'readwrite' = 'read'): Promise<MountDescriptor> {
@@ -2953,7 +3151,7 @@ export class DinksterConnection {
     return pending
   }
 
-  /** Fetch one immutable wire-44 locale catalog by its advertised digest. */
+  /** Fetch one immutable locale catalog by its advertised digest. */
   async fetchPackLocaleCatalog(packId: string, digest: string): Promise<unknown | undefined> {
     const key = `${packId}\u0000${digest}`
     const cached = this.packLocaleCatalogs.get(key)
@@ -3343,11 +3541,10 @@ export function buildDinksterRegistry(
   connection: ConnectionId,
   raw: DinksterNodesPayload,
   extensionSnapshotPair?: { readonly digest: string; readonly snapshot: EffectiveExtensionSnapshot },
-  allowedWireVersions: readonly number[] = DINKSTER_ACCEPTED_WIRE_VERSIONS,
 ): SchemaRegistry {
-  const parsed = parseDinksterNodes(raw, allowedWireVersions)
-  const aliases = comfyAliasCatalogFromDinksterWire(raw, parsed.schemas, allowedWireVersions)
-  const groups = comfyGroupCatalogFromDinksterWire(raw, parsed.schemas, allowedWireVersions)
+  const parsed = parseDinksterNodes(raw)
+  const aliases = comfyAliasCatalogFromDinksterWire(raw, parsed.schemas)
+  const groups = comfyGroupCatalogFromDinksterWire(raw, parsed.schemas)
   const schemas = new Map(parsed.schemas)
   for (const record of aliases.catalog.records) {
     const carrier = schemas.get(record.carrier)
@@ -3388,12 +3585,15 @@ export function buildDinksterRegistry(
   // (surface generation), composing is present-only-when-true.
   const epoch =
     typeof raw.epoch === 'number' && Number.isInteger(raw.epoch) && raw.epoch > 0 ? raw.epoch : undefined
+  const resolve: SchemaResolver = Object.assign((type: string) => schemas.get(type) ?? aliasMap.get(type), {
+    forEditorRole: (role: string) => schemaForEditorRole(schemas.values(), role),
+  })
   return {
     connection,
     hash: fnv1a64(canonicalJson(schemaIdentityWithoutWidgetPresentation(raw) as Json)),
     schemas,
     diagnostics: [...parsed.diagnostics, ...aliasDiags, ...aliases.diagnostics, ...groups.diagnostics],
-    resolve: (type) => schemas.get(type) ?? aliasMap.get(type),
+    resolve,
     packs: packsFromDinksterWire(raw),
     ...(aliases.catalog.records.length > 0 ? { comfyAliases: aliases.catalog } : {}),
     ...(groups.catalog.records.length > 0 ? { comfyGroups: groups.catalog } : {}),
@@ -3424,7 +3624,6 @@ function schemaIdentityWithoutWidgetPresentation(
   const comboWidget = record['type'] === 'COMBO' || record['type'] === 'MULTI_COMBO'
   const multiComboWidget = record['type'] === 'MULTI_COMBO'
   return Object.fromEntries(Object.entries(value).flatMap(([key, entry]) =>
-    key === 'schemaSkips' ||
     key === 'hasDocs' ||
     (record['role'] === 'input' && (key === 'acceptsStorage' || key === 'acceptsStream') && entry === false) ||
     (comboOption && COMBO_OPTION_PRESENTATION_FIELDS.has(key)) ||

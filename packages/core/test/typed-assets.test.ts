@@ -14,7 +14,7 @@
  * - type variables unify through the asset constructor (asset<T> binds T)
  */
 import { describe, expect, it } from 'vitest'
-import { assetCoercible, coercionTargetsOf, typesCompatible } from '../src/schema/compat.js'
+import { assetCoercible, coercionTargetsOf, typesCompatible } from '../src/schema/type-compatibility.js'
 import { compile } from '../src/compile/compile.js'
 import type { GraphDef, Json, WorkflowDocument } from '../src/format/document.js'
 import { asConnectionId, asGraphDefId, asLineageId, asNodeId, asPortId } from '../src/ids.js'
@@ -33,7 +33,7 @@ import {
   type OutputSpec,
   type TypeExpr,
 } from '../src/schema/model.js'
-import { DINKSTER_ACCEPTED_WIRE_VERSIONS, typeExprFromDinksterWire } from '../src/schema/dinkster-wire.js'
+import { DINKSTER_SCHEMA_WIRE_VERSION, typeExprFromDinksterWire } from '../src/schema/dinkster-wire.js'
 import { solveGraphTypes } from '../src/schema/solve.js'
 import { typeMatchesToken } from '../src/search-filters.js'
 
@@ -406,7 +406,7 @@ describe('solver: open generic coercions and the single-step limit', () => {
 
 describe('schema wire v12', () => {
   it('is in the advertised accept set', () => {
-    expect(DINKSTER_ACCEPTED_WIRE_VERSIONS).toContain(12)
+    expect(DINKSTER_SCHEMA_WIRE_VERSION).toBe(1)
   })
 
   it('decodes the recursive asset TypeExpr kind exactly like list', () => {

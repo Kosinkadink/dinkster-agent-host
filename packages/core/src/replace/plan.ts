@@ -26,7 +26,7 @@ import { canonicalJson, fnv1a64 } from '../compile/hash.js'
 import type { BoundaryBinding, DynamicPortState, GraphDef, Json, JsonObject, NodeData, WorkflowDocument } from '../format/document.js'
 import { asNodeId, asPortId, isExactWidgetTapRef, isPortEndpoint, isWidgetTapRef, samePortRef, type PortRef } from '../ids.js'
 import { normalizedComboOptions } from '../schema/combo-options.js'
-import { canonicalCompatTypeIdOf } from '../schema/compat.js'
+import { canonicalCompatTypeIdOf } from '../schema/type-compatibility.js'
 import {
   buildGraphConnectivity,
   collectWire15MemberEvidence,

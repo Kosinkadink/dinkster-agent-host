@@ -8,14 +8,28 @@
       "id": "root",
       "name": "root",
       "nodes": {
-        "producer": { "id": "producer", "type": "Producer", "values": {} },
-        "s": { "id": "s", "type": "#shell", "values": {} }
+        "producer": {
+          "id": "producer",
+          "type": "Producer",
+          "values": {}
+        },
+        "s": {
+          "id": "s",
+          "type": "#shell",
+          "values": {}
+        }
       },
       "links": {
         "parent": {
           "id": "parent",
-          "from": { "node": "producer", "port": "out" },
-          "to": { "node": "s", "port": "in" }
+          "from": {
+            "node": "producer",
+            "port": "out"
+          },
+          "to": {
+            "node": "s",
+            "port": "in"
+          }
         }
       },
       "nets": {},
@@ -26,7 +40,11 @@
       "id": "shell",
       "name": "shell",
       "nodes": {
-        "i": { "id": "i", "type": "#body", "values": {} }
+        "i": {
+          "id": "i",
+          "type": "#body",
+          "values": {}
+        }
       },
       "links": {},
       "nets": {},
@@ -35,7 +53,11 @@
         "inputs": [
           {
             "id": "in",
-            "binds": { "kind": "port", "node": "i", "port": "inner" }
+            "binds": {
+              "kind": "port",
+              "node": "i",
+              "port": "inner"
+            }
           }
         ],
         "outputs": []
@@ -46,8 +68,16 @@
       "id": "body",
       "name": "body",
       "nodes": {
-        "source": { "id": "source", "type": "Source", "values": {} },
-        "sink": { "id": "sink", "type": "Sink", "values": {} }
+        "source": {
+          "id": "source",
+          "type": "Source",
+          "values": {}
+        },
+        "sink": {
+          "id": "sink",
+          "type": "Sink",
+          "values": {}
+        }
       },
       "links": {},
       "nets": {},
@@ -56,59 +86,100 @@
         "inputs": [
           {
             "id": "inner",
-            "binds": { "kind": "port", "node": "sink", "port": "in" }
+            "binds": {
+              "kind": "port",
+              "node": "sink",
+              "port": "in"
+            }
           }
         ],
         "outputs": [
           {
             "id": "outer",
-            "binds": { "kind": "port", "node": "source", "port": "out" }
+            "binds": {
+              "kind": "port",
+              "node": "source",
+              "port": "out"
+            }
           }
         ]
       },
       "nextOrdinal": 0
     }
   },
-  "view": { "graphs": {} },
+  "view": {
+    "graphs": {}
+  },
   "occurrenceTopologies": {
     "s.i": {
-      "owner": { "instancePath": ["s"], "node": "i" },
+      "owner": {
+        "instancePath": [
+          "s"
+        ],
+        "node": "i"
+      },
       "bodyGraph": "body",
       "links": {
         "l0": {
           "id": "l0",
           "from": {
             "kind": "boundary",
-            "occurrence": { "instancePath": ["s"], "node": "i" },
-            "address": { "port": "outer" },
+            "occurrence": {
+              "instancePath": [
+                "s"
+              ],
+              "node": "i"
+            },
+            "address": {
+              "port": "outer"
+            },
             "route": [
               {
                 "graph": "body",
                 "boundaryId": "outer",
-                "binding": { "kind": "port", "node": "source", "port": "out" }
+                "binding": {
+                  "kind": "port",
+                  "node": "source",
+                  "port": "out"
+                }
               }
             ]
           },
           "to": {
             "kind": "body",
-            "endpoint": { "node": "sink", "port": "local" }
+            "endpoint": {
+              "node": "sink",
+              "port": "local"
+            }
           }
         }
       },
       "suppressedDeliveries": [
         {
           "kind": "projectedLeg",
-          "delivery": { "kind": "link", "graph": "root", "linkId": "parent" },
+          "delivery": {
+            "kind": "link",
+            "graph": "root",
+            "linkId": "parent"
+          },
           "route": [
             {
               "graph": "shell",
               "boundaryId": "in",
-              "binding": { "kind": "port", "node": "i", "port": "inner" }
+              "binding": {
+                "kind": "port",
+                "node": "i",
+                "port": "inner"
+              }
             },
             {
               "graph": "body",
               "boundaryId": "inner",
-              "binding": { "kind": "port", "node": "sink", "port": "in" }
+              "binding": {
+                "kind": "port",
+                "node": "sink",
+                "port": "in"
+              }
             }
           ]
         }

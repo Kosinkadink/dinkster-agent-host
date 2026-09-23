@@ -90,6 +90,82 @@ const frame = (ws: FakeWS, payload: unknown): void =>
   ws.onmessage?.({ data: JSON.stringify(payload) })
 
 describe('delegation transport', () => {
+  it.each([false, true])('shares one slow retry and resumes pending operations without re-minting (transport failure: %s)', async (transportFailure) => {
+    let available = false
+    let failProbe = false
+    const timers: { run: () => void; delay: number }[] = []
+    const fetchFn = vi.fn(async (url: string, init?: RequestInit) => {
+      if (failProbe) { failProbe = false; throw new Error('network unavailable') }
+      if (!available) return jsonResponse(403, { error: 'user-session-required' })
+      if (init?.method === 'POST') return jsonResponse(200, serverOp)
+      if (url.includes('/ops?')) return jsonResponse(200, { ops: [] })
+      if (url.endsWith('/snapshot')) return jsonResponse(200, { revision: 3, document: {} })
+      return jsonResponse(200, descriptor)
+    })
+    const onDiagnostic = vi.fn()
+    const { connection, events } = harness({ fetchFn, onDiagnostic, scheduleFn: (run, delay) => { const timer = { run, delay }; timers.push(timer); return timer } })
+    try {
+      const op = { protocolVersion: 1, actorId: 'alice', opId: 'op-1', baseRevision: 3, patch: [] }
+      const posting = connection.postOp(op)
+      await vi.waitFor(() => expect(onDiagnostic).toHaveBeenCalledTimes(1))
+      expect(onDiagnostic).toHaveBeenCalledWith(expect.objectContaining({ version: 1, type: 'collab.denial', reason: 'user-session-required', retryAfterMs: 30_000 }))
+      expect(connection.denial).toBeUndefined()
+      const waiting = [connection.fetchSnapshot(), connection.fetchOps(3), connection.putSnapshot(3, {} as never), connection.fetchSession()]
+      expect(fetchFn).toHaveBeenCalledTimes(1)
+      expect(timers.map((timer) => timer.delay)).toEqual([30_000])
+      failProbe = transportFailure
+      timers[0]!.run()
+      await vi.waitFor(() => expect(timers).toHaveLength(2))
+      expect(fetchFn).toHaveBeenCalledTimes(2)
+      expect(onDiagnostic).toHaveBeenCalledTimes(1)
+      available = true
+      expect(timers[1]!.delay).toBe(30_000)
+      timers[1]!.run()
+      await expect(posting).resolves.toEqual({ kind: 'accepted', op: serverOp })
+      await Promise.all(waiting)
+      expect(fetchFn.mock.calls.filter(([, init]) => init?.method === 'POST').map(([, init]) => init?.body)).toEqual([JSON.stringify(op), JSON.stringify(op)])
+      expect(events.filter((event) => event.kind === 'denial')).toHaveLength(1)
+      expect(fetchFn.mock.calls.some(([url]) => url.includes('/delegations'))).toBe(false)
+    } finally { connection.close() }
+  })
+
+  it('suspends immediately on the socket reason and close cancels the wait and stale callbacks', async () => {
+    const timers: { run: () => void; delay: number }[] = []
+    const fetchFn = vi.fn(async () => jsonResponse(200, descriptor))
+    const cancelFn = vi.fn()
+    const { connection, sockets, events } = harness({ fetchFn, cancelFn, scheduleFn: (run, delay) => { const timer = { run, delay }; timers.push(timer); return timer } })
+    sockets[0]!.onopen?.({})
+    sockets[0]!.onclose?.({ code: 1008, reason: 'user-session-required' })
+    expect(events.map((event) => event.kind)).toEqual(['disconnected', 'denial'])
+    expect(timers.map((timer) => timer.delay)).toEqual([30_000])
+    expect(fetchFn).not.toHaveBeenCalled()
+    const waiting = connection.fetchSnapshot()
+    const rejected = expect(waiting).rejects.toThrow('connection closed')
+    connection.close()
+    await rejected
+    expect(cancelFn).toHaveBeenCalledWith(timers[0])
+    timers[0]!.run()
+    expect(fetchFn).not.toHaveBeenCalled()
+    expect(sockets).toHaveLength(1)
+  })
+
+  it.each([401, 403])('a definitive refusal during slow retry terminates the suspended wait (%s)', async (status) => {
+    let refused = false
+    const timers: (() => void)[] = []
+    const fetchFn = vi.fn(async () => jsonResponse(refused ? status : 403, { error: refused ? 'capability-required' : 'user-session-required' }))
+    const { connection, events } = harness({ fetchFn, scheduleFn: (run) => { timers.push(run); return run } })
+    const waiting = connection.fetchSnapshot()
+    const rejected = expect(waiting).rejects.toMatchObject({ diagnostic: { status, code: 'capability-required' } })
+    await vi.waitFor(() => expect(timers).toHaveLength(1))
+    refused = true
+    timers[0]!()
+    await rejected
+    expect(connection.denial).toMatchObject({ status, code: 'capability-required' })
+    expect(events.filter((event) => event.kind === 'denial')).toHaveLength(2)
+    timers[0]!()
+    expect(fetchFn).toHaveBeenCalledTimes(2)
+    connection.close()
+  })
   it('allows a final checkpoint request to finish after an ordinary close', async () => {
     let finish!: (response: Response) => void
     const fetchFn = vi.fn((_url: string, _init?: RequestInit) => new Promise<Response>((resolve) => { finish = resolve }))
@@ -110,6 +186,30 @@ describe('delegation transport', () => {
     expect(scheduled).toHaveLength(0)
     expect(fetchFn).toHaveBeenCalledTimes(1)
     connection.close()
+  })
+
+  it('terminates revoked HTTP and socket credentials with the delegation identity', async () => {
+    const fetchFn = vi.fn(async () => jsonResponse(403, {
+      error: 'delegation-revoked', delegationId: 'delegation-123',
+    }))
+    const http = harness({ fetchFn })
+    await expect(http.connection.fetchSnapshot()).rejects.toMatchObject({
+      diagnostic: {
+        code: 'delegation-revoked', delegationId: 'delegation-123',
+        message: 'Delegation delegation-123: delegation-revoked',
+      },
+    })
+    expect(http.scheduled).toHaveLength(0)
+    http.connection.close()
+
+    const socket = harness()
+    socket.sockets[0]!.onopen?.({})
+    socket.sockets[0]!.onclose?.({ code: 1008, reason: 'delegation-revoked:delegation-456' })
+    expect(socket.connection.denial).toMatchObject({
+      code: 'delegation-revoked', delegationId: 'delegation-456', operation: 'events',
+    })
+    expect(socket.scheduled).toHaveLength(0)
+    socket.connection.close()
   })
 
   it.each(['fetchSnapshot', 'fetchOps', 'putSnapshot'] as const)('terminates %s on read/write authorization refusal and retains the diagnostic', async (operation) => {
@@ -245,6 +345,20 @@ describe('session management helpers', () => {
         jsonResponse(400, { error: "'scope' is required (single-user: 'local')" }),
       ),
     ).rejects.toThrow(/'scope' is required/)
+  })
+
+  it('reports revoked delegation identity without retrying a management request', async () => {
+    const fetchFn = vi.fn(async () => jsonResponse(403, {
+      error: 'delegation-revoked', delegationId: 'delegation-789',
+    }))
+    const onDiagnostic = vi.fn()
+    await expect(listCollabSessions('http://test:8765', 'local', fetchFn, { onDiagnostic }))
+      .rejects.toThrow(/delegation-revoked/)
+    expect(fetchFn).toHaveBeenCalledTimes(1)
+    expect(onDiagnostic).toHaveBeenCalledWith(expect.objectContaining({
+      code: 'delegation-revoked', delegationId: 'delegation-789',
+      operation: 'list-sessions', message: 'Delegation delegation-789: delegation-revoked',
+    }))
   })
 
   it('listCollabSessions encodes the scope and unwraps the sessions array', async () => {

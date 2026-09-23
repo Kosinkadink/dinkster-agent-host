@@ -163,11 +163,19 @@ to 300. Its proposal disappears when the command disconnects.
 ## Authentication
 
 Dinkster authentication is off by default, so a local auth-off server needs no
-credential. When authentication is enabled, create a short-lived delegation
+credential. When authentication is enabled, create a delegation
 from the frontend's **Connect agent** control and pass it through
 `DINKSTER_AGENT_TOKEN` or `--token`. The delegation is a bearer credential and
 must be kept out of source control, logs, process listings, and recorded shell
 commands. Never give an agent the user's full session credential.
+
+Delegations survive server restarts and have no default expiry. They remain
+active only while the owning user has signed in recently. If that freshness
+window expires or the server restarts, the host pauses discovery, joining and
+pending collaboration operations, reports `user-session-required`, and probes
+once every 30 seconds. The same token resumes after the user signs in; do not
+mint a replacement. Revocation and permission refusals are terminal, and
+revocation diagnostics identify the revoked delegation.
 
 The CLI can exchange a private user-session file for a delegation file without
 printing either credential:
@@ -186,8 +194,8 @@ required for session discovery, session creation, and jobs.
 ## Pinned local end-to-end example
 
 The recorded compatibility target is Dinkster-Frontend
-`53bf43576ad0774c7a148428c5ca72d2f96e33af` with Dinkster
-`444328290949f58d0693ca2b4491b1c55817db1a`. Check both sibling repositories
+`3a6648c3a7fcc07a3fc9d5bedeacb0f4c90861bf` with Dinkster
+`3c8d0fe639ce10f30f61d559c8e82d9b2fc2863f`. Check both sibling repositories
 at those revisions, start `dinkster-serve` on `127.0.0.1:8792`, and start the
 frontend against that server. In the frontend, create or open a shared session.
 Then run:

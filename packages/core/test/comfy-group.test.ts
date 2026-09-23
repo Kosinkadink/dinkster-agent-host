@@ -25,7 +25,7 @@ const wireSchema = (
   outputs: readonly string[],
   inputKinds: Readonly<Record<string, 'optional-socket' | 'required-socket' | 'optional-widget'>> = {},
 ) => ({
-  schemaVersion: 15,
+  schemaVersion: 1,
   nodeType,
   version: 1,
   displayName: nodeType,
@@ -44,7 +44,7 @@ const wireSchema = (
         required: kind === undefined || kind === 'required-socket',
         ...(kind === 'optional-socket' || kind === 'required-socket'
           ? {}
-          : { widget: { type: 'FLOAT', default: id === 'amount' ? 1 : 0 } }),
+          : { default: id === 'amount' ? 1 : 0 }),
       }
     }),
     ...outputs.map((id) => ({
@@ -101,7 +101,7 @@ const payload = (record: unknown, sourceSchemas: readonly unknown[] = [
   wireSchema(sourceA, ['value', 'amount'], ['value']),
   wireSchema(sourceB, ['value', 'amount', 'sam_model'], ['value'], { sam_model: 'optional-socket' }),
 ]): DinksterNodesPayload => ({
-  schemaVersion: 25,
+  schemaVersion: 1,
   packs: {
     core: {
       displayName: 'core',
@@ -267,7 +267,7 @@ describe('ComfyUI exact-group registry wire', () => {
     }
     const otherPack = (payload(otherRecord).packs as Record<string, unknown>)['core']
     const duplicatePayload: DinksterNodesPayload = {
-      schemaVersion: 25,
+      schemaVersion: 1,
       packs: { core: corePack, other: otherPack },
     }
     const collision = comfyGroupCatalogFromDinksterWire(
@@ -311,7 +311,7 @@ describe('ComfyUI exact-group registry wire', () => {
       },
     })
     const result = comfyGroupCatalogFromDinksterWire(
-      { schemaVersion: 25, packs: { core: hostile } },
+      { schemaVersion: 1, packs: { core: hostile } },
       new Map([['dinkster.blend', nativeSchema('dinkster.blend')]]),
     )
 

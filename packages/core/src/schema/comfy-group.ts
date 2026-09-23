@@ -2,7 +2,7 @@ import { diag, type Diagnostic } from '../diagnostics.js'
 import type { Json } from '../format/document.js'
 import { ownJson } from '../format/json.js'
 import type { ReplacementRule } from '../replace/model.js'
-import { DINKSTER_ACCEPTED_WIRE_VERSIONS, type DinksterNodesPayload } from './dinkster-wire.js'
+import type { DinksterNodesPayload } from './dinkster-wire.js'
 import { inputsOf, outputsOf, type InputSpec, type NodeSchema, type OutputSpec } from './model.js'
 import {
   array,
@@ -348,7 +348,6 @@ const parsePackRegistry = (
   ownerPack: string,
   value: unknown,
   nativeSchemas: ReadonlyMap<string, NodeSchema>,
-  allowedWireVersions: readonly number[],
 ): ParsedPackRegistry => {
   const where = `pack '${ownerPack}' comfyGroups`
   const raw = fields(value, where, ['format', 'sourceSchemas', 'groupSchemas', 'records'])
@@ -356,7 +355,7 @@ const parsePackRegistry = (
   const schemas = (key: 'sourceSchemas' | 'groupSchemas'): ReadonlyMap<string, NodeSchema> => {
     const out = new Map<string, NodeSchema>()
     array(raw[key], `${where}.${key}`).forEach((item, index) => {
-      const schema = parseComfySourceSchema(item, `${where}.${key}[${index}]`, allowedWireVersions)
+      const schema = parseComfySourceSchema(item, `${where}.${key}[${index}]`)
       if (out.has(schema.type)) throw new Error(`${where}.${key} has duplicate nodeType '${schema.type}'`)
       if (key === 'groupSchemas' && nativeSchemas.has(schema.type)) {
         throw new Error(`${where}.${key} nodeType '${schema.type}' collides with a native schema`)
@@ -442,7 +441,6 @@ const parsePackRegistry = (
 export function comfyGroupCatalogFromDinksterWire(
   payload: DinksterNodesPayload,
   nativeSchemas: ReadonlyMap<string, NodeSchema>,
-  allowedWireVersions: readonly number[] = DINKSTER_ACCEPTED_WIRE_VERSIONS,
 ): ComfyGroupCatalogResult {
   const diagnostics: Diagnostic[] = []
   const parsed: ParsedPackRegistry[] = []
@@ -466,7 +464,7 @@ export function comfyGroupCatalogFromDinksterWire(
     try {
       const owned = ownJson(groups)
       if (!owned.ok) throw new Error(`registry is not JSON: ${owned.reason}`)
-      const registry = parsePackRegistry(packId, owned.value, nativeSchemas, allowedWireVersions)
+      const registry = parsePackRegistry(packId, owned.value, nativeSchemas)
       parsed.push(registry)
       diagnostics.push(...comfyRevisionDiagnostics(registry.records.flatMap((record) => [
         record.source,

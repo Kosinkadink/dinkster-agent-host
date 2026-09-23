@@ -23,7 +23,7 @@ const nativeSchema = (type: string, pack = 'core'): NodeSchema => ({
 })
 
 const sourceSchema = (nodeType: string) => ({
-  schemaVersion: 15,
+  schemaVersion: 1,
   nodeType,
   version: 1,
   displayName: 'Legacy Add',
@@ -35,7 +35,7 @@ const sourceSchema = (nodeType: string) => ({
       id: 'value',
       type: { kind: 'concrete', types: ['core.float'] },
       required: true,
-      widget: { type: 'FLOAT', default: 0 },
+      default: 0,
     },
     { role: 'output', id: 'value', type: { kind: 'concrete', types: ['core.float'] } },
   ],
@@ -69,7 +69,7 @@ const payload = (
   sourceSchemas: readonly unknown[],
   pack = 'core',
 ): DinksterNodesPayload => ({
-  schemaVersion: 25,
+  schemaVersion: 1,
   packs: {
     [pack]: {
       displayName: pack,
@@ -179,18 +179,18 @@ describe('ComfyUI alias registry wire', () => {
     expect(result.diagnostics[0]!.message).toContain('unknown fields: unexpected')
   })
 
-  it('rejects source snapshots outside the caller-accepted wire versions', () => {
+  it('rejects source snapshots outside the current wire version', () => {
     const sourceType = 'comfy_alias:comfy-core/LegacyAdd'
+    const staleSchema = { ...sourceSchema(sourceType), schemaVersion: 2 }
     const result = comfyAliasCatalogFromDinksterWire(
-      payload([record('LegacyAdd', sourceType, 'dinkster.math.add')], [sourceSchema(sourceType)]),
+      payload([record('LegacyAdd', sourceType, 'dinkster.math.add')], [staleSchema]),
       new Map([['dinkster.math.add', nativeSchema('dinkster.math.add')]]),
-      [25],
     )
 
     expect(result.catalog.records).toEqual([])
     expect(result.diagnostics).toHaveLength(1)
     expect(result.diagnostics[0]).toMatchObject({ code: 'schema.comfyAlias.invalid' })
-    expect(result.diagnostics[0]!.message).toContain('schemaVersion 15 is not accepted')
+    expect(result.diagnostics[0]!.message).toContain('schemaVersion 2 is not accepted')
   })
 
   it('rejects confidence contracts and source/carrier mismatches', () => {
@@ -234,7 +234,7 @@ describe('ComfyUI alias registry wire', () => {
     const duplicate = record('LegacyAdd', sourceType, 'dinkster.math.add')
     const otherDuplicate = record('LegacyAdd', sourceType, 'dinkster.logic.and')
     const raw: DinksterNodesPayload = {
-      schemaVersion: 25,
+      schemaVersion: 1,
       packs: {
         core: (payload([duplicate], [sourceSchema(sourceType)], 'core').packs as Record<string, unknown>)['core'],
         other: (payload([otherDuplicate], [sourceSchema(sourceType)], 'other').packs as Record<string, unknown>)['other'],
@@ -268,7 +268,7 @@ describe('ComfyUI alias registry wire', () => {
       source: { pack: 'pack-b', nodeClass: 'SameName', nodeType: typeB, revision: 'bbb' },
     }
     const raw: DinksterNodesPayload = {
-      schemaVersion: 25,
+      schemaVersion: 1,
       packs: {
         math: (payload([recordA], [sourceSchema(typeA)], 'math').packs as Record<string, unknown>)['math'],
         logic: (payload([recordB], [sourceSchema(typeB)], 'logic').packs as Record<string, unknown>)['logic'],

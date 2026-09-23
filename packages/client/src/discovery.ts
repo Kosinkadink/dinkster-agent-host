@@ -5,18 +5,11 @@
  * Probe order (each step is conclusive when it matches, otherwise falls
  * through to the next):
  *
- *   0. A machine-readable ?wire= 406 refusal from /api/nodes is conclusive
- *      INCOMPATIBILITY and beats every other answer, including a valid
- *      supervisor: a supervised engine that refuses our wire must be the
- *      loud 'dinkster-incompatible', never a backend that dies at schema
- *      fetch.
- *   1. GET /supervisor/status  - a valid supervisor answer is a Dinkster
+ *   1. GET /supervisor/status - a valid supervisor answer is a Dinkster
  *      deployment (engine may still be starting; the supervisor poll
  *      narrates that after add).
- *   2. GET /api/nodes?wire=<accepted> - a native engine self-identifies:
- *      200 with a nodes table is 'dinkster'; the machine-readable 406 refusal
- *      is 'dinkster-incompatible' (a real Dinkster whose wire we cannot decode -
- *      loud, NEVER misclassified as v1 or absent); the supervisor's 503
+ *   2. GET /api/nodes - a native engine self-identifies: 200 with a nodes
+ *      table is 'dinkster'; the supervisor's 503
  *      engine-not-ready gate is 'dinkster' (supervised).
  *   3. GET /system_stats - ComfyUI's small stats answer ({system, devices})
  *      is 'v1' (legacy bridge). Chosen over /object_info deliberately: the
@@ -35,13 +28,11 @@
  *
  * Framework-free; fetch and timeout are injectable. Never throws.
  */
-import { DINKSTER_ADVERTISED_WIRE_VERSIONS } from '@dinkster/core'
-import type { FetchLike } from './connection.js'
+import type { FetchLike } from './connection-contract.js'
 import { parseEngineNotReady, parseSupervisorStatus } from './supervisor.js'
 
 export type BackendDiscovery =
   | { readonly kind: 'dinkster'; readonly supervised: boolean }
-  | { readonly kind: 'dinkster-incompatible'; readonly supported: readonly number[] }
   | { readonly kind: 'v1' }
   | { readonly kind: 'unrecognized'; readonly detail: string }
   | { readonly kind: 'unreachable'; readonly detail: string }
@@ -93,14 +84,6 @@ const looksLikeNativeNodes = (body: unknown): boolean => {
   )
 }
 
-/** The ?wire= 406 refusal: {"error":"wire-version-unsupported","supported":[...]}. */
-const parseWireRefusal = (body: unknown): readonly number[] | undefined => {
-  if (typeof body !== 'object' || body === null) return undefined
-  const b = body as { error?: unknown; supported?: unknown }
-  if (b.error !== 'wire-version-unsupported') return undefined
-  return Array.isArray(b.supported) ? b.supported.filter((v): v is number => typeof v === 'number') : []
-}
-
 /** v1 /system_stats shape: an object carrying BOTH of ComfyUI's system and
  * devices sections (the real endpoint always emits both together). An SPA's
  * HTML, arbitrary JSON, and partial shapes from unrelated services all fail
@@ -143,7 +126,7 @@ export async function discoverBackend(
   // Fire the enabled probes at once; judge them in priority order below.
   const [supAnswer, nodesAnswer, v1Answer] = await Promise.all([
     probe(fetchFn, `${base}/supervisor/status`, timeoutMs),
-    probe(fetchFn, `${base}/api/nodes?wire=${DINKSTER_ADVERTISED_WIRE_VERSIONS.join(',')}`, timeoutMs),
+    probe(fetchFn, `${base}/api/nodes`, timeoutMs),
     options.probeV1 === false
       ? Promise.resolve(undefined)
       : probe(fetchFn, `${base}/system_stats`, timeoutMs),
@@ -151,16 +134,6 @@ export async function discoverBackend(
 
   const sup = note(supAnswer)
   const nodes = note(nodesAnswer)
-
-  // A machine-readable wire refusal is conclusive INCOMPATIBILITY and beats
-  // everything - including a valid supervisor answer. A supervised
-  // deployment whose engine refuses our wire must be the loud
-  // 'dinkster-incompatible', never a compatible-looking backend that dies at
-  // schema fetch (and never v1).
-  if (nodes && nodes.status === 406) {
-    const supported = parseWireRefusal(nodes.body)
-    if (supported) return { kind: 'dinkster-incompatible', supported }
-  }
 
   // 1. Supervisor?
   if (sup && sup.status === 200 && parseSupervisorStatus(sup.body)) {

@@ -1,126 +1,126 @@
 {
- "schemaVersion": 29,
- "nodeType": "dinkster.image.adjust",
- "version": 1,
- "displayName": "Adjust Image",
- "category": "image/adjust",
- "description": "",
- "idempotent": true,
- "interface": [
-  {
-   "role": "input",
-   "id": "image",
-   "type": {
-    "kind": "concrete",
-    "types": [
-     "dinkster.image"
-    ]
-   },
-   "required": true
-  },
-  {
-   "role": "input",
-   "id": "operation",
-   "type": {
-    "kind": "concrete",
-    "types": [
-     "core.combo"
-    ]
-   },
-   "required": false,
-   "default": "brightness",
-   "widget": {
-    "type": "COMBO",
-    "options": [
-     "invert",
-     "normalize",
-     "brightness",
-     "contrast"
-    ]
-   }
-  },
-  {
-   "role": "input",
-   "id": "factor",
-   "type": {
-    "kind": "concrete",
-    "types": [
-     "core.float"
-    ]
-   },
-   "required": false,
-   "default": 1.0,
-   "widget": {
-    "type": "NUMBER",
-    "min": 0.0,
-    "max": 10.0,
-    "step": 0.01
-   }
-  },
-  {
-   "role": "input",
-   "id": "mean",
-   "type": {
-    "kind": "concrete",
-    "types": [
-     "core.float"
-    ]
-   },
-   "required": false,
-   "default": 0.5,
-   "widget": {
-    "type": "NUMBER",
-    "min": -10.0,
-    "max": 10.0,
-    "step": 0.01
-   },
-   "advanced": true
-  },
-  {
-   "role": "input",
-   "id": "standard_deviation",
-   "type": {
-    "kind": "concrete",
-    "types": [
-     "core.float"
-    ]
-   },
-   "required": false,
-   "default": 0.5,
-   "widget": {
-    "type": "NUMBER",
-    "min": 0.001,
-    "max": 10.0,
-    "step": 0.001
-   },
-   "advanced": true
-  },
-  {
-   "role": "output",
-   "id": "image",
-   "type": {
-    "kind": "concrete",
-    "types": [
-     "dinkster.image"
-    ]
-   },
-   "preview": true
+  "schemaVersion": 1,
+  "nodeType": "dinkster.image.adjust",
+  "version": 1,
+  "displayName": "Adjust Image",
+  "category": "image/adjust",
+  "description": "",
+  "idempotent": true,
+  "interface": [
+    {
+      "role": "input",
+      "id": "image",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "dinkster.image"
+        ]
+      },
+      "required": true
+    },
+    {
+      "role": "input",
+      "id": "operation",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "core.combo"
+        ]
+      },
+      "required": false,
+      "default": "brightness",
+      "widget": {
+        "type": "COMBO",
+        "options": [
+          "invert",
+          "normalize",
+          "brightness",
+          "contrast"
+        ]
+      }
+    },
+    {
+      "role": "input",
+      "id": "factor",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "core.float"
+        ]
+      },
+      "required": false,
+      "default": 1.0,
+      "widget": {
+        "type": "NUMBER",
+        "min": 0.0,
+        "max": 10.0,
+        "step": 0.01
+      }
+    },
+    {
+      "role": "input",
+      "id": "mean",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "core.float"
+        ]
+      },
+      "required": false,
+      "default": 0.5,
+      "widget": {
+        "type": "NUMBER",
+        "min": -10.0,
+        "max": 10.0,
+        "step": 0.01
+      },
+      "advanced": true
+    },
+    {
+      "role": "input",
+      "id": "standard_deviation",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "core.float"
+        ]
+      },
+      "required": false,
+      "default": 0.5,
+      "widget": {
+        "type": "NUMBER",
+        "min": 0.001,
+        "max": 10.0,
+        "step": 0.001
+      },
+      "advanced": true
+    },
+    {
+      "role": "output",
+      "id": "image",
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "dinkster.image"
+        ]
+      },
+      "preview": true
+    }
+  ],
+  "searchTerms": [
+    "invert image",
+    "normalize image",
+    "brightness",
+    "contrast",
+    "ImageInvert",
+    "NormalizeImages"
+  ],
+  "mirror": {
+    "kind": "glsl",
+    "precision": "bounded",
+    "tolerance": {
+      "perChannel": 0.00392156862745098
+    },
+    "source": "#version 300 es\nprecision highp float;\nprecision highp int;\nprecision highp sampler2D;\n\nuniform sampler2D u_image;\nuniform int operation;\nuniform float factor;\nuniform float mean;\nuniform float standard_deviation;\n\nout vec4 fragColor;\n\nvoid main() {\n    vec4 x = texelFetch(u_image, ivec2(gl_FragCoord.xy), 0);\n    if (operation == 0) {\n        fragColor = 1.0 - x;\n    } else if (operation == 1) {\n        fragColor = (x - mean) / standard_deviation;\n    } else if (operation == 2) {\n        fragColor = clamp(x * factor, 0.0, 1.0);\n    } else {\n        fragColor = clamp((x - 0.5) * factor + 0.5, 0.0, 1.0);\n    }\n}\n"
   }
- ],
- "searchTerms": [
-  "invert image",
-  "normalize image",
-  "brightness",
-  "contrast",
-  "ImageInvert",
-  "NormalizeImages"
- ],
- "mirror": {
-  "kind": "glsl",
-  "precision": "bounded",
-  "tolerance": {
-   "perChannel": 0.00392156862745098
-  },
-  "source": "#version 300 es\nprecision highp float;\nprecision highp int;\nprecision highp sampler2D;\n\nuniform sampler2D u_image;\nuniform int operation;\nuniform float factor;\nuniform float mean;\nuniform float standard_deviation;\n\nout vec4 fragColor;\n\nvoid main() {\n    vec4 x = texelFetch(u_image, ivec2(gl_FragCoord.xy), 0);\n    if (operation == 0) {\n        fragColor = 1.0 - x;\n    } else if (operation == 1) {\n        fragColor = (x - mean) / standard_deviation;\n    } else if (operation == 2) {\n        fragColor = clamp(x * factor, 0.0, 1.0);\n    } else {\n        fragColor = clamp((x - 0.5) * factor + 0.5, 0.0, 1.0);\n    }\n}\n"
- }
 }

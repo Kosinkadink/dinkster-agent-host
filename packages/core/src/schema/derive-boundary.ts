@@ -42,7 +42,7 @@ import { generatedBoundaryLabel } from './boundary-labels.js'
 import { isSubtreeBinding, type BoundaryBinding, type BoundaryItem, type DynamicPortState, type GraphDef, type NodeData, type RegionContract } from '../format/document.js'
 import { isPortEndpoint, portAddressKey, type DynamicMemberId, type PortId } from '../ids.js'
 import { subgraphDefIdOf } from '../invariants.js'
-import { typesCompatible, typesDirectlyCompatible } from './compat.js'
+import { typesCompatible, typesDirectlyCompatible } from './type-compatibility.js'
 import { DEFAULT_ELAB_BUDGET } from './elaborate.js'
 import { outputDescriptorAssetOf, outputDescriptorValueOf, parseOutputDescriptors } from './output-descriptors.js'
 import { autogrowBounds, canonicalTypeIdOf, effectiveComboOption, inputsOf, outputCountValueOf, outputSchemaInputsOf, typeExprFromTypeId } from './model.js'
@@ -61,8 +61,11 @@ import type {
   TypeExpr,
 } from './model.js'
 
-/** Resolves a node type (backend id or '#<defId>') to its schema. */
-export type SchemaResolver = (nodeType: string) => NodeSchema | undefined
+/** Resolves node types and optional backend-declared editor roles. */
+export interface SchemaResolver {
+  (nodeType: string): NodeSchema | undefined
+  readonly forEditorRole?: (role: string) => NodeSchema | undefined
+}
 
 export interface DeriveResult {
   /** Present unless an error-level diagnostic was produced. */

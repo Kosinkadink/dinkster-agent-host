@@ -20,13 +20,13 @@ const workflowFixture = JSON.parse(readFileSync(
   new URL('../fixtures/replacements/save-video-comfy-workflow.json', import.meta.url), 'utf8',
 )) as { readonly nodes: readonly JsonObject[]; readonly links: readonly Json[] }
 const native = parseDinksterNodes({
-  schemaVersion: 38, nodes: Object.fromEntries(nativeWire.map((schema) => [schema.nodeType, schema])),
+  schemaVersion: 1, nodes: Object.fromEntries(nativeWire.map((schema) => [schema.nodeType, schema])),
 })
 expect(native.diagnostics).toEqual([])
 const nativeSchemas = new Map(native.schemas)
 nativeSchemas.set('dinkster.save_video', { ...nativeSchemas.get('dinkster.save_video')!, pack: 'media-io' })
 const decoded = comfyAliasCatalogFromDinksterWire({
-  schemaVersion: 38,
+  schemaVersion: 1,
   packs: { 'media-io': { comfyAliases: aliases } },
 }, nativeSchemas)
 expect(decoded.diagnostics.filter((item) => item.severity === 'error')).toEqual([])

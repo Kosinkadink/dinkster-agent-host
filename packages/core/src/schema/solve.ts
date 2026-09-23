@@ -55,7 +55,7 @@ import { diag, type Diagnostic } from '../diagnostics.js'
 import type { GraphDef, LinkData, NodeData } from '../format/document.js'
 import { asPortId, isPortEndpoint, type LinkId, type NodeId, type PortRef } from '../ids.js'
 import { buildRerouteIndex, traceEndpointAll } from '../reroute.js'
-import { assetCoercible, atomNamesOf, canonicalCompatTypeIdOf, coercionTargetsOf, typesCompatible } from './compat.js'
+import { assetCoercible, atomNamesOf, canonicalCompatTypeIdOf, coercionTargetsOf, typesCompatible } from './type-compatibility.js'
 import type { SchemaResolver } from './derive-boundary.js'
 import {
   buildGraphConnectivity,

@@ -1,14 +1,23 @@
 {
   "schemaVersion": 1,
   "epoch": 2,
-  "dinkster": { "version": "0.0.1", "schemaWire": 14 },
+  "dinkster": {
+    "version": "0.0.1",
+    "schemaWire": 1
+  },
   "packs": {
-    "core": { "displayName": "Dinkster Core" },
-    "comfy": { "displayName": "ComfyUI Compat", "abbr": "C1", "color": "#4a7ab5" }
+    "core": {
+      "displayName": "Dinkster Core"
+    },
+    "comfy": {
+      "displayName": "ComfyUI Compat",
+      "abbr": "C1",
+      "color": "#4a7ab5"
+    }
   },
   "nodes": {
     "comfy.EmptyImage": {
-      "schemaVersion": 14,
+      "schemaVersion": 1,
       "nodeType": "comfy.EmptyImage",
       "version": 1,
       "displayName": "Empty Image",
@@ -16,18 +25,73 @@
       "description": "",
       "idempotent": true,
       "interface": [
-        { "role": "input", "id": "width", "type": { "kind": "concrete", "types": ["core.int"] }, "required": false, "default": 512 },
-        { "role": "input", "id": "height", "type": { "kind": "concrete", "types": ["core.int"] }, "required": false, "default": 512 },
-        { "role": "input", "id": "batch_size", "type": { "kind": "concrete", "types": ["core.int"] }, "required": false, "default": 1 },
-        { "role": "input", "id": "color", "type": { "kind": "concrete", "types": ["core.int"] }, "required": false, "default": 0 },
-        { "role": "output", "id": "image", "type": { "kind": "concrete", "types": ["comfy.IMAGE"] } }
+        {
+          "role": "input",
+          "id": "width",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          },
+          "required": false,
+          "default": 512
+        },
+        {
+          "role": "input",
+          "id": "height",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          },
+          "required": false,
+          "default": 512
+        },
+        {
+          "role": "input",
+          "id": "batch_size",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          },
+          "required": false,
+          "default": 1
+        },
+        {
+          "role": "input",
+          "id": "color",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          },
+          "required": false,
+          "default": 0
+        },
+        {
+          "role": "output",
+          "id": "image",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "comfy.IMAGE"
+            ]
+          }
+        }
       ],
-      "aliases": ["EmptyImage"],
+      "aliases": [
+        "EmptyImage"
+      ],
       "pack": "comfy",
       "signature": "b4300ec0050ed477d3571db7770da46874e010c6"
     },
     "comfy.PreviewImage": {
-      "schemaVersion": 14,
+      "schemaVersion": 1,
       "nodeType": "comfy.PreviewImage",
       "version": 1,
       "displayName": "Preview Image",
@@ -35,9 +99,21 @@
       "description": "Saves the input images to your ComfyUI output directory.",
       "idempotent": false,
       "interface": [
-        { "role": "input", "id": "images", "type": { "kind": "concrete", "types": ["comfy.IMAGE"] }, "required": true }
+        {
+          "role": "input",
+          "id": "images",
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "comfy.IMAGE"
+            ]
+          },
+          "required": true
+        }
       ],
-      "aliases": ["PreviewImage"],
+      "aliases": [
+        "PreviewImage"
+      ],
       "outputNode": true,
       "pack": "comfy",
       "signature": "e424b8fcf75d529e8befa93a08e6636128330f41"

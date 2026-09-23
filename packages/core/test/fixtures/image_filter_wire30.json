@@ -1,841 +1,841 @@
 {
- "schemaVersion": 30,
- "nodeType": "dinkster.image.filter",
- "version": 2,
- "displayName": "Filter Image",
- "category": "image/filter",
- "description": "",
- "idempotent": true,
- "interface": [
-  {
-   "role": "input",
-   "id": "image",
-   "type": {
-    "kind": "concrete",
-    "types": [
-     "dinkster.image"
-    ]
-   },
-   "required": true
-  },
-  {
-   "role": "dynamicCombo",
-   "id": "operation",
-   "options": [
+  "schemaVersion": 1,
+  "nodeType": "dinkster.image.filter",
+  "version": 2,
+  "displayName": "Filter Image",
+  "category": "image/filter",
+  "description": "",
+  "idempotent": true,
+  "interface": [
     {
-     "key": "gaussian_blur",
-     "inputs": [
-      {
-       "role": "input",
-       "id": "radius",
-       "type": {
+      "role": "input",
+      "id": "image",
+      "type": {
         "kind": "concrete",
         "types": [
-         "core.int"
+          "dinkster.image"
         ]
-       },
-       "required": false,
-       "default": 1,
-       "widget": {
-        "type": "NUMBER",
-        "min": 0,
-        "max": 31,
-        "step": 1
-       }
       },
-      {
-       "role": "input",
-       "id": "sigma",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.float"
-        ]
-       },
-       "required": false,
-       "default": 1.0,
-       "widget": {
-        "type": "NUMBER",
-        "min": 0.1,
-        "max": 10.0,
-        "step": 0.1
-       }
-      }
-     ]
+      "required": true
     },
     {
-     "key": "sharpen",
-     "inputs": [
-      {
-       "role": "input",
-       "id": "radius",
-       "type": {
+      "role": "dynamicCombo",
+      "id": "operation",
+      "options": [
+        {
+          "key": "gaussian_blur",
+          "inputs": [
+            {
+              "role": "input",
+              "id": "radius",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
+              "required": false,
+              "default": 1,
+              "widget": {
+                "type": "NUMBER",
+                "min": 0,
+                "max": 31,
+                "step": 1
+              }
+            },
+            {
+              "role": "input",
+              "id": "sigma",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.float"
+                ]
+              },
+              "required": false,
+              "default": 1.0,
+              "widget": {
+                "type": "NUMBER",
+                "min": 0.1,
+                "max": 10.0,
+                "step": 0.1
+              }
+            }
+          ]
+        },
+        {
+          "key": "sharpen",
+          "inputs": [
+            {
+              "role": "input",
+              "id": "radius",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
+              "required": false,
+              "default": 1,
+              "widget": {
+                "type": "NUMBER",
+                "min": 0,
+                "max": 31,
+                "step": 1
+              }
+            },
+            {
+              "role": "input",
+              "id": "sigma",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.float"
+                ]
+              },
+              "required": false,
+              "default": 1.0,
+              "widget": {
+                "type": "NUMBER",
+                "min": 0.1,
+                "max": 10.0,
+                "step": 0.1
+              }
+            },
+            {
+              "role": "input",
+              "id": "strength",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.float"
+                ]
+              },
+              "required": false,
+              "default": 1.0,
+              "widget": {
+                "type": "NUMBER",
+                "min": 0.0,
+                "max": 5.0,
+                "step": 0.01
+              }
+            }
+          ]
+        },
+        {
+          "key": "quantize",
+          "inputs": [
+            {
+              "role": "input",
+              "id": "colors",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
+              "required": false,
+              "default": 256,
+              "widget": {
+                "type": "NUMBER",
+                "min": 1,
+                "max": 256,
+                "step": 1
+              },
+              "advanced": true
+            },
+            {
+              "role": "input",
+              "id": "dither",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.combo"
+                ]
+              },
+              "required": false,
+              "default": "none",
+              "widget": {
+                "type": "COMBO",
+                "options": [
+                  "none",
+                  "floyd-steinberg",
+                  "bayer-2",
+                  "bayer-4",
+                  "bayer-8",
+                  "bayer-16"
+                ]
+              },
+              "advanced": true
+            }
+          ]
+        },
+        {
+          "key": "noise",
+          "inputs": [
+            {
+              "role": "input",
+              "id": "strength",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.float"
+                ]
+              },
+              "required": false,
+              "default": 1.0,
+              "widget": {
+                "type": "NUMBER",
+                "min": 0.0,
+                "max": 5.0,
+                "step": 0.01
+              }
+            },
+            {
+              "role": "input",
+              "id": "seed",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
+              "required": false,
+              "default": 0,
+              "widget": {
+                "type": "NUMBER",
+                "min": 0,
+                "max": 9007199254740991,
+                "step": 1
+              },
+              "advanced": true
+            }
+          ]
+        },
+        {
+          "key": "erode",
+          "inputs": [
+            {
+              "role": "input",
+              "id": "kernel_size",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
+              "required": false,
+              "default": 3,
+              "widget": {
+                "type": "NUMBER",
+                "min": 1,
+                "max": 999,
+                "step": 1
+              },
+              "advanced": true
+            }
+          ]
+        },
+        {
+          "key": "dilate",
+          "inputs": [
+            {
+              "role": "input",
+              "id": "kernel_size",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
+              "required": false,
+              "default": 3,
+              "widget": {
+                "type": "NUMBER",
+                "min": 1,
+                "max": 999,
+                "step": 1
+              },
+              "advanced": true
+            }
+          ]
+        },
+        {
+          "key": "open",
+          "inputs": [
+            {
+              "role": "input",
+              "id": "kernel_size",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
+              "required": false,
+              "default": 3,
+              "widget": {
+                "type": "NUMBER",
+                "min": 1,
+                "max": 999,
+                "step": 1
+              },
+              "advanced": true
+            }
+          ]
+        },
+        {
+          "key": "close",
+          "inputs": [
+            {
+              "role": "input",
+              "id": "kernel_size",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
+              "required": false,
+              "default": 3,
+              "widget": {
+                "type": "NUMBER",
+                "min": 1,
+                "max": 999,
+                "step": 1
+              },
+              "advanced": true
+            }
+          ]
+        },
+        {
+          "key": "gradient",
+          "inputs": [
+            {
+              "role": "input",
+              "id": "kernel_size",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
+              "required": false,
+              "default": 3,
+              "widget": {
+                "type": "NUMBER",
+                "min": 1,
+                "max": 999,
+                "step": 1
+              },
+              "advanced": true
+            }
+          ]
+        },
+        {
+          "key": "bottom_hat",
+          "inputs": [
+            {
+              "role": "input",
+              "id": "kernel_size",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
+              "required": false,
+              "default": 3,
+              "widget": {
+                "type": "NUMBER",
+                "min": 1,
+                "max": 999,
+                "step": 1
+              },
+              "advanced": true
+            }
+          ]
+        },
+        {
+          "key": "top_hat",
+          "inputs": [
+            {
+              "role": "input",
+              "id": "kernel_size",
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
+              "required": false,
+              "default": 3,
+              "widget": {
+                "type": "NUMBER",
+                "min": 1,
+                "max": 999,
+                "step": 1
+              },
+              "advanced": true
+            }
+          ]
+        }
+      ],
+      "required": true,
+      "default": "gaussian_blur"
+    },
+    {
+      "role": "output",
+      "id": "image",
+      "type": {
         "kind": "concrete",
         "types": [
-         "core.int"
+          "dinkster.image"
         ]
-       },
-       "required": false,
-       "default": 1,
-       "widget": {
-        "type": "NUMBER",
-        "min": 0,
-        "max": 31,
-        "step": 1
-       }
       },
-      {
-       "role": "input",
-       "id": "sigma",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.float"
-        ]
-       },
-       "required": false,
-       "default": 1.0,
-       "widget": {
-        "type": "NUMBER",
-        "min": 0.1,
-        "max": 10.0,
-        "step": 0.1
-       }
-      },
-      {
-       "role": "input",
-       "id": "strength",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.float"
-        ]
-       },
-       "required": false,
-       "default": 1.0,
-       "widget": {
-        "type": "NUMBER",
-        "min": 0.0,
-        "max": 5.0,
-        "step": 0.01
-       }
-      }
-     ]
-    },
-    {
-     "key": "quantize",
-     "inputs": [
-      {
-       "role": "input",
-       "id": "colors",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.int"
-        ]
-       },
-       "required": false,
-       "default": 256,
-       "widget": {
-        "type": "NUMBER",
-        "min": 1,
-        "max": 256,
-        "step": 1
-       },
-       "advanced": true
-      },
-      {
-       "role": "input",
-       "id": "dither",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.combo"
-        ]
-       },
-       "required": false,
-       "default": "none",
-       "widget": {
-        "type": "COMBO",
-        "options": [
-         "none",
-         "floyd-steinberg",
-         "bayer-2",
-         "bayer-4",
-         "bayer-8",
-         "bayer-16"
-        ]
-       },
-       "advanced": true
-      }
-     ]
-    },
-    {
-     "key": "noise",
-     "inputs": [
-      {
-       "role": "input",
-       "id": "strength",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.float"
-        ]
-       },
-       "required": false,
-       "default": 1.0,
-       "widget": {
-        "type": "NUMBER",
-        "min": 0.0,
-        "max": 5.0,
-        "step": 0.01
-       }
-      },
-      {
-       "role": "input",
-       "id": "seed",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.int"
-        ]
-       },
-       "required": false,
-       "default": 0,
-       "widget": {
-        "type": "NUMBER",
-        "min": 0,
-        "max": 9007199254740991,
-        "step": 1
-       },
-       "advanced": true
-      }
-     ]
-    },
-    {
-     "key": "erode",
-     "inputs": [
-      {
-       "role": "input",
-       "id": "kernel_size",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.int"
-        ]
-       },
-       "required": false,
-       "default": 3,
-       "widget": {
-        "type": "NUMBER",
-        "min": 1,
-        "max": 999,
-        "step": 1
-       },
-       "advanced": true
-      }
-     ]
-    },
-    {
-     "key": "dilate",
-     "inputs": [
-      {
-       "role": "input",
-       "id": "kernel_size",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.int"
-        ]
-       },
-       "required": false,
-       "default": 3,
-       "widget": {
-        "type": "NUMBER",
-        "min": 1,
-        "max": 999,
-        "step": 1
-       },
-       "advanced": true
-      }
-     ]
-    },
-    {
-     "key": "open",
-     "inputs": [
-      {
-       "role": "input",
-       "id": "kernel_size",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.int"
-        ]
-       },
-       "required": false,
-       "default": 3,
-       "widget": {
-        "type": "NUMBER",
-        "min": 1,
-        "max": 999,
-        "step": 1
-       },
-       "advanced": true
-      }
-     ]
-    },
-    {
-     "key": "close",
-     "inputs": [
-      {
-       "role": "input",
-       "id": "kernel_size",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.int"
-        ]
-       },
-       "required": false,
-       "default": 3,
-       "widget": {
-        "type": "NUMBER",
-        "min": 1,
-        "max": 999,
-        "step": 1
-       },
-       "advanced": true
-      }
-     ]
-    },
-    {
-     "key": "gradient",
-     "inputs": [
-      {
-       "role": "input",
-       "id": "kernel_size",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.int"
-        ]
-       },
-       "required": false,
-       "default": 3,
-       "widget": {
-        "type": "NUMBER",
-        "min": 1,
-        "max": 999,
-        "step": 1
-       },
-       "advanced": true
-      }
-     ]
-    },
-    {
-     "key": "bottom_hat",
-     "inputs": [
-      {
-       "role": "input",
-       "id": "kernel_size",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.int"
-        ]
-       },
-       "required": false,
-       "default": 3,
-       "widget": {
-        "type": "NUMBER",
-        "min": 1,
-        "max": 999,
-        "step": 1
-       },
-       "advanced": true
-      }
-     ]
-    },
-    {
-     "key": "top_hat",
-     "inputs": [
-      {
-       "role": "input",
-       "id": "kernel_size",
-       "type": {
-        "kind": "concrete",
-        "types": [
-         "core.int"
-        ]
-       },
-       "required": false,
-       "default": 3,
-       "widget": {
-        "type": "NUMBER",
-        "min": 1,
-        "max": 999,
-        "step": 1
-       },
-       "advanced": true
-      }
-     ]
+      "preview": true
     }
-   ],
-   "required": true,
-   "default": "gaussian_blur"
-  },
-  {
-   "role": "output",
-   "id": "image",
-   "type": {
-    "kind": "concrete",
-    "types": [
-     "dinkster.image"
-    ]
-   },
-   "preview": true
-  }
- ],
- "searchTerms": [
-  "blur image",
-  "sharpen image",
-  "quantize image",
-  "noise image",
-  "morphology",
-  "ImageBlur",
-  "ImageSharpen",
-  "ImageQuantize"
- ],
- "replacements": [
-  {
-   "from": "dinkster.image.filter",
-   "migration": {
-    "historicalInputs": [
-     "operation",
-     "radius",
-     "sigma",
-     "strength",
-     "colors",
-     "dither",
-     "seed",
-     "kernel_size"
-    ]
-   },
-   "cases": [
+  ],
+  "searchTerms": [
+    "blur image",
+    "sharpen image",
+    "quantize image",
+    "noise image",
+    "morphology",
+    "ImageBlur",
+    "ImageSharpen",
+    "ImageQuantize"
+  ],
+  "replacements": [
     {
-     "to": "dinkster.image.filter",
-     "when": {
-      "kind": "all",
-      "of": [
-       {
-        "kind": "not",
-        "of": {
-         "kind": "inputConnected",
-         "input": "operation"
+      "from": "dinkster.image.filter",
+      "migration": {
+        "historicalInputs": [
+          "operation",
+          "radius",
+          "sigma",
+          "strength",
+          "colors",
+          "dither",
+          "seed",
+          "kernel_size"
+        ]
+      },
+      "cases": [
+        {
+          "to": "dinkster.image.filter",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "of": {
+                  "kind": "inputConnected",
+                  "input": "operation"
+                }
+              },
+              {
+                "kind": "valueEquals",
+                "input": "operation",
+                "value": "sharpen"
+              }
+            ]
+          },
+          "slotVariants": {
+            "operation": "sharpen"
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "operation.radius": {
+              "kind": "copy",
+              "input": "radius"
+            },
+            "operation.sigma": {
+              "kind": "copy",
+              "input": "sigma"
+            },
+            "operation.strength": {
+              "kind": "copy",
+              "input": "strength"
+            }
+          },
+          "outputs": {
+            "image": "image"
+          }
+        },
+        {
+          "to": "dinkster.image.filter",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "of": {
+                  "kind": "inputConnected",
+                  "input": "operation"
+                }
+              },
+              {
+                "kind": "valueEquals",
+                "input": "operation",
+                "value": "quantize"
+              }
+            ]
+          },
+          "slotVariants": {
+            "operation": "quantize"
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "operation.colors": {
+              "kind": "copy",
+              "input": "colors"
+            },
+            "operation.dither": {
+              "kind": "copy",
+              "input": "dither"
+            }
+          },
+          "outputs": {
+            "image": "image"
+          }
+        },
+        {
+          "to": "dinkster.image.filter",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "of": {
+                  "kind": "inputConnected",
+                  "input": "operation"
+                }
+              },
+              {
+                "kind": "valueEquals",
+                "input": "operation",
+                "value": "noise"
+              }
+            ]
+          },
+          "slotVariants": {
+            "operation": "noise"
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "operation.strength": {
+              "kind": "copy",
+              "input": "strength"
+            },
+            "operation.seed": {
+              "kind": "copy",
+              "input": "seed"
+            }
+          },
+          "outputs": {
+            "image": "image"
+          }
+        },
+        {
+          "to": "dinkster.image.filter",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "of": {
+                  "kind": "inputConnected",
+                  "input": "operation"
+                }
+              },
+              {
+                "kind": "valueEquals",
+                "input": "operation",
+                "value": "erode"
+              }
+            ]
+          },
+          "slotVariants": {
+            "operation": "erode"
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "operation.kernel_size": {
+              "kind": "copy",
+              "input": "kernel_size"
+            }
+          },
+          "outputs": {
+            "image": "image"
+          }
+        },
+        {
+          "to": "dinkster.image.filter",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "of": {
+                  "kind": "inputConnected",
+                  "input": "operation"
+                }
+              },
+              {
+                "kind": "valueEquals",
+                "input": "operation",
+                "value": "dilate"
+              }
+            ]
+          },
+          "slotVariants": {
+            "operation": "dilate"
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "operation.kernel_size": {
+              "kind": "copy",
+              "input": "kernel_size"
+            }
+          },
+          "outputs": {
+            "image": "image"
+          }
+        },
+        {
+          "to": "dinkster.image.filter",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "of": {
+                  "kind": "inputConnected",
+                  "input": "operation"
+                }
+              },
+              {
+                "kind": "valueEquals",
+                "input": "operation",
+                "value": "open"
+              }
+            ]
+          },
+          "slotVariants": {
+            "operation": "open"
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "operation.kernel_size": {
+              "kind": "copy",
+              "input": "kernel_size"
+            }
+          },
+          "outputs": {
+            "image": "image"
+          }
+        },
+        {
+          "to": "dinkster.image.filter",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "of": {
+                  "kind": "inputConnected",
+                  "input": "operation"
+                }
+              },
+              {
+                "kind": "valueEquals",
+                "input": "operation",
+                "value": "close"
+              }
+            ]
+          },
+          "slotVariants": {
+            "operation": "close"
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "operation.kernel_size": {
+              "kind": "copy",
+              "input": "kernel_size"
+            }
+          },
+          "outputs": {
+            "image": "image"
+          }
+        },
+        {
+          "to": "dinkster.image.filter",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "of": {
+                  "kind": "inputConnected",
+                  "input": "operation"
+                }
+              },
+              {
+                "kind": "valueEquals",
+                "input": "operation",
+                "value": "gradient"
+              }
+            ]
+          },
+          "slotVariants": {
+            "operation": "gradient"
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "operation.kernel_size": {
+              "kind": "copy",
+              "input": "kernel_size"
+            }
+          },
+          "outputs": {
+            "image": "image"
+          }
+        },
+        {
+          "to": "dinkster.image.filter",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "of": {
+                  "kind": "inputConnected",
+                  "input": "operation"
+                }
+              },
+              {
+                "kind": "valueEquals",
+                "input": "operation",
+                "value": "bottom_hat"
+              }
+            ]
+          },
+          "slotVariants": {
+            "operation": "bottom_hat"
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "operation.kernel_size": {
+              "kind": "copy",
+              "input": "kernel_size"
+            }
+          },
+          "outputs": {
+            "image": "image"
+          }
+        },
+        {
+          "to": "dinkster.image.filter",
+          "when": {
+            "kind": "all",
+            "of": [
+              {
+                "kind": "not",
+                "of": {
+                  "kind": "inputConnected",
+                  "input": "operation"
+                }
+              },
+              {
+                "kind": "valueEquals",
+                "input": "operation",
+                "value": "top_hat"
+              }
+            ]
+          },
+          "slotVariants": {
+            "operation": "top_hat"
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "operation.kernel_size": {
+              "kind": "copy",
+              "input": "kernel_size"
+            }
+          },
+          "outputs": {
+            "image": "image"
+          }
+        },
+        {
+          "to": "dinkster.image.filter",
+          "slotVariants": {
+            "operation": "gaussian_blur"
+          },
+          "inputs": {
+            "image": {
+              "kind": "copy",
+              "input": "image"
+            },
+            "operation.radius": {
+              "kind": "copy",
+              "input": "radius"
+            },
+            "operation.sigma": {
+              "kind": "copy",
+              "input": "sigma"
+            }
+          },
+          "outputs": {
+            "image": "image"
+          }
         }
-       },
-       {
-        "kind": "valueEquals",
-        "input": "operation",
-        "value": "sharpen"
-       }
       ]
-     },
-     "slotVariants": {
-      "operation": "sharpen"
-     },
-     "inputs": {
-      "image": {
-       "kind": "copy",
-       "input": "image"
-      },
-      "operation.radius": {
-       "kind": "copy",
-       "input": "radius"
-      },
-      "operation.sigma": {
-       "kind": "copy",
-       "input": "sigma"
-      },
-      "operation.strength": {
-       "kind": "copy",
-       "input": "strength"
-      }
-     },
-     "outputs": {
-      "image": "image"
-     }
-    },
-    {
-     "to": "dinkster.image.filter",
-     "when": {
-      "kind": "all",
-      "of": [
-       {
-        "kind": "not",
-        "of": {
-         "kind": "inputConnected",
-         "input": "operation"
-        }
-       },
-       {
-        "kind": "valueEquals",
-        "input": "operation",
-        "value": "quantize"
-       }
-      ]
-     },
-     "slotVariants": {
-      "operation": "quantize"
-     },
-     "inputs": {
-      "image": {
-       "kind": "copy",
-       "input": "image"
-      },
-      "operation.colors": {
-       "kind": "copy",
-       "input": "colors"
-      },
-      "operation.dither": {
-       "kind": "copy",
-       "input": "dither"
-      }
-     },
-     "outputs": {
-      "image": "image"
-     }
-    },
-    {
-     "to": "dinkster.image.filter",
-     "when": {
-      "kind": "all",
-      "of": [
-       {
-        "kind": "not",
-        "of": {
-         "kind": "inputConnected",
-         "input": "operation"
-        }
-       },
-       {
-        "kind": "valueEquals",
-        "input": "operation",
-        "value": "noise"
-       }
-      ]
-     },
-     "slotVariants": {
-      "operation": "noise"
-     },
-     "inputs": {
-      "image": {
-       "kind": "copy",
-       "input": "image"
-      },
-      "operation.strength": {
-       "kind": "copy",
-       "input": "strength"
-      },
-      "operation.seed": {
-       "kind": "copy",
-       "input": "seed"
-      }
-     },
-     "outputs": {
-      "image": "image"
-     }
-    },
-    {
-     "to": "dinkster.image.filter",
-     "when": {
-      "kind": "all",
-      "of": [
-       {
-        "kind": "not",
-        "of": {
-         "kind": "inputConnected",
-         "input": "operation"
-        }
-       },
-       {
-        "kind": "valueEquals",
-        "input": "operation",
-        "value": "erode"
-       }
-      ]
-     },
-     "slotVariants": {
-      "operation": "erode"
-     },
-     "inputs": {
-      "image": {
-       "kind": "copy",
-       "input": "image"
-      },
-      "operation.kernel_size": {
-       "kind": "copy",
-       "input": "kernel_size"
-      }
-     },
-     "outputs": {
-      "image": "image"
-     }
-    },
-    {
-     "to": "dinkster.image.filter",
-     "when": {
-      "kind": "all",
-      "of": [
-       {
-        "kind": "not",
-        "of": {
-         "kind": "inputConnected",
-         "input": "operation"
-        }
-       },
-       {
-        "kind": "valueEquals",
-        "input": "operation",
-        "value": "dilate"
-       }
-      ]
-     },
-     "slotVariants": {
-      "operation": "dilate"
-     },
-     "inputs": {
-      "image": {
-       "kind": "copy",
-       "input": "image"
-      },
-      "operation.kernel_size": {
-       "kind": "copy",
-       "input": "kernel_size"
-      }
-     },
-     "outputs": {
-      "image": "image"
-     }
-    },
-    {
-     "to": "dinkster.image.filter",
-     "when": {
-      "kind": "all",
-      "of": [
-       {
-        "kind": "not",
-        "of": {
-         "kind": "inputConnected",
-         "input": "operation"
-        }
-       },
-       {
-        "kind": "valueEquals",
-        "input": "operation",
-        "value": "open"
-       }
-      ]
-     },
-     "slotVariants": {
-      "operation": "open"
-     },
-     "inputs": {
-      "image": {
-       "kind": "copy",
-       "input": "image"
-      },
-      "operation.kernel_size": {
-       "kind": "copy",
-       "input": "kernel_size"
-      }
-     },
-     "outputs": {
-      "image": "image"
-     }
-    },
-    {
-     "to": "dinkster.image.filter",
-     "when": {
-      "kind": "all",
-      "of": [
-       {
-        "kind": "not",
-        "of": {
-         "kind": "inputConnected",
-         "input": "operation"
-        }
-       },
-       {
-        "kind": "valueEquals",
-        "input": "operation",
-        "value": "close"
-       }
-      ]
-     },
-     "slotVariants": {
-      "operation": "close"
-     },
-     "inputs": {
-      "image": {
-       "kind": "copy",
-       "input": "image"
-      },
-      "operation.kernel_size": {
-       "kind": "copy",
-       "input": "kernel_size"
-      }
-     },
-     "outputs": {
-      "image": "image"
-     }
-    },
-    {
-     "to": "dinkster.image.filter",
-     "when": {
-      "kind": "all",
-      "of": [
-       {
-        "kind": "not",
-        "of": {
-         "kind": "inputConnected",
-         "input": "operation"
-        }
-       },
-       {
-        "kind": "valueEquals",
-        "input": "operation",
-        "value": "gradient"
-       }
-      ]
-     },
-     "slotVariants": {
-      "operation": "gradient"
-     },
-     "inputs": {
-      "image": {
-       "kind": "copy",
-       "input": "image"
-      },
-      "operation.kernel_size": {
-       "kind": "copy",
-       "input": "kernel_size"
-      }
-     },
-     "outputs": {
-      "image": "image"
-     }
-    },
-    {
-     "to": "dinkster.image.filter",
-     "when": {
-      "kind": "all",
-      "of": [
-       {
-        "kind": "not",
-        "of": {
-         "kind": "inputConnected",
-         "input": "operation"
-        }
-       },
-       {
-        "kind": "valueEquals",
-        "input": "operation",
-        "value": "bottom_hat"
-       }
-      ]
-     },
-     "slotVariants": {
-      "operation": "bottom_hat"
-     },
-     "inputs": {
-      "image": {
-       "kind": "copy",
-       "input": "image"
-      },
-      "operation.kernel_size": {
-       "kind": "copy",
-       "input": "kernel_size"
-      }
-     },
-     "outputs": {
-      "image": "image"
-     }
-    },
-    {
-     "to": "dinkster.image.filter",
-     "when": {
-      "kind": "all",
-      "of": [
-       {
-        "kind": "not",
-        "of": {
-         "kind": "inputConnected",
-         "input": "operation"
-        }
-       },
-       {
-        "kind": "valueEquals",
-        "input": "operation",
-        "value": "top_hat"
-       }
-      ]
-     },
-     "slotVariants": {
-      "operation": "top_hat"
-     },
-     "inputs": {
-      "image": {
-       "kind": "copy",
-       "input": "image"
-      },
-      "operation.kernel_size": {
-       "kind": "copy",
-       "input": "kernel_size"
-      }
-     },
-     "outputs": {
-      "image": "image"
-     }
-    },
-    {
-     "to": "dinkster.image.filter",
-     "slotVariants": {
-      "operation": "gaussian_blur"
-     },
-     "inputs": {
-      "image": {
-       "kind": "copy",
-       "input": "image"
-      },
-      "operation.radius": {
-       "kind": "copy",
-       "input": "radius"
-      },
-      "operation.sigma": {
-       "kind": "copy",
-       "input": "sigma"
-      }
-     },
-     "outputs": {
-      "image": "image"
-     }
     }
-   ]
+  ],
+  "mirror": {
+    "kind": "glsl",
+    "precision": "bounded",
+    "tolerance": {
+      "perChannel": 0.00392156862745098
+    },
+    "source": "#version 300 es\nprecision highp float;\nprecision highp int;\nprecision highp sampler2D;\n\nuniform sampler2D u_image;\nuniform int operation;\nuniform int radius;\nuniform float sigma;\nuniform float strength;\n\nout vec4 fragColor;\n\nconst int MAX_RADIUS = 31;\n\nfloat weights[2 * MAX_RADIUS + 1];\n\nvoid loadKernel() {\n    float total = 0.0;\n    for (int offset = -radius; offset <= radius; offset++) {\n        float c = float(offset) / float(radius);\n        float weight = exp(-(c * c) / (2.0 * sigma * sigma));\n        weights[offset + radius] = weight;\n        total += weight;\n    }\n    for (int i = 0; i <= 2 * radius; i++) {\n        weights[i] /= total;\n    }\n}\n\nint reflectIndex(int position, int size) {\n    if (size == 1) {\n        return 0;\n    }\n    int period = 2 * (size - 1);\n    int wrapped = position % period;\n    if (wrapped < 0) {\n        wrapped += period;\n    }\n    return wrapped < size ? wrapped : period - wrapped;\n}\n\nvec4 gaussianBlur(ivec2 center, ivec2 size) {\n    if (radius == 0) {\n        return texelFetch(u_image, center, 0);\n    }\n    loadKernel();\n    vec4 accumulated = vec4(0.0);\n    for (int dy = -radius; dy <= radius; dy++) {\n        int y = reflectIndex(center.y + dy, size.y);\n        vec4 row = vec4(0.0);\n        for (int dx = -radius; dx <= radius; dx++) {\n            int x = reflectIndex(center.x + dx, size.x);\n            row += weights[dx + radius] * texelFetch(u_image, ivec2(x, y), 0);\n        }\n        accumulated += weights[dy + radius] * row;\n    }\n    return accumulated;\n}\n\nvoid main() {\n    ivec2 center = ivec2(gl_FragCoord.xy);\n    ivec2 size = textureSize(u_image, 0);\n    if (operation == 0) {\n        fragColor = gaussianBlur(center, size);\n    } else {\n        vec4 x = texelFetch(u_image, center, 0);\n        fragColor = clamp(x + 10.0 * strength * (x - gaussianBlur(center, size)), 0.0, 1.0);\n    }\n}\n",
+    "applies": {
+      "operation": [
+        "gaussian_blur",
+        "sharpen"
+      ]
+    }
   }
- ],
- "mirror": {
-  "kind": "glsl",
-  "precision": "bounded",
-  "tolerance": {
-   "perChannel": 0.00392156862745098
-  },
-  "source": "#version 300 es\nprecision highp float;\nprecision highp int;\nprecision highp sampler2D;\n\nuniform sampler2D u_image;\nuniform int operation;\nuniform int radius;\nuniform float sigma;\nuniform float strength;\n\nout vec4 fragColor;\n\nconst int MAX_RADIUS = 31;\n\nfloat weights[2 * MAX_RADIUS + 1];\n\nvoid loadKernel() {\n    float total = 0.0;\n    for (int offset = -radius; offset <= radius; offset++) {\n        float c = float(offset) / float(radius);\n        float weight = exp(-(c * c) / (2.0 * sigma * sigma));\n        weights[offset + radius] = weight;\n        total += weight;\n    }\n    for (int i = 0; i <= 2 * radius; i++) {\n        weights[i] /= total;\n    }\n}\n\nint reflectIndex(int position, int size) {\n    if (size == 1) {\n        return 0;\n    }\n    int period = 2 * (size - 1);\n    int wrapped = position % period;\n    if (wrapped < 0) {\n        wrapped += period;\n    }\n    return wrapped < size ? wrapped : period - wrapped;\n}\n\nvec4 gaussianBlur(ivec2 center, ivec2 size) {\n    if (radius == 0) {\n        return texelFetch(u_image, center, 0);\n    }\n    loadKernel();\n    vec4 accumulated = vec4(0.0);\n    for (int dy = -radius; dy <= radius; dy++) {\n        int y = reflectIndex(center.y + dy, size.y);\n        vec4 row = vec4(0.0);\n        for (int dx = -radius; dx <= radius; dx++) {\n            int x = reflectIndex(center.x + dx, size.x);\n            row += weights[dx + radius] * texelFetch(u_image, ivec2(x, y), 0);\n        }\n        accumulated += weights[dy + radius] * row;\n    }\n    return accumulated;\n}\n\nvoid main() {\n    ivec2 center = ivec2(gl_FragCoord.xy);\n    ivec2 size = textureSize(u_image, 0);\n    if (operation == 0) {\n        fragColor = gaussianBlur(center, size);\n    } else {\n        vec4 x = texelFetch(u_image, center, 0);\n        fragColor = clamp(x + 10.0 * strength * (x - gaussianBlur(center, size)), 0.0, 1.0);\n    }\n}\n",
-  "applies": {
-   "operation": [
-    "gaussian_blur",
-    "sharpen"
-   ]
-  }
- }
 }

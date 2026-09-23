@@ -1,6 +1,6 @@
 [
   {
-    "schemaVersion": 38,
+    "schemaVersion": 1,
     "nodeType": "dinkster.set_save_target_prefix",
     "version": 1,
     "displayName": "Set Save Target Prefix",
@@ -54,7 +54,7 @@
     ]
   },
   {
-    "schemaVersion": 38,
+    "schemaVersion": 1,
     "nodeType": "dinkster.save_video",
     "version": 3,
     "displayName": "Save Video",
@@ -366,7 +366,7 @@
     "outputNode": true
   },
   {
-    "schemaVersion": 38,
+    "schemaVersion": 1,
     "nodeType": "dinkster.value.convert",
     "version": 1,
     "displayName": "Convert Value",
@@ -471,7 +471,7 @@
     ]
   },
   {
-    "schemaVersion": 38,
+    "schemaVersion": 1,
     "nodeType": "dinkster.float",
     "version": 1,
     "displayName": "Float",

@@ -148,19 +148,24 @@ import { effectiveOccurrenceTopology, type EffectiveLinkIdentity } from './effec
  */
 export function documentResolver(doc: WorkflowDocument, base: SchemaResolver): SchemaResolver {
   const cache = new Map<string, NodeSchema | undefined>()
-  const resolve: SchemaResolver = (nodeType) => {
-    const defId = subgraphDefIdOf(nodeType)
-    if (defId === undefined) return base(nodeType)
-    if (cache.has(nodeType)) return cache.get(nodeType)
-    const def = doc.graphs[defId]
-    if (!def) {
-      cache.set(nodeType, undefined)
-      return undefined
+  const resolve: SchemaResolver = Object.assign(
+    (nodeType: string) => {
+      const defId = subgraphDefIdOf(nodeType)
+      if (defId === undefined) return base(nodeType)
+      if (cache.has(nodeType)) return cache.get(nodeType)
+      const def = doc.graphs[defId]
+      if (!def) {
+        cache.set(nodeType, undefined)
+        return undefined
+      }
+      const derived = deriveBoundarySchema(def, resolve)
+      cache.set(nodeType, derived.schema)
+      return derived.schema
+    },
+    {
+      ...(base.forEditorRole === undefined ? {} : { forEditorRole: base.forEditorRole })
     }
-    const derived = deriveBoundarySchema(def, resolve)
-    cache.set(nodeType, derived.schema)
-    return derived.schema
-  }
+  )
   return resolve
 }
 

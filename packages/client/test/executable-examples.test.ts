@@ -44,8 +44,9 @@ const input = (id: string, type: Record<string, unknown>, defaultValue?: unknown
 })
 const output = (id: string, type: Record<string, unknown>): Record<string, unknown> => ({ role: 'output', id, type })
 const schema = (nodeType: string, interfaceItems: Record<string, unknown>[]): Record<string, unknown> => ({
-  schemaVersion: 21,
+  schemaVersion: 1,
   nodeType,
+  version: 1,
   displayName: nodeType,
   category: 'examples',
   idempotent: true,
@@ -56,7 +57,7 @@ const int = concrete('core.int')
 const boolean = concrete('core.boolean')
 const exampleNodes = {
   schemaVersion: 1,
-  dinkster: { version: 'test', schemaWire: 21, graphFeatures: ['regions'] },
+  dinkster: { version: 'test', schemaWire: 1, graphFeatures: ['regions'] },
   nodes: {
     'std.math.add_ints': schema('std.math.add_ints', [
       input('a', int), input('b', int), output('sum', int),

@@ -3,10 +3,10 @@ import { inputsOf } from '../src/schema/model.js'
 import { parseDinksterNodes } from '../src/schema/dinkster-wire.js'
 
 const catalog = (widget: unknown) => ({
-  schemaVersion: 44,
+  schemaVersion: 1,
   nodes: {
     'pack.custom': {
-      schemaVersion: 44,
+      schemaVersion: 1,
       displayName: 'Pack Custom',
       interface: [{
         role: 'input',

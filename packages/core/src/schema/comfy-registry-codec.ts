@@ -1,6 +1,10 @@
 import { diag, type Diagnostic } from '../diagnostics.js'
 import { isReplacementRule, type ReplacementRule } from '../replace/model.js'
-import { parseDinksterNodes, type DinksterWireSchema } from './dinkster-wire.js'
+import {
+  DINKSTER_SCHEMA_WIRE_VERSION,
+  parseDinksterNodes,
+  type DinksterWireSchema,
+} from './dinkster-wire.js'
 import type { NodeSchema } from './model.js'
 
 export const COMFY_CORE_REVISION = 'b78cec87'
@@ -240,7 +244,6 @@ export const parseComfyReplacement = (value: unknown, where: string): Replacemen
 export const parseComfySourceSchema = (
   value: unknown,
   where: string,
-  allowedWireVersions: readonly number[],
 ): NodeSchema => {
   const raw = object(value, where)
   const version = raw['schemaVersion']
@@ -248,14 +251,14 @@ export const parseComfySourceSchema = (
   if (typeof version !== 'number' || !Number.isInteger(version)) {
     throw new Error(`${where}.schemaVersion must be an integer`)
   }
-  if (!allowedWireVersions.includes(version)) {
+  if (version !== DINKSTER_SCHEMA_WIRE_VERSION) {
     throw new Error(`${where}.schemaVersion ${version} is not accepted`)
   }
   if ('replacements' in raw) throw new Error(`${where} must not carry replacements`)
   const decoded = parseDinksterNodes({
     schemaVersion: version,
     nodes: { [nodeType]: raw as DinksterWireSchema },
-  }, allowedWireVersions)
+  })
   if (decoded.diagnostics.length > 0 || decoded.schemas.size !== 1) {
     throw new Error(`${where} is invalid: ${decoded.diagnostics.map((item) => item.message).join('; ')}`)
   }

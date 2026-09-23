@@ -45,7 +45,7 @@ const loadGolden = (name: string): { raw: readonly DinksterWireSchema[]; schemas
     }
   ).schemas
   const { schemas, diagnostics } = parseDinksterNodes({
-    schemaVersion: 21,
+    schemaVersion: 1,
     nodes: Object.fromEntries(raw.map((s) => [s.nodeType, s])),
   })
   expect(diagnostics, `${name}.json must decode clean`).toEqual([])
@@ -169,7 +169,7 @@ describe('vocabulary golden: decode', () => {
   })
 })
 
-describe('combo golden: wire v21 widget adjuncts and socket identity', () => {
+describe('combo golden: widget adjuncts and socket identity', () => {
   it('decodes COMBO and MULTI_COMBO presentation with exact list identity', () => {
     const schema = schemaOf(combo, 'fixture.combo-contract')
     const input = schema.items.find((item) => item.kind === 'input')
@@ -178,7 +178,12 @@ describe('combo golden: wire v21 widget adjuncts and socket identity', () => {
       type: { kind: 'concrete', name: 'core.combo' },
       widget: {
         widgetType: 'COMBO',
-        options: { options: ['alpha', 'beta'] },
+        options: {
+          options: [
+            { value: 'alpha', label: 'Alpha', info: 'Primary choice', folder: 'Featured' },
+            'beta',
+          ],
+        },
         remote: { route: '/api/choices/fixture.combo', refreshButton: true },
         controller: 'after_generate',
         controllerInitial: 'randomize',
@@ -216,7 +221,11 @@ describe('combo golden: wire v21 widget adjuncts and socket identity', () => {
       widget: {
         widgetType: 'MULTI_COMBO',
         options: {
-          options: ['beta', 'alpha', 'beta'],
+          options: [
+            { value: 'beta', label: 'Beta provider', info: 'Preferred provider', folder: 'Providers/Featured' },
+            'alpha',
+            'beta',
+          ],
           placeholder: 'Select providers',
           chip: false,
         },

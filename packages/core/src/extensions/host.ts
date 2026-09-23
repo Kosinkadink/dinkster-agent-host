@@ -121,6 +121,28 @@ export interface ExtensionPanelContributionV1 extends ExtensionIdentity {
   readonly title?: string
 }
 
+export interface CanvasLayerNode {
+  readonly id: string
+  readonly type: string
+  readonly title: string
+  readonly x: number
+  readonly y: number
+  readonly width: number
+  readonly height: number
+}
+
+export interface CanvasLayerContext {
+  readonly context: CanvasRenderingContext2D
+  readonly viewport: Readonly<{ x: number; y: number; width: number; height: number; scale: number }>
+  readonly nodes: readonly CanvasLayerNode[]
+}
+
+export interface CanvasLayerContribution extends ExtensionIdentity {
+  readonly position: 'background' | 'foreground'
+  readonly order?: number
+  readonly draw: (context: CanvasLayerContext) => void
+}
+
 export interface PackActivationApi<TTextEditorExtension extends ExtensionIdentity = ExtensionIdentity> {
   /** Aborted before rollback/deactivation disposers run. */
   readonly signal: AbortSignal
@@ -140,6 +162,7 @@ export interface PackActivationApi<TTextEditorExtension extends ExtensionIdentit
   editorBinding(id: string, binding: EditorBinding): void
   panel(id: string, slot: ExtensionPanelSlot, provider: HostUiProviderV1, order?: number, title?: string): void
   virtualNode(id: string, kind: VirtualNodeKind): void
+  canvasLayer(id: string, layer: CanvasLayerContribution): void
 }
 
 /** App-shell contributions stay structural here so core never depends on Solid. */
@@ -223,6 +246,7 @@ interface Slot<TTextEditorExtension extends ExtensionIdentity> {
     | { readonly category: 'editorBinding'; readonly value: EditorBinding }
     | { readonly category: 'panel'; readonly value: ExtensionPanelContributionV1 }
     | { readonly category: 'virtualNode'; readonly value: VirtualNodeKind }
+    | { readonly category: 'canvasLayer'; readonly value: CanvasLayerContribution }
   /** Set while the payload is registered; calling it removes it. */
   unregister?: (() => void) | undefined
 }
@@ -258,6 +282,7 @@ export interface ExtensionHostOptions<TTextEditorExtension extends ExtensionIden
   readonly registerEditorBinding?: (binding: EditorBinding) => () => void
   readonly registerPanel?: (panel: ExtensionPanelContributionV1) => () => void
   readonly registerVirtualNode?: (kind: VirtualNodeKind) => () => void
+  readonly registerCanvasLayer?: (layer: CanvasLayerContribution) => () => void
   /** Suppress registry change publication until the initial pack commit settles. */
   readonly beginRegistryBatch?: () => (commit: boolean) => void
   readonly policy?: DeploymentPolicy
@@ -386,6 +411,24 @@ export class ExtensionHost<TTextEditorExtension extends ExtensionIdentity = Exte
 
     const api: PackActivationApi<TTextEditorExtension> = {
       signal: pack.controller.signal,
+      canvasLayer: (id, layer) => accept(id, 'canvasLayer', layer.id, () => {
+        if (layer.position !== 'background' && layer.position !== 'foreground') {
+          throw new Error(`canvas layer '${id}' has an invalid position`)
+        }
+        if (layer.order !== undefined && (!Number.isFinite(layer.order) || !Number.isInteger(layer.order))) {
+          throw new Error(`canvas layer '${id}' has an invalid order`)
+        }
+        if (typeof layer.draw !== 'function') throw new Error(`canvas layer '${id}' requires a draw callback`)
+        pack.slots.get(id)!.payload = {
+          category: 'canvasLayer',
+          value: Object.freeze({
+            id,
+            position: layer.position,
+            ...(layer.order === undefined ? {} : { order: layer.order }),
+            draw: layer.draw,
+          }),
+        }
+      }),
       eventConsumer: (id, consume) => accept(id, 'eventConsumer', undefined, () => {
         if (!this.options.registerEventConsumer) throw new Error('event consumers require a connection snapshot world')
         if (typeof consume !== 'function') throw new Error(`event consumer '${id}' requires a callback`)
@@ -761,6 +804,8 @@ export class ExtensionHost<TTextEditorExtension extends ExtensionIdentity = Exte
                 ? this.widgets.registerPreviewRenderer(p.value)
                 : p.category === 'textEditorExtension'
                   ? this.options.registerTextEditorExtension?.(p.value) ?? (() => {})
+                  : p.category === 'canvasLayer'
+                    ? this.options.registerCanvasLayer?.(p.value) ?? (() => {})
                 : p.category === 'setting'
                   ? this.options.registerSetting?.(p.value) ?? (() => {})
                   : p.category === 'command'

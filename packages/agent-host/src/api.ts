@@ -4,13 +4,13 @@ import {
   credentialFetch,
   createCollabSession,
   encodePresence,
-  getCollabSession,
   listCollabSessions,
   PRESENCE_MAX_PROPOSALS,
   PRESENCE_MAX_PROPOSAL_NOTE,
   PRESENCE_MAX_PROPOSAL_SETTING_ID,
   PRESENCE_MAX_PROPOSAL_VALUE,
   PRESENCE_VERSION,
+  type CollabSessionRequestOptions,
   type SettingsProposal,
 } from '@dinkster/client'
 import {
@@ -19,6 +19,7 @@ import {
   asLineageId,
   connectSharedSession,
   coreCommandRegistry,
+  type CollabDenial,
   type CollabSessionDescriptor,
   type CommandOutcome,
   type Diagnostic,
@@ -34,7 +35,7 @@ import {
 
 const SCOPE = 'shared'
 
-export interface CreateSessionOptions {
+export interface CreateSessionOptions extends CollabSessionRequestOptions {
   readonly documentId?: string
   readonly snapshot?: WorkflowDocument
   readonly token?: string | undefined
@@ -43,6 +44,7 @@ export interface CreateSessionOptions {
 
 export interface AgentConnectOptions {
   readonly token?: string | undefined
+  readonly onDiagnostic?: ((diagnostic: CollabDenial) => void) | undefined
   readonly actorId?: string
   readonly displayName?: string
   readonly owner?: string
@@ -93,8 +95,10 @@ export const defaultActorId = (): string =>
 const waitForLive = async (
   session: SharedDocumentSession,
   targetRevision: number,
+  connection: CollabHttpConnection,
 ): Promise<void> => {
   for (let attempt = 0; attempt < 200; attempt += 1) {
+    await connection.waitForUserSession()
     const status = session.status.get()
     if (status === 'live' && session.revision >= targetRevision) return
     if (status === 'closed' || status === 'error') {
@@ -107,26 +111,25 @@ const waitForLive = async (
 
 const settleSharedSession = async (
   session: SharedDocumentSession,
-  baseUrl: string,
-  sessionId: string,
-  token?: string,
+  connection: CollabHttpConnection,
 ): Promise<void> => {
   for (let attempt = 0; attempt < 200; attempt += 1) {
+    await connection.waitForUserSession()
     await session.settle()
     const status = session.status.get()
     if (status === 'live') return
     if (status === 'closed' || status === 'error') {
       throw new Error(`session became ${status} while acknowledging edits`)
     }
-    const descriptor = await getCollabSession(baseUrl, sessionId, credentialFetch({ token, actorKind: 'agent' }))
+    const descriptor = await connection.fetchSession()
     if (descriptor === undefined) throw new Error('session ended while acknowledging edits')
-    await waitForLive(session, descriptor.revision)
+    await waitForLive(session, descriptor.revision, connection)
   }
   throw new Error('session did not finish acknowledging edits')
 }
 
-export async function listSessions(baseUrl: string, token?: string, scope = SCOPE): Promise<readonly CollabSessionDescriptor[]> {
-  return listCollabSessions(baseUrl.replace(/\/$/, ''), scope, credentialFetch({ token, actorKind: 'agent' }))
+export async function listSessions(baseUrl: string, token?: string, scope = SCOPE, options: CollabSessionRequestOptions = {}): Promise<readonly CollabSessionDescriptor[]> {
+  return listCollabSessions(baseUrl.replace(/\/$/, ''), scope, credentialFetch({ token, actorKind: 'agent' }), options)
 }
 
 export async function createSession(
@@ -138,7 +141,7 @@ export async function createSession(
     scope: options.scope ?? SCOPE,
     documentId: options.documentId ?? snapshot.lineage,
     snapshot,
-  }, credentialFetch({ token: options.token, actorKind: 'agent' }))
+  }, credentialFetch({ token: options.token, actorKind: 'agent' }), options)
 }
 
 export function createAgentHandle(
@@ -255,6 +258,7 @@ export function beginConnect(
   const normalizedBaseUrl = baseUrl.replace(/\/$/, '')
   const connection = new CollabHttpConnection({
     baseUrl: normalizedBaseUrl, sessionId, actorId, token: options.token, actorKind: 'agent',
+    onDiagnostic: options.onDiagnostic,
   })
   let session: SharedDocumentSession | undefined
   let connectedHandle: AgentSessionHandle | undefined
@@ -270,15 +274,15 @@ export function beginConnect(
       })
       session = connected
       connection.onEvent((event) => {
-        if (event.kind === 'denial') void connected.settle().catch(() => {})
+        if (event.kind === 'denial' && event.diagnostic.reason !== 'user-session-required') void connected.settle().catch(() => {})
       })
       if (connection.denial !== undefined) await connected.settle()
       if (closed) throw new Error('connection closed while joining')
-      const descriptor = await getCollabSession(normalizedBaseUrl, sessionId, credentialFetch({ token: options.token, actorKind: 'agent' }))
+      const descriptor = await connection.fetchSession()
       if (descriptor === undefined) throw new Error('session ended while joining')
-      await waitForLive(connected, descriptor.revision)
+      await waitForLive(connected, descriptor.revision, connection)
       if (closed) throw new Error('connection closed while joining')
-      const settle = () => settleSharedSession(connected, normalizedBaseUrl, sessionId, options.token)
+      const settle = () => settleSharedSession(connected, connection)
       connectedHandle = createAgentHandle(
         connected,
         settle,

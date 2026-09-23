@@ -1,9 +1,6 @@
 import { diag, type Diagnostic } from '../diagnostics.js'
 import type { ReplacementRule } from '../replace/model.js'
-import {
-  DINKSTER_ACCEPTED_WIRE_VERSIONS,
-  type DinksterNodesPayload,
-} from './dinkster-wire.js'
+import type { DinksterNodesPayload } from './dinkster-wire.js'
 import type { NodeSchema } from './model.js'
 import {
   array,
@@ -69,7 +66,6 @@ const parsePackRegistry = (
   ownerPack: string,
   value: unknown,
   nativeSchemas: ReadonlyMap<string, NodeSchema>,
-  allowedWireVersions: readonly number[],
 ): ParsedPackRegistry => {
   const raw = fields(value, `pack '${ownerPack}' comfyAliases`, ['format', 'sourceSchemas', 'records'])
   if (raw['format'] !== COMFY_ALIAS_FORMAT) throw new Error(`unsupported format '${String(raw['format'])}'`)
@@ -78,7 +74,6 @@ const parsePackRegistry = (
     const schema = parseComfySourceSchema(
       item,
       `pack '${ownerPack}' comfyAliases.sourceSchemas[${index}]`,
-      allowedWireVersions,
     )
     if (sourceSchemas.has(schema.type)) throw new Error(`duplicate source schema nodeType '${schema.type}'`)
     sourceSchemas.set(schema.type, schema)
@@ -137,7 +132,6 @@ const parsePackRegistry = (
 export function comfyAliasCatalogFromDinksterWire(
   payload: DinksterNodesPayload,
   nativeSchemas: ReadonlyMap<string, NodeSchema>,
-  allowedWireVersions: readonly number[] = DINKSTER_ACCEPTED_WIRE_VERSIONS,
 ): ComfyAliasCatalogResult {
   const diagnostics: Diagnostic[] = []
   const parsed: ParsedPackRegistry[] = []
@@ -149,7 +143,7 @@ export function comfyAliasCatalogFromDinksterWire(
     const aliases = (packRaw as Record<string, unknown>)['comfyAliases']
     if (aliases === undefined) continue
     try {
-      const registry = parsePackRegistry(packId, aliases, nativeSchemas, allowedWireVersions)
+      const registry = parsePackRegistry(packId, aliases, nativeSchemas)
       parsed.push(registry)
       diagnostics.push(...comfyRevisionDiagnostics(registry.records.map((record) => record.source), packId))
     } catch (error) {

@@ -6,7 +6,7 @@ import { upstreamRecipesEqual } from '../src/compile/recipe.js'
 import { occurrenceDynamicView } from '../src/compile/occurrence-view.js'
 import type { WorkflowDocument } from '../src/format/document.js'
 import { asConnectionId } from '../src/ids.js'
-import { parseDinksterNodes, parseDinksterSchemaWire38, parseDinksterSchemaWire39 } from '../src/schema/dinkster-wire.js'
+import { parseDinksterNodes, parseDinksterSchema } from '../src/schema/dinkster-wire.js'
 import { deriveBoundarySchema } from '../src/schema/derive-boundary.js'
 import { elaborateInterface, elabOutputsOf } from '../src/schema/elaborate.js'
 import type { NodeSchema, OutputDescriptorsSpec } from '../src/schema/model.js'
@@ -35,7 +35,7 @@ const sink: NodeSchema = { ...schema, type: 'Sink', items: [{ kind: 'input', id:
 const resolve = (type: string): NodeSchema | undefined => type === schema.type ? schema : type === sink.type ? sink : undefined
 const outputRows = (s: NodeSchema, values: Record<string, unknown>) => elabOutputsOf(elaborateInterface(s, { values: values as Record<string, string> })).map((output) => [output.address.port, output.spec.displayName, output.spec.type])
 const wire = {
-  schemaVersion: 39,
+  schemaVersion: 1,
   interface: [
     { role: 'input', id: 'entries', type: { kind: 'concrete', types: ['core.string'] }, required: true },
     { role: 'outputDescriptors', ...spec, choices: spec.choices.map((choice) => ({ ...choice, type: { kind: 'concrete', types: [choice.type.name] } })) },
@@ -62,56 +62,44 @@ function document(chained = false): WorkflowDocument {
 const run = (doc: WorkflowDocument) => compile({ document: doc, revision: 0, resolve, scope: { kind: 'full' }, connection: asConnectionId('test'), schemaHash: 'test' })
 
 describe('stored output descriptors', () => {
-  it('requires wire 39 or later with concrete catalog choices and required string source', () => {
-    expect(parseDinksterSchemaWire39(schema.type, wire).schema?.items[1]).toMatchObject({ outputDescriptors: spec })
-    expect(parseDinksterSchemaWire38(schema.type, { ...wire, schemaVersion: 38 }).schema).toBeUndefined()
+  it('requires concrete catalog choices and a required string source', () => {
+    expect(parseDinksterSchema(schema.type, wire).schema?.items[1]).toMatchObject({ outputDescriptors: spec })
     for (const mutation of [
       { minEntries: -1 }, { maxEntries: 513 }, { minEntries: 33 }, { fixedIds: 'yes' }, { choices: [] },
       { choices: [{ id: 'bad', type: { kind: 'wildcard' } }] },
       { probe: { input: 'missing', kind: 'model', revision: '1' }, fixedIds: true },
     ]) {
       const altered = { ...wire, interface: [wire.interface[0], { ...wire.interface[1], ...mutation }] }
-      expect(parseDinksterSchemaWire39(schema.type, altered).schema, JSON.stringify(mutation)).toBeUndefined()
+      expect(parseDinksterSchema(schema.type, altered).schema, JSON.stringify(mutation)).toBeUndefined()
     }
   })
 
-  it.each([14, 15, 38])('refuses descriptor constructs on older wire %s rather than dropping outputs', (schemaVersion) => {
-    const parsed = parseDinksterNodes({ schemaVersion, nodes: {
-      [schema.type]: { ...wire, schemaVersion },
-    } })
-    expect(parsed.schemas.size).toBe(0)
-    expect(parsed.diagnostics).toContainEqual(expect.objectContaining({
-      severity: 'error', message: expect.stringContaining('outputDescriptors requires schema wire 39'),
-    }))
-  })
-
-  it.each([39, 40])('coexists with storage and media declarations on wire %s', (schemaVersion) => {
+  it('coexists with storage and media declarations', () => {
     const media = {
       role: 'input', id: 'image', required: true, acceptsStorage: true,
-      type: { kind: 'concrete', types: ['dinkster.image'] },
-      ...(schemaVersion === 40 ? { alphaPolicy: 'require' } : {}),
+      type: { kind: 'concrete', types: ['dinkster.image'] }, alphaPolicy: 'require',
     }
-    const catalog = (acceptsStorage: unknown) => ({ schemaVersion, nodes: {
-      [schema.type]: { ...wire, schemaVersion, interface: [...wire.interface, { ...media, acceptsStorage }] },
+    const catalog = (acceptsStorage: unknown) => ({ schemaVersion: 1, nodes: {
+      [schema.type]: { ...wire, interface: [...wire.interface, { ...media, acceptsStorage }] },
     } })
     const parsed = parseDinksterNodes(catalog(true))
     expect(parsed.diagnostics).toEqual([])
     const decoded = parsed.schemas.get(schema.type)!
-    expect(decoded.items[2]).toMatchObject({ acceptsStorage: true, ...(schemaVersion === 40 ? { alphaPolicy: 'require' } : {}) })
+    expect(decoded.items[2]).toMatchObject({ acceptsStorage: true, alphaPolicy: 'require' })
     expect(outputRows(decoded, { entries: literal })).toEqual(outputRows(schema, { entries: literal }))
     expect(parseDinksterNodes(catalog('true')).schemas.size).toBe(0)
   })
 
-  it('preserves wire 40 choice policies through elaboration and boundary projection', () => {
+  it('preserves choice policies through elaboration and boundary projection', () => {
     const policy = { alphaPolicy: 'require', maskPolarity: 'transparency', maskSemantic: 'alpha' }
-    const catalog = (schemaVersion: number, fields: Record<string, unknown>) => ({ schemaVersion, nodes: {
-      [schema.type]: { ...wire, schemaVersion, interface: [wire.interface[0], {
+    const catalog = (fields: Record<string, unknown>) => ({ schemaVersion: 1, nodes: {
+      [schema.type]: { ...wire, interface: [wire.interface[0], {
         ...wire.interface[1], choices: spec.choices.map((choice) => ({
           ...choice, ...fields, type: { kind: 'concrete', types: [choice.type.name] },
         })),
       }] },
     } })
-    const parsed = parseDinksterNodes(catalog(40, policy))
+    const parsed = parseDinksterNodes(catalog(policy))
     expect(parsed.diagnostics).toEqual([])
     const decoded = parsed.schemas.get(schema.type)!
     for (const output of elabOutputsOf(elaborateInterface(decoded, { values: { entries: literal } }))) {
@@ -120,9 +108,8 @@ describe('stored output descriptors', () => {
     const derived = deriveBoundarySchema(document().graphs.inner!, () => decoded)
     expect(derived.diagnostics).toEqual([])
     expect(elabOutputsOf(elaborateInterface(derived.schema!, { values: {} }))[0]?.spec).toMatchObject(policy)
-    expect(parseDinksterNodes(catalog(39, policy)).schemas.size).toBe(0)
     for (const fields of [{ alphaPolicy: 'unknown' }, { maskPolarity: true }, { maskSemantic: 'unknown' }, { acceptsStorage: true }]) {
-      expect(parseDinksterNodes(catalog(40, fields)).schemas.size).toBe(0)
+      expect(parseDinksterNodes(catalog(fields)).schemas.size).toBe(0)
     }
   })
 
@@ -173,7 +160,7 @@ describe('stored output descriptors', () => {
     const multiple = { ...wire, interface: [...wire.interface,
       { ...wire.interface[0], id: 'other' }, { ...wire.interface[1], input: 'other' },
     ] }
-    expect(parseDinksterSchemaWire39(schema.type, multiple).schema).toBeUndefined()
+    expect(parseDinksterSchema(schema.type, multiple).schema).toBeUndefined()
     expect(parseOutputDescriptors(spec, JSON.stringify({ entries: [{ ...entries[0], name: '\u{1f600}'.repeat(256) }] })).ok).toBe(true)
     expect(parseOutputDescriptors(spec, JSON.stringify({ entries: [{ ...entries[0], name: '\u{1f600}'.repeat(257) }] })).ok).toBe(false)
   })
