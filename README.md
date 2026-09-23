@@ -16,6 +16,12 @@ pnpm typecheck
 pnpm test
 ```
 
+Pull requests run the complete check suite with a five-minute budget. While
+private-repository hosted billing is unavailable, the required `CI_RUNNERS`
+repository variable selects a repository-scoped CPU-only Linux runner. The
+runner must not have a GPU label. Retargeting Linux checks to GitHub-hosted
+runners waits for GitHub support to resolve the account billing block.
+
 `@dinkster/client` and `@dinkster/core` are not published. This repository
 workspace-links pinned, byte-identical source trees for them. See
 [`SOURCE_REVISIONS.md`](SOURCE_REVISIONS.md) for the revisions and verification
