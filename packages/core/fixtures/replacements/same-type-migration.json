@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 28,
+  "schemaVersion": 1,
   "nodeType": "dinkster.image.to_mask",
   "displayName": "Image to Mask",
   "category": "fixture",

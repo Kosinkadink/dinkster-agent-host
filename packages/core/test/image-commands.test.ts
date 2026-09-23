@@ -157,6 +157,7 @@ describe('image.applyAsset', () => {
 const maskLoaderSchema: NodeSchema = {
   ...schema,
   type: 'dinkster.load_image',
+  editorRole: 'image-source',
   items: [
     {
       kind: 'input', id: 'image', optional: false,
@@ -171,6 +172,7 @@ const maskLoaderSchema: NodeSchema = {
 const maskPaintSchema: NodeSchema = {
   ...schema,
   type: 'dinkster.mask.paint',
+  editorRole: 'mask-paint',
   items: [
     { kind: 'input', id: 'source', type: { kind: 'asset', element: { kind: 'concrete', name: 'dinkster.image' } }, optional: false, widget: { widgetType: 'ASSET', options: {} } },
     { kind: 'input', id: 'operations', type: { kind: 'concrete', name: 'core.string' }, optional: false, widget: { widgetType: 'STRING', options: { multiline: true } } },
@@ -220,8 +222,11 @@ const maskGraph = (): GraphDef => ({
   },
 })
 
-const maskStore = (graphDef = maskGraph()) => new DocumentStore(document(graphDef), coreCommandRegistry([], (type) =>
-  type === maskLoaderSchema.type ? maskLoaderSchema : type === maskPaintSchema.type ? maskPaintSchema : undefined))
+const maskResolve = Object.assign((type: string) =>
+  type === maskLoaderSchema.type ? maskLoaderSchema : type === maskPaintSchema.type ? maskPaintSchema : undefined, {
+  forEditorRole: (role: string) => role === 'mask-paint' ? maskPaintSchema : role === 'image-source' ? maskLoaderSchema : undefined,
+})
+const maskStore = (graphDef = maskGraph()) => new DocumentStore(document(graphDef), coreCommandRegistry([], maskResolve))
 
 describe('image.applyMaskPaint', () => {
   it('atomically inserts one paint node and retargets only loader mask consumers', () => {
@@ -259,6 +264,12 @@ describe('image.applyMaskPaint', () => {
       { ...maskInvocation.params, operations: `${maskOperations}${' '.repeat(4_194_305)}` },
       ...nonIntegerMaskOperations.map((operations) => ({ ...maskInvocation.params, operations })),
     ]) expect(maskStore().dispatch({ command: maskInvocation.command, params }).ok).toBe(false)
+  })
+
+  it('reports a missing mask schema when no resolver is available', () => {
+    const outcome = new DocumentStore(document(maskGraph()), coreCommandRegistry()).dispatch(maskInvocation)
+    expect(outcome.ok).toBe(false)
+    expect(outcome.diagnostics.map((diagnostic) => diagnostic.code)).toContain('image.maskSchemaMissing')
   })
 })
 
@@ -440,18 +451,20 @@ describe('image.compositorApply', () => {
 })
 
 describe('image.documentExport', () => {
-  const loadSchema: NodeSchema = { ...schema, type: 'dinkster.layers.load', items: [
+  const loadSchema: NodeSchema = { ...schema, type: 'dinkster.layers.load', editorRole: 'layers-load', items: [
     { kind: 'input', id: 'document', type: { kind: 'concrete', name: 'dinkster.asset' }, optional: false,
       widget: { widgetType: 'ASSET', options: {} } },
     { kind: 'output', id: 'layers', type: { kind: 'concrete', name: 'dinkster.layers' } },
   ] }
-  const flattenSchema: NodeSchema = { ...schema, type: 'dinkster.layers.flatten', items: [
+  const flattenSchema: NodeSchema = { ...schema, type: 'dinkster.layers.flatten', editorRole: 'layers-flatten', items: [
     { kind: 'input', id: 'layers', type: { kind: 'concrete', name: 'dinkster.layers' }, optional: false },
     { kind: 'input', id: 'selector', type: { kind: 'concrete', name: 'core.string' }, optional: true,
       widget: { widgetType: 'STRING', options: {}, default: 'composite' } },
   ] }
-  const resolve = (type: string): NodeSchema | undefined =>
-    type === loadSchema.type ? loadSchema : type === flattenSchema.type ? flattenSchema : undefined
+  const resolve = Object.assign((type: string): NodeSchema | undefined =>
+    type === loadSchema.type ? loadSchema : type === flattenSchema.type ? flattenSchema : undefined, {
+    forEditorRole: (role: string) => role === 'layers-load' ? loadSchema : role === 'layers-flatten' ? flattenSchema : undefined,
+  })
   const asset = { ...sourceRef, mediaType: 'application/vnd.dinkster.image-document+json' }
   const params = () => ({ graphId: 'g0', expectedGraphFingerprint: sha256Hex(canonicalJson(graph())), asset, position: { x: 80, y: 80 } })
 
@@ -514,18 +527,18 @@ describe('image.documentRecipeExport', () => {
     { ...schema, type: 'Source', items: [
       { kind: 'output', id: 'out', type: { kind: 'concrete', name: 'dinkster.layers' } },
     ] },
-    { ...schema, type: 'dinkster.layers.edit', items: [
+    { ...schema, type: 'dinkster.layers.edit', editorRole: 'layers-edit', items: [
       { kind: 'input', id: 'layers', type: { kind: 'concrete', name: 'dinkster.layers' }, optional: false },
       { kind: 'input', id: 'commands', type: { kind: 'concrete', name: 'core.string' }, optional: false,
         widget: { widgetType: 'STRING', options: { multiline: true } } },
       { kind: 'output', id: 'layers', type: { kind: 'concrete', name: 'dinkster.layers' } },
     ] },
-    { ...schema, type: 'dinkster.layers.flatten', items: [
+    { ...schema, type: 'dinkster.layers.flatten', editorRole: 'layers-flatten', items: [
       { kind: 'input', id: 'layers', type: { kind: 'concrete', name: 'dinkster.layers' }, optional: false },
       { kind: 'input', id: 'selector', type: { kind: 'concrete', name: 'core.string' }, optional: true },
       { kind: 'output', id: 'image', type: { kind: 'concrete', name: 'dinkster.image' } },
     ] },
-    { ...schema, type: 'dinkster.save_image', isOutputNode: true, items: [
+    { ...schema, type: 'dinkster.save_image', editorRole: 'image-save', isOutputNode: true, items: [
       { kind: 'input', id: 'images', type: { kind: 'concrete', name: 'dinkster.image' }, optional: false },
       { kind: 'input', id: 'format', type: { kind: 'concrete', name: 'core.combo' }, optional: true,
         widget: { widgetType: 'COMBO', options: { options: ['png', 'jpeg', 'webp'] }, default: 'png' } },
@@ -534,7 +547,9 @@ describe('image.documentRecipeExport', () => {
       { kind: 'output', id: 'assets', type: { kind: 'list', element: { kind: 'asset', element: { kind: 'concrete', name: 'dinkster.image' } } } },
     ] },
   ]
-  const resolve = (type: string): NodeSchema | undefined => schemas.find((candidate) => candidate.type === type)
+  const resolve = Object.assign((type: string): NodeSchema | undefined => schemas.find((candidate) => candidate.type === type), {
+    forEditorRole: (role: string) => schemas.find((candidate) => candidate.editorRole === role),
+  })
   const params = () => ({
     graphId: 'g0',
     expectedGraphFingerprint: sha256Hex(canonicalJson(graph())),

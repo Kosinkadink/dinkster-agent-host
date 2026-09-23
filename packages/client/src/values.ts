@@ -22,7 +22,7 @@
  */
 
 import { parseAssetTypeId } from '@dinkster/core'
-import type { FetchLike } from './connection.js'
+import type { FetchLike } from './connection-contract.js'
 
 // ---------------------------------------------------------------------------
 // Wire shapes (decoded, normalized)

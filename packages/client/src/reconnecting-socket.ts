@@ -39,6 +39,7 @@ export interface ReconnectingSocketConfig {
    * (e.g. Comfy v1 feature negotiation).
    */
   readonly onOpen?: (send: (data: string) => void) => void
+  readonly onClose?: (event: unknown) => void
   /** Every inbound message's raw data (string or ArrayBuffer). */
   readonly onData: (data: unknown) => void
 }
@@ -110,11 +111,12 @@ export class ReconnectingSocket {
       if (this.ws !== ws || this.deliberateClose) return
       this.config.onData(ev.data)
     }
-    ws.onclose = () => {
+    ws.onclose = (event) => {
       // A close from a superseded socket must not touch current state
       // (disconnect() + connect() can race an in-flight async close).
       if (this.ws !== ws) return
       this.ws = undefined
+      this.config.onClose?.(event)
       if (this.deliberateClose) {
         this.statusSignal.set('disconnected')
         return

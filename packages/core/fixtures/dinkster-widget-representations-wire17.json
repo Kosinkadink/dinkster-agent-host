@@ -2,13 +2,19 @@
   "schemaVersion": 1,
   "dinkster": {
     "version": "0.0.1",
-    "schemaWire": 17,
-    "graphFeatures": ["typedLiteral"],
-    "mergeableTypes": ["comfy.IMAGE"]
+    "schemaWire": 1,
+    "graphFeatures": [
+      "typedLiteral"
+    ],
+    "mergeableTypes": [
+      "comfy.IMAGE"
+    ]
   },
   "nodes": {
     "dinkster.clip_text_encode": {
-      "aliases": ["CLIPTextEncode"],
+      "aliases": [
+        "CLIPTextEncode"
+      ],
       "category": "model/conditioning",
       "description": "Encodes a text prompt using a CLIP model into an embedding that can be used to guide the diffusion model towards generating specific images.",
       "displayName": "CLIP Text Encode",
@@ -19,19 +25,30 @@
           "id": "text",
           "required": true,
           "role": "input",
-          "type": {"kind": "concrete", "types": ["core.string"]},
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.string"
+            ]
+          },
           "widget": {
             "default": "multiline",
             "representations": [
               {
                 "displayName": "Single line",
                 "id": "single-line",
-                "widget": {"multiline": false, "type": "STRING"}
+                "widget": {
+                  "multiline": false,
+                  "type": "STRING"
+                }
               },
               {
                 "displayName": "Multiline",
                 "id": "multiline",
-                "widget": {"multiline": true, "type": "STRING"}
+                "widget": {
+                  "multiline": true,
+                  "type": "STRING"
+                }
               }
             ],
             "type": "REPRESENTATIONS",
@@ -43,17 +60,27 @@
           "id": "clip",
           "required": true,
           "role": "input",
-          "type": {"kind": "concrete", "types": ["comfy.CLIP"]}
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "comfy.CLIP"
+            ]
+          }
         },
         {
           "id": "conditioning",
           "role": "output",
-          "type": {"kind": "concrete", "types": ["comfy.CONDITIONING"]}
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "comfy.CONDITIONING"
+            ]
+          }
         }
       ],
       "nodeType": "dinkster.clip_text_encode",
       "pack": "comfy",
-      "schemaVersion": 17,
+      "schemaVersion": 1,
       "searchTerms": [
         "CLIPTextEncode",
         "text",

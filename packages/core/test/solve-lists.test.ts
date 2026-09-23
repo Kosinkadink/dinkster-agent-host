@@ -11,7 +11,7 @@
  * - deliberate under-constraint: open list vs bare variable records nothing
  */
 import { describe, expect, it } from 'vitest'
-import { typesCompatible } from '../src/schema/compat.js'
+import { typesCompatible } from '../src/schema/type-compatibility.js'
 import { asNodeId, asPortId } from '../src/ids.js'
 import type { GraphDef } from '../src/format/document.js'
 import type { SchemaResolver } from '../src/schema/derive-boundary.js'

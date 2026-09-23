@@ -20,7 +20,7 @@ const fixture = JSON.parse(readFileSync(
 )) as { schemas: (DinksterWireSchema & { nodeType: string })[] }
 
 const decoded = parseDinksterNodes({
-  schemaVersion: 28,
+  schemaVersion: 1,
   nodes: Object.fromEntries(fixture.schemas.map((schema) => [schema.nodeType, schema])),
 })
 expect(decoded.diagnostics).toEqual([])

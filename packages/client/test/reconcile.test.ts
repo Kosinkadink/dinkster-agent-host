@@ -4,7 +4,8 @@
  */
 import { describe, expect, it } from 'vitest'
 import { asConnectionId, asPromptId, type ExecutionRef } from '@dinkster/core'
-import { BackendConnection, ExecutionStore, reconcileExecutions, type FetchLike } from '../src/index.js'
+import { ExecutionStore, type FetchLike } from '../src/index.js'
+import { BackendConnection, reconcileExecutions } from '../src/comfy-v1.js'
 
 const C0 = asConnectionId('c0')
 const ref = (prompt: string): ExecutionRef => ({ connection: C0, prompt: asPromptId(prompt) })

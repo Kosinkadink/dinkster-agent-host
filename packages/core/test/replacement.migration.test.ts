@@ -23,7 +23,7 @@ const fixture = JSON.parse(readFileSync(
 )) as DinksterWireSchema & { nodeType: string }
 
 const decoded = parseDinksterNodes({
-  schemaVersion: 28,
+  schemaVersion: 1,
   nodes: { [fixture.nodeType]: fixture },
 })
 expect(decoded.diagnostics).toEqual([])
@@ -978,11 +978,11 @@ describe('published Save Video v3 migration', () => {
     'utf8',
   )) as DinksterWireSchema & { nodeType: string }
   const decodedVideo = parseDinksterNodes({
-    schemaVersion: 38,
+    schemaVersion: 1,
     nodes: { [videoFixture.nodeType]: videoFixture },
   })
   expect(decodedVideo.diagnostics).toEqual([])
-  expect(videoFixture).toMatchObject({ nodeType: 'dinkster.save_video', version: 3, schemaVersion: 38 })
+  expect(videoFixture).toMatchObject({ nodeType: 'dinkster.save_video', version: 3, schemaVersion: 1 })
 
   const input = (id: string, name: string, extra: Partial<InputSpec> = {}): InputSpec => ({
     kind: 'input', id, type: { kind: 'concrete', name }, optional: false, ...extra,

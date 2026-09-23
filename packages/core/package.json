@@ -5,7 +5,8 @@
   "type": "module",
   "description": "Framework-free core: document model, schema registry, identity, contracts (M-1).",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./comfy-v1": "./src/comfy-v1.ts"
   },
   "scripts": {
     "test": "vitest run --exclude test/perf.test.ts --exclude test/perf-dispatch.test.ts && vitest run test/perf.test.ts && vitest run test/perf-dispatch.test.ts",

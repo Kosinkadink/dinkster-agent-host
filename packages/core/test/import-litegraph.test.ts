@@ -24,7 +24,7 @@ import { createReplacementRegistry } from '../src/replace/registry.js'
 import { scanReplacements } from '../src/replace/scan.js'
 import { elabInputsOf, elaborateInterface } from '../src/schema/elaborate.js'
 import type { CountBoundOutputAutogrowSpec, InputSpec, NodeSchema, OutputSpec } from '../src/schema/model.js'
-import { parseDinksterSchemaWire16, type DinksterWireSchema } from '../src/schema/dinkster-wire.js'
+import { parseDinksterSchema, type DinksterWireSchema } from '../src/schema/dinkster-wire.js'
 import { parseObjectInfo, type ObjectInfoEntry } from '../src/schema/object-info.js'
 import { solveGraphTypes } from '../src/schema/solve.js'
 
@@ -34,9 +34,9 @@ const readJson = (rel: string): unknown => JSON.parse(readFileSync(join(root, re
 const objectInfo = readJson('fixtures/object_info.json') as Record<string, ObjectInfoEntry>
 const { schemas } = parseObjectInfo(objectInfo)
 const resolve = (type: string) => schemas.get(type)
-const resizeImageMaskSchema = parseDinksterSchemaWire16(
+const resizeImageMaskSchema = parseDinksterSchema(
   'comfy.ResizeImageMaskNode',
-  readJson('fixtures/dinkster-resize-image-mask-wire16.json') as DinksterWireSchema,
+  { ...readJson('fixtures/dinkster-resize-image-mask-wire16.json') as DinksterWireSchema, schemaVersion: 1 },
 ).schema!
 
 const errorsOf = (d: readonly Diagnostic[]) => d.filter((x) => x.severity === 'error')

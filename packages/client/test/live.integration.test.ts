@@ -14,7 +14,8 @@ import {
   loadDocument,
   type WorkflowDocument,
 } from '@dinkster/core'
-import { BackendConnection, ExecutionStore, type WebSocketLike } from '../src/index.js'
+import { ExecutionStore, type WebSocketLike } from '../src/index.js'
+import { BackendConnection } from '../src/comfy-v1.js'
 
 const LIVE_URL = process.env['DINKSTER_LIVE_URL']
 const coreRoot = join(dirname(fileURLToPath(import.meta.url)), '../../core')

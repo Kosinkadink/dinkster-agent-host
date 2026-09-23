@@ -1,7 +1,7 @@
 import { userInfo } from 'node:os'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import * as z from 'zod/v4'
-import type { ExecutionScope, Json } from '@dinkster/core'
+import type { CollabDenial, ExecutionScope, Json } from '@dinkster/core'
 import {
   beginConnect,
   createSession,
@@ -13,7 +13,7 @@ import { commandCatalog } from './catalog.js'
 import { captureExecutionDenial } from './execution.js'
 
 export interface AgentApi {
-  listSessions(baseUrl: string, token?: string, scope?: string): ReturnType<typeof listSessions>
+  listSessions(...args: Parameters<typeof listSessions>): ReturnType<typeof listSessions>
   createSession(baseUrl: string, options?: Parameters<typeof createSession>[1]): ReturnType<typeof createSession>
   beginConnect(baseUrl: string, sessionId: string, options?: AgentConnectOptions): PendingAgentConnection
 }
@@ -45,6 +45,11 @@ export function createToolHandlers(
   credentials: { token?: string | undefined; scope?: string | undefined } = {},
 ): { handlers: AgentToolHandlers; close: () => void } {
   const sessions = new Map<string, PendingAgentConnection>()
+  const requests = new AbortController()
+  const onDiagnostic = (diagnostic: CollabDenial) => {
+    console.error(JSON.stringify(diagnostic))
+  }
+  const requestOptions = { signal: requests.signal, onDiagnostic }
   let closed = false
   const joined = (sessionId: string) => {
     if (closed) throw new Error('agent host is closed')
@@ -55,6 +60,7 @@ export function createToolHandlers(
         ...(actorId !== undefined ? { actorId } : {}),
         harness: 'mcp',
         owner: userInfo().username,
+        onDiagnostic,
       })
       sessions.set(sessionId, pending)
       void pending.handle.catch(() => sessions.delete(sessionId))
@@ -62,8 +68,8 @@ export function createToolHandlers(
     return pending.handle
   }
   const handlers: AgentToolHandlers = {
-    sessions_list: () => api.listSessions(baseUrl, credentials.token, credentials.scope),
-    session_create: (args) => api.createSession(baseUrl, { ...credentials, ...(args.documentId && { documentId: args.documentId }) }),
+    sessions_list: () => api.listSessions(baseUrl, credentials.token, credentials.scope, requestOptions),
+    session_create: (args) => api.createSession(baseUrl, { ...credentials, ...requestOptions, ...(args.documentId && { documentId: args.documentId }) }),
     commands_list: async () => commandCatalog,
     document_get: async ({ sessionId }) => (await joined(sessionId)).getDocument(),
     command_dispatch: async ({ sessionId, command, params }) => {
@@ -104,6 +110,7 @@ export function createToolHandlers(
     handlers,
     close: () => {
       closed = true
+      requests.abort()
       for (const pending of sessions.values()) pending.close()
       sessions.clear()
     },

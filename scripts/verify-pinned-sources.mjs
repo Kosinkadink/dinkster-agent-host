@@ -3,9 +3,9 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 
 const expectedTrees = new Map([
-  ['packages/agent-host', 'b57270de9289c4155a4bed16d1758e964eda35bce754e32872deea44681276e4'],
-  ['packages/client', '813a2cae9c2836612f6b67bb1a7fa391ed2d302b48dc835a16a2a5d24ea885fb'],
-  ['packages/core', '9ca9c7680cae0cc8bfe3b4054cdb63d5eb2eed3ed5547a0357b7a9b9eb966775'],
+  ['packages/agent-host', '23ebca4633b95e0dbbde1e276e7e47c7d1b2e15b869e0f56699237179d59ffff'],
+  ['packages/client', '996d6e0622550c8e897788d10b946e4a2e36a38a1469b65c887aada8af088700'],
+  ['packages/core', '0ee22ab556623c0b73a8331b9c2be05778f6a1ca552c8211f8d32f94ddf312b1'],
 ])
 
 for (const [directory, expected] of expectedTrees) {

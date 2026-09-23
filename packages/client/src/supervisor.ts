@@ -16,7 +16,7 @@
  * All optional fields are omitted-when-unknown, never null. The protocol
  * grows additively, so unknown fields pass through unread.
  */
-import type { FetchLike } from './connection.js'
+import type { FetchLike } from './connection-contract.js'
 
 export type SupervisorState = 'starting' | 'ready' | 'failed' | 'stopped'
 

@@ -2,7 +2,7 @@
 import { userInfo } from 'node:os'
 import { readFile, writeFile } from 'node:fs/promises'
 import { credentialFetch, mintDelegation } from '@dinkster/client'
-import type { Diagnostic, ExecutionScope, Json, NormalizedEvent } from '@dinkster/core'
+import type { CollabDenial, Diagnostic, ExecutionScope, Json, NormalizedEvent } from '@dinkster/core'
 import { commandCatalog } from './catalog.js'
 import {
   connect,
@@ -299,9 +299,13 @@ export async function followExecutionEvents(
 }
 
 export async function runCli(options: CliOptions, connectAgent: typeof connect = connect): Promise<unknown> {
+  const onDiagnostic = (diagnostic: CollabDenial) => {
+    console.error(JSON.stringify(diagnostic))
+  }
   const connectForCli = () => connectAgent(options.baseUrl!, options.sessionId!, {
     token: options.token,
     actorId: options.actorId, harness: 'cli', owner: options.owner,
+    onDiagnostic,
   })
   switch (options.action) {
     case 'login': {
@@ -315,8 +319,8 @@ export async function runCli(options: CliOptions, connectAgent: typeof connect =
     }
     case 'help': return usage(options.helpTopic)
     case 'commands-list': return commandCatalog
-    case 'sessions-list': return listSessions(options.baseUrl!, options.token, options.collaborationScope)
-    case 'sessions-create': return createSession(options.baseUrl!, { token: options.token, scope: options.collaborationScope })
+    case 'sessions-list': return listSessions(options.baseUrl!, options.token, options.collaborationScope, { onDiagnostic })
+    case 'sessions-create': return createSession(options.baseUrl!, { token: options.token, scope: options.collaborationScope, onDiagnostic })
     case 'document-get': {
       const handle = await connectForCli()
       try { return handle.getDocument() } finally { handle.close() }

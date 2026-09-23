@@ -59,7 +59,7 @@ const adjustWire = JSON.parse(
 ) as { mirror: { source: string; tolerance: { perChannel: number } } }
 
 const adjustSchema = ((): NodeSchema => {
-  const parsed = parseDinksterNodes({ schemaVersion: 29, nodes: { 'dinkster.image.adjust': adjustWire } })
+  const parsed = parseDinksterNodes({ schemaVersion: 1, nodes: { 'dinkster.image.adjust': adjustWire } })
   expect(parsed.diagnostics.filter((d) => d.severity === 'error')).toEqual([])
   const schema = parsed.schemas.get('dinkster.image.adjust')
   expect(schema).toBeDefined()
@@ -90,7 +90,7 @@ const filterWire = JSON.parse(
 ) as { mirror: { source: string; tolerance: { perChannel: number }; applies: Record<string, readonly string[]> } }
 
 const filterSchema = ((): NodeSchema => {
-  const parsed = parseDinksterNodes({ schemaVersion: 30, nodes: { 'dinkster.image.filter': filterWire } })
+  const parsed = parseDinksterNodes({ schemaVersion: 1, nodes: { 'dinkster.image.filter': filterWire } })
   expect(parsed.diagnostics.filter((d) => d.severity === 'error')).toEqual([])
   const schema = parsed.schemas.get('dinkster.image.filter')
   expect(schema).toBeDefined()

@@ -43,19 +43,18 @@ const readJson = (rel: string): unknown => JSON.parse(readFileSync(join(coreRoot
 
 const nodesPayload = readJson('fixtures/dinkster-nodes.json') as DinksterNodesPayload
 const docsPageFixture = JSON.parse(readFileSync(new URL('./fixtures/docs-page.json', import.meta.url), 'utf8')) as unknown
-const nodesPayloadAtWire = (
-  wire: number,
+const currentNodesPayload = (
   dinkster?: Record<string, unknown>,
 ): DinksterNodesPayload => ({
   ...nodesPayload,
-  schemaVersion: dinkster === undefined ? wire : 1,
-  ...(dinkster === undefined ? {} : { dinkster }),
+  schemaVersion: 1,
+  ...(dinkster === undefined ? {} : { dinkster: { ...dinkster, schemaWire: 1 } }),
   nodes: Object.fromEntries(
     Object.entries(nodesPayload.nodes as Record<string, Record<string, unknown>>)
-      .map(([type, schema]) => [type, { ...schema, schemaVersion: wire }]),
+      .map(([type, schema]) => [type, { ...schema, schemaVersion: 1 }]),
   ),
 })
-const liveNodesPayload = nodesPayloadAtWire(23)
+const liveNodesPayload = currentNodesPayload()
 const C0 = asConnectionId('c0')
 const registry = buildDinksterRegistry(C0, nodesPayload)
 const liveRegistry = buildDinksterRegistry(C0, liveNodesPayload)
@@ -66,8 +65,8 @@ const jsonResponse = (status: number, body: unknown): Response =>
 
 it('includes output profile detector revision in registry identity', () => {
   const payload = (revision: string): DinksterNodesPayload => ({
-    schemaVersion: 39,
-    nodes: { 'dinkster.load_model_profile': { schemaVersion: 39, interface: [
+    schemaVersion: 1,
+    nodes: { 'dinkster.load_model_profile': { schemaVersion: 1, interface: [
       { role: 'input', id: 'checkpoint', required: true, type: { kind: 'concrete', types: ['dinkster.asset'] } },
       { role: 'input', id: 'entries', required: true, type: { kind: 'concrete', types: ['core.string'] } },
       { role: 'outputDescriptors', input: 'entries', choices: ['model', 'clip', 'vae'].map((id) => ({ id, type: { kind: 'concrete', types: [`dinkster.${id}`] } })), minEntries: 1, maxEntries: 3, fixedIds: true, probe: { input: 'checkpoint', kind: 'model', revision } },
@@ -83,8 +82,8 @@ it('includes output profile detector revision in registry identity', () => {
 describe('schema registry identity', () => {
   it('excludes the wire 42 help availability marker from execution identity', () => {
     const base = {
-      schemaVersion: 42,
-      nodes: { Documented: { schemaVersion: 42, interface: [] } },
+      schemaVersion: 1,
+      nodes: { Documented: { schemaVersion: 1, interface: [] } },
     } as unknown as DinksterNodesPayload
     const withDocs = structuredClone(base) as any
     withDocs.nodes.Documented.hasDocs = true
@@ -94,9 +93,9 @@ describe('schema registry identity', () => {
 
   it('normalizes false storage acceptance but retains true in registry cache identity', () => {
     const base = {
-      schemaVersion: 39,
+      schemaVersion: 1,
       nodes: { Storage: {
-        schemaVersion: 39,
+        schemaVersion: 1,
         signature: 'backend-signature',
         interface: [{
           role: 'input', id: 'value', required: true,
@@ -116,9 +115,9 @@ describe('schema registry identity', () => {
 
   it('normalizes false stream acceptance and hashes stream and chunk policies', () => {
     const base = {
-      schemaVersion: 41,
+      schemaVersion: 1,
       nodes: { Stream: {
-        schemaVersion: 41,
+        schemaVersion: 1,
         signature: 'backend-signature',
         interface: [{
           role: 'input', id: 'image', required: true,
@@ -154,9 +153,9 @@ describe('schema registry identity', () => {
 
   it.each([{}, { role: 'input' }])('preserves literal default fields named acceptsStorage: %j', (fields) => {
     const payload = (value: unknown): DinksterNodesPayload => ({
-      schemaVersion: 39,
+      schemaVersion: 1,
       nodes: { Options: {
-        schemaVersion: 39, signature: 'backend-signature',
+        schemaVersion: 1, signature: 'backend-signature',
         interface: [{
           role: 'input', id: 'options', required: false,
           type: { kind: 'concrete', types: ['custom.options'] }, default: value,
@@ -170,9 +169,9 @@ describe('schema registry identity', () => {
 
   it('includes wire 40 media policies in registry cache identity', () => {
     const base = {
-      schemaVersion: 40,
+      schemaVersion: 1,
       nodes: { Media: {
-        schemaVersion: 40,
+        schemaVersion: 1,
         signature: 'backend-signature',
         interface: [{
           role: 'input', id: 'image', required: true,
@@ -188,9 +187,9 @@ describe('schema registry identity', () => {
 
   it('does not include remote COMBO policy fields in the frontend registry hash', () => {
     const base = {
-      schemaVersion: 20,
+      schemaVersion: 1,
       nodes: { Policy: {
-        schemaVersion: 20,
+        schemaVersion: 1,
         signature: 'backend-signature',
         interface: [{
           role: 'input', id: 'choice', required: true,
@@ -206,11 +205,11 @@ describe('schema registry identity', () => {
     expect(buildDinksterRegistry(C0, base).hash).toBe(buildDinksterRegistry(C0, withPolicy).hash)
   })
 
-  it('excludes MULTI_COMBO presentation and schema skips while retaining behavior', () => {
+  it('excludes MULTI_COMBO presentation while retaining behavior', () => {
     const base = {
-      schemaVersion: 21,
+      schemaVersion: 1,
       nodes: { Multi: {
-        schemaVersion: 21,
+        schemaVersion: 1,
         signature: 'backend-signature',
         interface: [{
           role: 'input', id: 'choices', required: true,
@@ -227,10 +226,6 @@ describe('schema registry identity', () => {
         controlAfterRefresh: 'last', timeoutMs: 2000, maxRetries: 1, refreshMs: 5000,
       },
     }
-    changed.schemaSkips = [{
-      nodeType: 'OtherMulti', code: 'schema-wire-required', requiredWire: 22,
-      reason: 'future descriptor requires schema wire 22',
-    }]
     expect(buildDinksterRegistry(C0, base).hash).not.toBe(buildDinksterRegistry(C0, changed).hash)
     delete changed.nodes.Multi.interface[0].widget.remote
     expect(buildDinksterRegistry(C0, base).hash).toBe(buildDinksterRegistry(C0, changed).hash)
@@ -240,9 +235,9 @@ describe('schema registry identity', () => {
 
   it('excludes wire 23 choice labels, info, and folders from registry identity', () => {
     const base = {
-      schemaVersion: 23,
+      schemaVersion: 1,
       nodes: { Sampler: {
-        schemaVersion: 23,
+        schemaVersion: 1,
         signature: 'backend-signature',
         interface: [{
           role: 'input', id: 'sampler', required: true,
@@ -264,9 +259,9 @@ describe('schema registry identity', () => {
 
   it('excludes wire 23 MULTI_COMBO presentation while retaining option values', () => {
     const base = {
-      schemaVersion: 23,
+      schemaVersion: 1,
       nodes: { Models: {
-        schemaVersion: 23,
+        schemaVersion: 1,
         signature: 'backend-signature',
         interface: [{
           role: 'input', id: 'models', required: true,
@@ -300,8 +295,40 @@ async function snapshotFixture(id: string): Promise<{ body: string; digest: stri
 }
 
 describe('mount listing decode', () => {
-  const connectionWith = (mounts: unknown): DinksterConnection =>
-    new DinksterConnection({ id: C0, baseUrl: '', clientId: 'test', webSocketFactory: () => ({}) as WebSocketLike, fetchFn: async () => jsonResponse(200, { mounts }) })
+  const connectionWith = (mounts: unknown, outputMount?: unknown, mountChangesAllowed: unknown = true): DinksterConnection =>
+    new DinksterConnection({ id: C0, baseUrl: '', clientId: 'test', webSocketFactory: () => ({}) as WebSocketLike, fetchFn: async () => jsonResponse(200, { mounts, mountChangesAllowed, ...(outputMount === undefined ? {} : { outputMount }) }) })
+
+  it('decodes mountChangesAllowed as an exact boolean', async () => {
+    await expect(connectionWith([], undefined, true).fetchMountSettings()).resolves.toMatchObject({ mountChangesAllowed: true })
+    await expect(connectionWith([], undefined, false).fetchMountSettings()).resolves.toMatchObject({ mountChangesAllowed: false })
+  })
+
+  it('decodes a missing mountChangesAllowed as false (older backends degrade to read-only)', async () => {
+    const fetch = (payload: unknown): DinksterConnection =>
+      new DinksterConnection({ id: C0, baseUrl: '', clientId: 'test', webSocketFactory: () => ({}) as WebSocketLike, fetchFn: async () => jsonResponse(200, payload) })
+    await expect(fetch({ mounts: [] }).fetchMountSettings()).resolves.toMatchObject({ mountChangesAllowed: false })
+    await expect(fetch({ mounts: [], mountChangesAllowed: undefined }).fetchMountSettings()).resolves.toMatchObject({ mountChangesAllowed: false })
+  })
+
+  it('rejects present non-boolean mountChangesAllowed', async () => {
+    const fetch = (payload: unknown): DinksterConnection =>
+      new DinksterConnection({ id: C0, baseUrl: '', clientId: 'test', webSocketFactory: () => ({}) as WebSocketLike, fetchFn: async () => jsonResponse(200, payload) })
+    for (const bad of ['true', 'false', 1, 0, null]) {
+      await expect(fetch({ mounts: [], mountChangesAllowed: bad }).fetchMountSettings()).rejects.toThrow('malformed mountChangesAllowed')
+    }
+  })
+
+  it('decodes the selected output mount and host path', async () => {
+    const settings = await connectionWith([
+      { id: 'output', mode: 'readwrite', state: 'ready', path: '/library/output' },
+    ], 'output').fetchMountSettings()
+    expect(settings).toEqual({
+      outputMount: 'output',
+      mountChangesAllowed: true,
+      mounts: [{ id: 'output', mode: 'readwrite', state: 'ready', path: '/library/output' }],
+    })
+    await expect(connectionWith([], 42).fetchMountSettings()).rejects.toThrow('malformed output mount')
+  })
 
   it("decodes the server vocabulary: 'read' and 'readwrite'", async () => {
     // The real server (dinkster_assets MOUNT_MODES) says 'read', never
@@ -380,6 +407,19 @@ describe('mount listing decode', () => {
       init: { method: 'POST', body: JSON.stringify({ id: 'shared-models', path: 'D:\\Models', mode: 'read' }) },
     })
     expect(requests[1]).toMatchObject({ url: 'http://native/api/mounts/shared-models', init: { method: 'DELETE' } })
+  })
+
+  it('selects the default output mount with the settings route', async () => {
+    const requests: { url: string; init?: RequestInit }[] = []
+    const connection = new DinksterConnection({ id: C0, baseUrl: 'http://native', clientId: 'test', webSocketFactory: () => ({}) as WebSocketLike, fetchFn: async (url, init) => {
+      requests.push({ url: String(url), ...(init ? { init } : {}) })
+      return jsonResponse(200, { outputMount: 'renders' })
+    } })
+    await connection.selectOutputMount('renders')
+    expect(requests).toEqual([{
+      url: 'http://native/api/mounts/output',
+      init: { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: 'renders' }) },
+    }])
   })
 })
 
@@ -495,6 +535,62 @@ describe('runtime settings transport', () => {
     const connection = new DinksterConnection({ id: C0, baseUrl: '', clientId: 'test', webSocketFactory: () => ({}) as WebSocketLike, fetchFn: async () => replies.shift()! })
     await expect(connection.updateRuntimeSetting('jobs', {})).rejects.toMatchObject({ status: 403, body: undefined, message: 'runtime settings request failed: 403' })
     await expect(connection.updateRuntimeSetting('jobs', {})).rejects.toMatchObject({ status: 500, body: undefined, message: 'runtime settings request failed: 500' })
+  })
+})
+
+describe('pack settings transport', () => {
+  const response = {
+    packId: 'pack/one',
+    displayName: 'Pack One',
+    schema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        enabled: { type: 'boolean', title: 'Enabled', default: true },
+        quality: { type: 'integer', title: 'Quality', default: 2, minimum: 1, maximum: 5 },
+      },
+      required: ['enabled', 'quality'],
+    },
+    values: { enabled: true, quality: 2 },
+  }
+
+  it('GETs and PUTs the encoded pack route with a complete values object', async () => {
+    const calls: { url: string; init?: RequestInit }[] = []
+    const connection = new DinksterConnection({
+      id: C0,
+      baseUrl: 'http://native',
+      clientId: 'test',
+      webSocketFactory: () => ({}) as WebSocketLike,
+      fetchFn: async (url, init) => {
+        calls.push({ url: String(url), ...(init ? { init } : {}) })
+        return jsonResponse(200, calls.length === 1 ? response : { ...response, values: { enabled: false, quality: 4 } })
+      },
+    })
+    await expect(connection.fetchPackSettings('pack/one')).resolves.toEqual(response)
+    await expect(connection.updatePackSettings('pack/one', { enabled: false, quality: 4 })).resolves.toMatchObject({ values: { enabled: false, quality: 4 } })
+    expect(calls).toEqual([
+      { url: 'http://native/api/packs/pack%2Fone/settings' },
+      { url: 'http://native/api/packs/pack%2Fone/settings', init: expect.objectContaining({ method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: '{"enabled":false,"quality":4}' }) },
+    ])
+  })
+
+  it('rejects malformed schemas and values instead of exposing partial settings', async () => {
+    const replies = [
+      { ...response, schema: { ...response.schema, future: true } },
+      { ...response, values: { enabled: true, quality: 9 } },
+      { ...response, values: { enabled: true, quality: 2**53 } },
+    ]
+    const connection = new DinksterConnection({ id: C0, baseUrl: '', clientId: 'test', fetchFn: async () => jsonResponse(200, replies.shift()) })
+    await expect(connection.fetchPackSettings('pack')).rejects.toThrow('pack settings response is malformed')
+    await expect(connection.fetchPackSettings('pack')).rejects.toThrow('pack settings response is malformed')
+    await expect(connection.fetchPackSettings('pack')).rejects.toThrow('pack settings response is malformed')
+  })
+
+  it('surfaces read status and backend mutation errors', async () => {
+    const replies = [jsonResponse(503, {}), jsonResponse(400, { error: 'quality must be at most 5' })]
+    const connection = new DinksterConnection({ id: C0, baseUrl: '', clientId: 'test', fetchFn: async () => replies.shift()! })
+    await expect(connection.fetchPackSettings('pack')).rejects.toThrow('pack settings request failed: 503')
+    await expect(connection.updatePackSettings('pack', { enabled: true, quality: 9 })).rejects.toThrow('quality must be at most 5')
   })
 })
 
@@ -915,16 +1011,16 @@ describe('native schema registry', () => {
     expect(registry.server).toBeUndefined() // fixture predates the header
     const withHeader = buildDinksterRegistry(C0, {
       ...nodesPayload,
-      dinkster: { version: '0.9.0', schemaWire: 3 },
+      dinkster: { version: '0.9.0', schemaWire: 1 },
     })
-    expect(withHeader.server).toEqual({ version: '0.9.0', schemaWire: 3 })
+    expect(withHeader.server).toEqual({ version: '0.9.0', schemaWire: 1 })
   })
 
   it('carries graphFeatures when present, omits it when absent (older backend)', () => {
     expect(registry.graphFeatures).toBeUndefined() // fixture predates the field
     const withFeatures = buildDinksterRegistry(C0, {
       ...nodesPayload,
-      dinkster: { version: '0.9.0', schemaWire: 10, graphFeatures: ['typedLiteral'] },
+      dinkster: { version: '0.9.0', schemaWire: 1, graphFeatures: ['typedLiteral'] },
     })
     expect(withFeatures.graphFeatures).toEqual(['typedLiteral'])
   })
@@ -933,12 +1029,12 @@ describe('native schema registry', () => {
     expect(registry.mergeableTypes).toBeUndefined() // fixture predates the field
     const withProviders = buildDinksterRegistry(C0, {
       ...nodesPayload,
-      dinkster: { version: '0.9.0', schemaWire: 12, mergeableTypes: ['comfy.IMAGE'] },
+      dinkster: { version: '0.9.0', schemaWire: 1, mergeableTypes: ['comfy.IMAGE'] },
     })
     expect(withProviders.mergeableTypes).toEqual(['comfy.IMAGE'])
     const settledEmpty = buildDinksterRegistry(C0, {
       ...nodesPayload,
-      dinkster: { version: '0.9.0', schemaWire: 12, mergeableTypes: [] },
+      dinkster: { version: '0.9.0', schemaWire: 1, mergeableTypes: [] },
     })
     expect(settledEmpty.mergeableTypes).toEqual([])
   })
@@ -992,10 +1088,10 @@ describe('promptToDinksterGraph', () => {
       role: 'output', id, type: { kind: 'concrete', types: [type] },
     })
     const effective = buildDinksterRegistry(C0, {
-      schemaVersion: 32,
+      schemaVersion: 1,
       nodes: {
-        Source: { schemaVersion: 32, nodeType: 'Source', interface: [output('caption', 'core.str'), output('total', 'core.int')] },
-        Sink: { schemaVersion: 32, nodeType: 'Sink', interface: [
+        Source: { schemaVersion: 1, nodeType: 'Source', interface: [output('caption', 'core.str'), output('total', 'core.int')] },
+        Sink: { schemaVersion: 1, nodeType: 'Sink', interface: [
           { role: 'input', id: 'text', required: true, type: { kind: 'concrete', types: ['core.str'] } },
           { role: 'input', id: 'count', required: true, type: { kind: 'concrete', types: ['core.int'] } },
         ] },
@@ -1032,8 +1128,8 @@ describe('promptToDinksterGraph', () => {
       [output('total', 'core.int'), output('caption', 'core.str')],
     ]) {
       const catalog = buildDinksterRegistry(C0, {
-        schemaVersion: 32,
-        nodes: { Source: { schemaVersion: 32, nodeType: 'Source', interface: declared } },
+        schemaVersion: 1,
+        nodes: { Source: { schemaVersion: 1, nodeType: 'Source', interface: declared } },
       })
       const native = promptToDinksterGraph(compiled.artifact.prompt, catalog.resolve)
       expect(native.ok).toBe(true)
@@ -1097,10 +1193,10 @@ describe('promptToDinksterGraph', () => {
     { count: 2, members: ['0', '1'] },
   ])('lowers output-family members $members with count $count by canonical ID', ({ count, members }) => {
     const dynamicRegistry = buildDinksterRegistry(C0, {
-      schemaVersion: 32,
+      schemaVersion: 1,
       nodes: {
         Splitter: {
-          schemaVersion: 32,
+          schemaVersion: 1,
           nodeType: 'Splitter',
           interface: [
             ...(count === undefined ? [] : [{
@@ -1212,10 +1308,10 @@ describe('promptToDinksterGraph', () => {
 
   it('moves recursive DynamicCombo selectors out of native inputs without removing DynamicSlot sockets', () => {
     const dynamicRegistry = buildDinksterRegistry(C0, {
-      schemaVersion: 22,
+      schemaVersion: 1,
       nodes: {
         Dynamic: {
-          schemaVersion: 22,
+          schemaVersion: 1,
           nodeType: 'Dynamic',
           interface: [
             {
@@ -1342,10 +1438,10 @@ describe('promptToDinksterGraph', () => {
       virtualPath: '',
     }
     const assetRegistry = buildDinksterRegistry(C0, {
-      schemaVersion: 4,
+      schemaVersion: 1,
       nodes: {
         'comfy.LoadImage': {
-          schemaVersion: 4,
+          schemaVersion: 1,
           nodeType: 'comfy.LoadImage',
           idempotent: false,
           interface: [{
@@ -1424,13 +1520,13 @@ function submitHarness(respond: (url: string, init?: RequestInit) => Response | 
 
 const nodesRoute = (url: string): Response | undefined =>
   url.includes('/api/nodes') ? jsonResponse(200, liveNodesPayload) : undefined
-const regionNodesPayload = nodesPayloadAtWire(21, {
-  version: 'test', schemaWire: 21, graphFeatures: ['regions'],
+const regionNodesPayload = currentNodesPayload({
+  version: 'test', schemaWire: 1, graphFeatures: ['regions'],
 })
 const regionNodesRoute = (url: string): Response | undefined =>
   url.includes('/api/nodes') ? jsonResponse(200, regionNodesPayload) : undefined
-const placementNodesPayload = nodesPayloadAtWire(23, {
-  version: 'test', schemaWire: 23, graphFeatures: ['placement'],
+const placementNodesPayload = currentNodesPayload({
+  version: 'test', schemaWire: 1, graphFeatures: ['placement'],
 })
 const placementNodesRoute = (url: string): Response | undefined =>
   url.includes('/api/nodes') ? jsonResponse(200, placementNodesPayload) : undefined
@@ -1477,123 +1573,42 @@ describe('worker catalog', () => {
   })
 })
 
-describe('fetchSchemas wire negotiation', () => {
-  it('advertises the current strict compatibility window via ?wire=', async () => {
+describe('fetchSchemas wire contract', () => {
+  it('requests the nodes catalog without version negotiation', async () => {
     const { conn, requests } = submitHarness(nodesRoute)
     await conn.fetchSchemas()
     const nodes = requests.find((r) => r.url.includes('/api/nodes'))!
-    expect(new URL(nodes.url, 'http://x').searchParams.get('wire')).toBe('21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,44')
+    expect(new URL(nodes.url, 'http://x').search).toBe('')
   })
 
-  it('can request wire 43 only for a document that needs its schema', async () => {
-    const { conn, requests } = submitHarness((url) => url.includes('/api/nodes')
-      ? jsonResponse(200, {
-          schemaVersion: 1,
-          dinkster: { version: 'wire43-backend', schemaWire: 43 },
-          nodes: {},
-        })
-      : undefined)
-    await conn.fetchSchemas([43])
-    const nodes = requests.find((r) => r.url.includes('/api/nodes'))!
-    expect(new URL(nodes.url, 'http://x').searchParams.get('wire')).toBe('43')
-  })
-
-  it('refuses a backend selecting unoffered wire 19', async () => {
+  it('refuses a backend selecting another wire version', async () => {
     const { conn } = submitHarness((url) => url.includes('/api/nodes')
       ? jsonResponse(200, {
           schemaVersion: 1,
-          dinkster: { version: 'highest-common', schemaWire: 19 },
+          dinkster: { version: 'incompatible', schemaWire: 2 },
           nodes: {},
         })
       : undefined)
     await expect(conn.fetchSchemas()).rejects.toThrow(
-      'schema wire version mismatch: this build decodes 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44; the server encodes 19',
+      'schema wire version mismatch: this build decodes 1; the server encodes 2',
     )
     expect(conn.currentRegistry).toBeUndefined()
   })
 
-  it('keeps the frozen wire 15 decoder out of live negotiation', async () => {
-    const { conn } = submitHarness((url) => {
-      if (!url.includes('/api/nodes')) return undefined
-      expect(new URL(url, 'http://x').searchParams.get('wire')).toBe('21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,44')
-      return jsonResponse(200, {
-        schemaVersion: 1,
-        dinkster: { version: 'old-backend', schemaWire: 15 },
-        nodes: {},
-      })
-    })
-    await expect(conn.fetchSchemas()).rejects.toThrow(
-      'schema wire version mismatch: this build decodes 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44; the server encodes 15',
-    )
-    expect(conn.currentRegistry).toBeUndefined()
-  })
-
-  it('refuses a server selecting unoffered strict wire 17', async () => {
-    const { conn } = submitHarness((url) =>
-      url.includes('/api/nodes')
-        ? jsonResponse(200, {
-            schemaVersion: 1,
-            dinkster: { version: 'wire17-backend', schemaWire: 17 },
-            nodes: {},
-          })
-        : undefined)
-    await expect(conn.fetchSchemas()).rejects.toThrow(
-      'schema wire version mismatch: this build decodes 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44; the server encodes 17',
-    )
-    expect(conn.currentRegistry).toBeUndefined()
-  })
-
-  it('refuses a backend selecting ancient wire 16', async () => {
-    const { conn } = submitHarness((url) =>
-      url.includes('/api/nodes')
-        ? jsonResponse(200, {
-            schemaVersion: 1,
-            dinkster: { version: 'new-backend', schemaWire: 16 },
-            nodes: {},
-          })
-        : undefined,
-    )
-    await expect(conn.fetchSchemas()).rejects.toThrow(
-      'schema wire version mismatch: this build decodes 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44; the server encodes 16',
-    )
-    expect(conn.currentRegistry).toBeUndefined()
-  })
-
-  it('turns the machine-readable 406 refusal into a diagnosable error', async () => {
-    const { conn } = submitHarness((url) =>
-      url.includes('/api/nodes')
-        ? jsonResponse(406, {
-            error: 'wire-version-unsupported',
-            requested: [3, 4, 5, 6, 10, 11, 12, 13, 14, 15, 16, 17, 18],
-            supported: [19],
-          })
-        : undefined,
-    )
-    await expect(conn.fetchSchemas()).rejects.toThrow(
-      'schema wire version mismatch: this build decodes 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44; the server encodes 19',
-    )
-  })
-
-  it('survives a 406 with an unparseable body', async () => {
-    const { conn } = submitHarness((url) =>
-      url.includes('/api/nodes') ? new Response('nope', { status: 406 }) : undefined,
-    )
-    await expect(conn.fetchSchemas()).rejects.toThrow('schema wire version mismatch')
-  })
 })
 
 describe('fetchSchemas payload validation (CL5)', () => {
-  it('installs the exact wire 41 serializer fixture with streaming policies intact', async () => {
+  it('installs the serializer fixture with streaming policies intact', async () => {
     const exports = readJson('fixtures/dinkster-wire41.json') as Record<string, unknown>[]
     const payload = {
       schemaVersion: 1,
-      dinkster: { version: 'fixture', schemaWire: 41 },
-      nodes: Object.fromEntries(exports.map((schema) => [schema['nodeType'], schema])),
+      dinkster: { version: 'fixture', schemaWire: 1 },
+      nodes: Object.fromEntries(exports.map((schema) => [schema['nodeType'], { ...schema, schemaVersion: 1 }])),
     }
     const { conn } = submitHarness((url) =>
       url.includes('/api/nodes') ? jsonResponse(200, payload) : undefined,
     )
-    const installed = await conn.fetchSchemas([41])
+    const installed = await conn.fetchSchemas()
     expect(installed.schemas.size).toBe(4)
     expect(installed.resolve('test.stream_source')?.items[0]).toMatchObject({
       kind: 'output', type: { kind: 'stream', element: { kind: 'concrete', name: 'dinkster.image' } },
@@ -1606,7 +1621,7 @@ describe('fetchSchemas payload validation (CL5)', () => {
   })
 
   it('accepts the current header-shaped payload (wire version in dinkster.schemaWire)', async () => {
-    const payload = { schemaVersion: 1, dinkster: { version: '0.1.0', schemaWire: 23 }, nodes: {} }
+    const payload = { schemaVersion: 1, dinkster: { version: '0.1.0', schemaWire: 1 }, nodes: {} }
     const { conn } = submitHarness((url) =>
       url.includes('/api/nodes') ? jsonResponse(200, payload) : undefined,
     )
@@ -1615,7 +1630,7 @@ describe('fetchSchemas payload validation (CL5)', () => {
 
   it('rejects a malformed nodes table instead of installing an empty registry', async () => {
     const { conn } = submitHarness((url) =>
-      url.includes('/api/nodes') ? jsonResponse(200, { schemaVersion: 23, nodes: 'bad' }) : undefined,
+      url.includes('/api/nodes') ? jsonResponse(200, { schemaVersion: 1, nodes: 'bad' }) : undefined,
     )
     await expect(conn.fetchSchemas()).rejects.toThrow('malformed or unsupported')
     expect(conn.currentRegistry).toBeUndefined()
@@ -1626,7 +1641,7 @@ describe('fetchSchemas payload validation (CL5)', () => {
       url.includes('/api/nodes') ? jsonResponse(200, { schemaVersion: 99, nodes: {} }) : undefined,
     )
     await expect(conn.fetchSchemas()).rejects.toThrow(
-      'schema wire version mismatch: this build decodes 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44; the server encodes 99',
+      'schema wire version mismatch: this build decodes 1; the server encodes 99',
     )
   })
 
@@ -1645,7 +1660,7 @@ describe('fetchSchemas payload validation (CL5)', () => {
     const fresh = conn.fetchSchemas()
     resolvers[1]!(jsonResponse(200, liveNodesPayload)) // newest request resolves first
     const freshRegistry = await fresh
-    resolvers[0]!(jsonResponse(200, { schemaVersion: 3, nodes: {} })) // superseded response lands late
+    resolvers[0]!(jsonResponse(200, { schemaVersion: 1, nodes: {} })) // superseded response lands late
     // The superseded invocation must return the committed registry too: its
     // own decode is stale and would split compile state from submit state.
     expect(await stale).toBe(freshRegistry)
@@ -1908,6 +1923,7 @@ describe('fetchDiagnostics', () => {
     expect(await conn.fetchDiagnostics()).toEqual({
       replacementProblems: [problem],
       compatSkips: [compatSkip],
+      packInferenceUnavailable: [],
     })
     expect(requests[0]?.url).toBe('http://test/api/diagnostics')
   })
@@ -1930,22 +1946,23 @@ describe('fetchDiagnostics', () => {
     expect(await conn.fetchDiagnostics()).toEqual({
       replacementProblems: [problem],
       compatSkips: [compatSkip],
+      packInferenceUnavailable: [],
     })
   })
 
   it('returns an empty diagnostics snapshot for a non-ok response', async () => {
     const { conn } = submitHarness(() => jsonResponse(404, { error: 'not found' }))
-    expect(await conn.fetchDiagnostics()).toEqual({ replacementProblems: [], compatSkips: [] })
+    expect(await conn.fetchDiagnostics()).toEqual({ replacementProblems: [], compatSkips: [], packInferenceUnavailable: [] })
   })
 
   it('returns an empty diagnostics snapshot when fetch throws', async () => {
     const { conn } = submitHarness(() => undefined)
-    expect(await conn.fetchDiagnostics()).toEqual({ replacementProblems: [], compatSkips: [] })
+    expect(await conn.fetchDiagnostics()).toEqual({ replacementProblems: [], compatSkips: [], packInferenceUnavailable: [] })
   })
 
   it('tolerates absent and malformed diagnostics keys independently', async () => {
     const absent = submitHarness(() => jsonResponse(200, {})).conn
-    expect(await absent.fetchDiagnostics()).toEqual({ replacementProblems: [], compatSkips: [] })
+    expect(await absent.fetchDiagnostics()).toEqual({ replacementProblems: [], compatSkips: [], packInferenceUnavailable: [] })
 
     const malformedSkips = submitHarness(() => jsonResponse(200, {
       replacementProblems: [problem],
@@ -1954,6 +1971,7 @@ describe('fetchDiagnostics', () => {
     expect(await malformedSkips.fetchDiagnostics()).toEqual({
       replacementProblems: [problem],
       compatSkips: [],
+      packInferenceUnavailable: [],
     })
 
     const malformedProblems = submitHarness(() => jsonResponse(200, {
@@ -1963,6 +1981,75 @@ describe('fetchDiagnostics', () => {
     expect(await malformedProblems.fetchDiagnostics()).toEqual({
       replacementProblems: [],
       compatSkips: [compatSkip],
+      packInferenceUnavailable: [],
+    })
+  })
+
+  it('decodes packInferenceUnavailable rows, taking the pack id from each row', async () => {
+    const { conn } = submitHarness(() => jsonResponse(200, {
+      packInferenceUnavailable: [
+        {
+          packId: 'pack.degraded',
+          reason: 'No live native sampling worker (dinkster.ksampler) is registered.',
+          entry: 'sampler',
+          worker: 'dinkster.ksampler',
+          providers: [{ registry: 'sampler', id: 'euler', available: false, extra: 'ignored' }],
+        },
+      ],
+    }))
+    expect(await conn.fetchDiagnostics()).toEqual({
+      replacementProblems: [],
+      compatSkips: [],
+      packInferenceUnavailable: [{
+        pack: 'pack.degraded',
+        reason: 'No live native sampling worker (dinkster.ksampler) is registered.',
+        entry: 'sampler',
+        worker: 'dinkster.ksampler',
+        providers: [{ registry: 'sampler', id: 'euler' }],
+      }],
+    })
+  })
+
+  it('keeps rows without optional fields and drops malformed ones independently', async () => {
+    const { conn } = submitHarness(() => jsonResponse(200, {
+      packInferenceUnavailable: [
+        { packId: 'pack.bare', reason: 'no worker', providers: [] },
+        { reason: 'no packId', providers: [] },
+        { packId: '', reason: 'empty packId', providers: [] },
+        { packId: 'pack.no-reason', providers: [] },
+        { packId: 'pack.bad-entry', reason: 'x', entry: 7, providers: [] },
+        { packId: 'pack.bad-worker', reason: 'x', worker: {}, providers: [] },
+        { packId: 'pack.no-providers', reason: 'x' },
+        { packId: 'pack.bad-provider-row', reason: 'x', providers: ['nope'] },
+        { packId: 'pack.bad-provider-fields', reason: 'x', providers: [{ registry: 's', id: 3 }] },
+        'not-an-object',
+      ],
+    }))
+    expect(await conn.fetchDiagnostics()).toEqual({
+      replacementProblems: [],
+      compatSkips: [],
+      packInferenceUnavailable: [{ pack: 'pack.bare', reason: 'no worker', providers: [] }],
+    })
+  })
+
+  it('tolerates a packInferenceUnavailable field that is not a list of rows', async () => {
+    const conn = submitHarness(() => jsonResponse(200, {
+      replacementProblems: [problem],
+      packInferenceUnavailable: 'bad',
+    })).conn
+    expect(await conn.fetchDiagnostics()).toEqual({
+      replacementProblems: [problem],
+      compatSkips: [],
+      packInferenceUnavailable: [],
+    })
+    // A map keyed by pack is not the wire the backend emits; it decodes as absent.
+    const mapped = submitHarness(() => jsonResponse(200, {
+      packInferenceUnavailable: { 'pack.degraded': { reason: 'x', providers: [] } },
+    })).conn
+    expect(await mapped.fetchDiagnostics()).toEqual({
+      replacementProblems: [],
+      compatSkips: [],
+      packInferenceUnavailable: [],
     })
   })
 })
@@ -3274,7 +3361,7 @@ describe('websocket', () => {
       expect(new Headers(init?.headers).get('X-Dinkster-Actor-Kind')).toBe('agent')
       if (url.includes('/api/events?clientId=')) return jsonResponse(400, { error: 'websocket-upgrade-required' })
       if (url.endsWith('/api/auth/ws-ticket')) return jsonResponse(200, { ticket: 'single use' })
-      if (url.includes('/api/nodes?wire=')) return jsonResponse(200, liveNodesPayload)
+      if (url.endsWith('/api/nodes')) return jsonResponse(200, liveNodesPayload)
       throw new Error(`unexpected fetch: ${url}`)
     })
     const conn = new DinksterConnection({

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 16,
+  "schemaVersion": 1,
   "nodeType": "comfy.ResizeImageMaskNode",
   "version": 1,
   "displayName": "Resize Image/Mask",
@@ -10,16 +10,37 @@
     {
       "role": "input",
       "id": "input",
-      "type": { "kind": "variable", "templateId": "input_type", "allowed": ["comfy.IMAGE", "comfy.MASK"] },
+      "type": {
+        "kind": "variable",
+        "templateId": "input_type",
+        "allowed": [
+          "comfy.IMAGE",
+          "comfy.MASK"
+        ]
+      },
       "required": true
     },
     {
       "role": "input",
       "id": "scale_method",
-      "type": { "kind": "concrete", "types": ["core.combo"] },
+      "type": {
+        "kind": "concrete",
+        "types": [
+          "core.combo"
+        ]
+      },
       "required": false,
       "default": "area",
-      "widget": { "type": "COMBO", "options": ["nearest-exact", "bilinear", "area", "bicubic", "lanczos"] }
+      "widget": {
+        "type": "COMBO",
+        "options": [
+          "nearest-exact",
+          "bilinear",
+          "area",
+          "bicubic",
+          "lanczos"
+        ]
+      }
     },
     {
       "role": "dynamicCombo",
@@ -31,7 +52,12 @@
             {
               "role": "input",
               "id": "width",
-              "type": { "kind": "concrete", "types": ["core.int"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
               "required": false,
               "default": 512,
               "doc": "Target width in pixels. Set to 0 to auto-calculate from height while preserving aspect ratio."
@@ -39,7 +65,12 @@
             {
               "role": "input",
               "id": "height",
-              "type": { "kind": "concrete", "types": ["core.int"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
               "required": false,
               "default": 512,
               "doc": "Target height in pixels. Set to 0 to auto-calculate from width while preserving aspect ratio."
@@ -47,10 +78,21 @@
             {
               "role": "input",
               "id": "crop",
-              "type": { "kind": "concrete", "types": ["core.combo"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.combo"
+                ]
+              },
               "required": false,
               "default": "center",
-              "widget": { "type": "COMBO", "options": ["disabled", "center"] },
+              "widget": {
+                "type": "COMBO",
+                "options": [
+                  "disabled",
+                  "center"
+                ]
+              },
               "doc": "How to handle aspect ratio mismatch: 'disabled' stretches to fit, 'center' crops to maintain aspect ratio."
             }
           ]
@@ -61,7 +103,12 @@
             {
               "role": "input",
               "id": "multiplier",
-              "type": { "kind": "concrete", "types": ["core.float"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.float"
+                ]
+              },
               "required": false,
               "default": 1.0,
               "doc": "Scale factor (e.g., 2.0 doubles size, 0.5 halves size)."
@@ -74,7 +121,12 @@
             {
               "role": "input",
               "id": "longer_size",
-              "type": { "kind": "concrete", "types": ["core.int"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
               "required": false,
               "default": 512,
               "doc": "The longer edge will be resized to this value. Aspect ratio is preserved."
@@ -87,7 +139,12 @@
             {
               "role": "input",
               "id": "shorter_size",
-              "type": { "kind": "concrete", "types": ["core.int"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
               "required": false,
               "default": 512,
               "doc": "The shorter edge will be resized to this value. Aspect ratio is preserved."
@@ -100,7 +157,12 @@
             {
               "role": "input",
               "id": "width",
-              "type": { "kind": "concrete", "types": ["core.int"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
               "required": false,
               "default": 512,
               "doc": "Target width in pixels. Height auto-adjusts to preserve aspect ratio."
@@ -113,7 +175,12 @@
             {
               "role": "input",
               "id": "height",
-              "type": { "kind": "concrete", "types": ["core.int"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
               "required": false,
               "default": 512,
               "doc": "Target height in pixels. Width auto-adjusts to preserve aspect ratio."
@@ -126,10 +193,15 @@
             {
               "role": "input",
               "id": "megapixels",
-              "type": { "kind": "concrete", "types": ["core.float"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.float"
+                ]
+              },
               "required": false,
               "default": 1.0,
-              "doc": "Target total megapixels (e.g., 1.0 \u2248 1024\u00d71024). Aspect ratio is preserved."
+              "doc": "Target total megapixels (e.g., 1.0 ~ 1024x1024). Aspect ratio is preserved."
             }
           ]
         },
@@ -139,17 +211,34 @@
             {
               "role": "input",
               "id": "match",
-              "type": { "kind": "union", "types": ["comfy.IMAGE", "comfy.MASK"] },
+              "type": {
+                "kind": "union",
+                "types": [
+                  "comfy.IMAGE",
+                  "comfy.MASK"
+                ]
+              },
               "required": true,
               "doc": "Resize input to match the dimensions of this reference image or mask."
             },
             {
               "role": "input",
               "id": "crop",
-              "type": { "kind": "concrete", "types": ["core.combo"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.combo"
+                ]
+              },
               "required": false,
               "default": "center",
-              "widget": { "type": "COMBO", "options": ["disabled", "center"] },
+              "widget": {
+                "type": "COMBO",
+                "options": [
+                  "disabled",
+                  "center"
+                ]
+              },
               "doc": "How to handle aspect ratio mismatch: 'disabled' stretches to fit, 'center' crops to maintain aspect ratio."
             }
           ]
@@ -160,7 +249,12 @@
             {
               "role": "input",
               "id": "multiple",
-              "type": { "kind": "concrete", "types": ["core.int"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.int"
+                ]
+              },
               "required": false,
               "default": 8,
               "doc": "Resize so width and height are divisible by this number. Useful for latent alignment (e.g., 8 or 64)."
@@ -174,10 +268,19 @@
     {
       "role": "output",
       "id": "resized",
-      "type": { "kind": "variable", "templateId": "input_type", "allowed": ["comfy.IMAGE", "comfy.MASK"] }
+      "type": {
+        "kind": "variable",
+        "templateId": "input_type",
+        "allowed": [
+          "comfy.IMAGE",
+          "comfy.MASK"
+        ]
+      }
     }
   ],
-  "aliases": ["ResizeImageMaskNode"],
+  "aliases": [
+    "ResizeImageMaskNode"
+  ],
   "pack": "comfy",
   "signature": "321bd539299a33d45000d3991dcb21aadcebfdbe"
 }

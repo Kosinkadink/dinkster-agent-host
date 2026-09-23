@@ -2,8 +2,7 @@ import { diag, type Diagnostic } from '../diagnostics.js'
 import { matchBypassInput } from '../compile/bypass.js'
 import { checkDocument } from '../invariants.js'
 import { deriveBoundarySchema } from '../schema/derive-boundary.js'
-import { inputsOf, type NodeSchema } from '../schema/model.js'
-import { parseObjectInfoEntry } from '../schema/object-info.js'
+import { inputsOf, type NodeSchema, type TypeExpr } from '../schema/model.js'
 import type { BoundaryBinding, BoundaryItem, GraphDef, Json, JsonObject, WorkflowDocument } from './document.js'
 import type { ImportLitegraphResult } from './import-litegraph.js'
 import { ownJson } from './json.js'
@@ -33,6 +32,13 @@ const integerId = (value: unknown): boolean =>
   (typeof value === 'string' && /^-?(0|[1-9][0-9]*)$/.test(value) && Number.isSafeInteger(Number(value)))
 const endpointKey = (end: Mutable): string => JSON.stringify(Object.entries(end).sort(([a], [b]) => a.localeCompare(b)))
 const nodeEnd = (end: Mutable, node: string): boolean => end['node'] === node
+const importedSlotType = (value: unknown): TypeExpr => {
+  if (Array.isArray(value)) return { kind: 'concrete', name: 'COMBO' }
+  if (typeof value !== 'string' || value === '*' || value === 'COMFY_MULTITYPED_V3') return { kind: 'wildcard' }
+  if (value === 'COMFY_MATCHTYPE_V3') return { kind: 'variable', templateId: 'T' }
+  const names = value.split(',').map((name) => name.trim()).filter(Boolean)
+  return names.length > 1 ? { kind: 'union', names } : { kind: 'concrete', name: names[0] ?? value }
+}
 
 /** Object links are used by schema-v1 graphs, including definitions in v0.4 files. */
 function normalizeLinks(graph: Mutable): void {
@@ -486,20 +492,17 @@ function inlineInstance(graph: Mutable, view: Mutable, instanceId: string, def: 
     }
     aliases.set(endpointKey({ node: inputProbe, port: `i${index}` }), source)
   }
-  const bypassSchema = parseObjectInfoEntry('boundary', {
-    input: { required: Object.fromEntries(def.raw['inputs'].map((slot: Mutable) => [slot['id'], [slot['type'] ?? '*', { forceInput: true }]])) },
-    output: def.raw['outputs'].map((slot: Mutable) => slot['type'] ?? '*'),
-  }).schema
-  const bypassInputs = bypassSchema ? inputsOf(bypassSchema).flatMap((item, index) => {
-    const driver = drivers.get(endpointKey({ node: instanceId, port: item.id }))
-    return driver ? [{ index, type: item.type, driver }] : []
-  }) : []
+  const bypassInputs: { index: number; type: TypeExpr; driver: Mutable }[] = def.raw['inputs'].flatMap(
+    (slot: Mutable, index: number) => {
+      const driver = drivers.get(endpointKey({ node: instanceId, port: slot['id'] }))
+      return driver ? [{ index, type: importedSlotType(slot['type']), driver }] : []
+    },
+  )
   for (const [index, slot] of def.raw['outputs'].entries()) {
     let driver = drivers.get(endpointKey({ node: outputProbe, port: `o${index}` }))
     if (instance['mode'] === 'muted') driver = undefined
     if (instance['mode'] === 'bypassed') {
-      const output = bypassSchema?.items.filter((item) => item.kind === 'output')[index]
-      driver = output?.kind === 'output' ? matchBypassInput({ index, type: output.type }, bypassInputs)?.driver : undefined
+      driver = matchBypassInput({ index, type: importedSlotType(slot['type']) }, bypassInputs)?.driver
     }
     aliases.set(endpointKey({ node: instanceId, port: slot['id'] }), driver)
   }

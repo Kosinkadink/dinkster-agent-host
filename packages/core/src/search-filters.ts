@@ -15,7 +15,7 @@
  * elaborations still make the node findable.
  */
 
-import { atomNamesOf, typesCompatible } from './schema/compat.js'
+import { atomNamesOf, typesCompatible } from './schema/type-compatibility.js'
 import { elaborateInterface, materializeFramesOf, type MaterializeFrame } from './schema/elaborate.js'
 import {
   defaultValuesOf,

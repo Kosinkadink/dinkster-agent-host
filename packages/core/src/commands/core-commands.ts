@@ -11,20 +11,19 @@
  * - Commands are schema-blind except where schema controls document shape.
  *   Other commands enforce STRUCTURAL rules (endpoints exist, one driver per
  *   input). Type compatibility is advisory UI/diagnostic territory
- *   (schema/compat.ts) so documents never become uneditable when dynamic
+ *   (schema/type-compatibility.ts) so documents never become uneditable when dynamic
  *   types drift.
  * - Each command records the minimal patch set; cascades (removing a node
  *   removes its links/net references/view state) are part of the same
  *   transaction so undo restores everything atomically.
  */
 
-import { canonicalJson, fnv1a64, sha256Hex } from '../compile/hash.js'
-import { compositorRecipeFingerprint, copyCompositorRecipe, isCompositorRecipe } from '../compositor.js'
-import { parseMaskPaintRecipe } from '../mask-paint-recipe.js'
-import { diag, type Diagnostic, type DiagnosticRef } from '../diagnostics.js'
-import { PREVIEW_MODES, regionContractShapeProblems, type BoundaryItem, type ControllerMode, type GraphDef, type LinkData, type NodeData, type NodeMode, type PreviewMode, type RegionContract, type WorkflowDocument } from '../format/document.js'
+import { canonicalJson, fnv1a64 } from '../compile/hash.js'
+import { type Diagnostic, type DiagnosticRef } from '../diagnostics.js'
+import { PREVIEW_MODES, regionContractShapeProblems, type BoundaryItem, type ControllerMode, type GraphDef, type LinkData, type NodeMode, type PreviewMode, type RegionContract, type WorkflowDocument } from '../format/document.js'
 import { NET_VIEWS_EXT_KEY, removeNetViewPositions, updateNetViewPositions, type NetViewGeometry, type NetViewPosition } from '../format/net-views.js'
 import { canonicalTypeIdOf, inputsOf, isImageAssetInput, outputCountInputsOf, outputsOf, type CountBoundOutputAutogrowSpec, type NodeSchema } from '../schema/model.js'
+import type { SchemaResolver } from '../schema/derive-boundary.js'
 import { buildGraphConnectivity, DEFAULT_ELAB_BUDGET, elabInputsOf, elaborateInterface, valueKeyOf } from '../schema/elaborate.js'
 import type { Json, JsonObject } from '../format/document.js'
 import { groupAllocationFloor } from '../group-alloc.js'
@@ -32,7 +31,7 @@ import { asDynamicMemberId, asNodeId, asPortId, asSelectorId, isPortEndpoint, is
 import { subgraphDefIdOf } from '../invariants.js'
 import { allocateOne, graphAllocator } from './alloc.js'
 import { buildRerouteIndex, rerouteDriverOf, wouldCreateRerouteCycle, wouldCreateSelectorCycle, wouldCreateTapCycle } from '../reroute.js'
-import { createTransactionBuilder, executeCommand, type CommandDefinition, type CommandExecutionContext, type TransactionBuilder } from './contract.js'
+import { createTransactionBuilder, executeCommand, type CommandDefinition, type TransactionBuilder } from './contract.js'
 import { BOUNDARY_COMMANDS } from './boundary-commands.js'
 import { SUBGRAPH_COMMANDS } from './subgraph-commands.js'
 import { DYNAMIC_COMMANDS } from './dynamic-commands.js'
@@ -43,100 +42,17 @@ import { EXPOSED_COMMANDS } from './exposed-commands.js'
 import { EXPOSED_PREVIEW_COMMANDS } from './exposed-preview-commands.js'
 import { APP_LAYOUT_COMMANDS } from './app-layout-commands.js'
 import { OCCURRENCE_LINK_COMMANDS } from './occurrence-link-commands.js'
-import { effectiveOccurrenceTopology, effectiveTopologyDrivesPort, occurrenceBoundaryTargets, occurrenceEndpointReferencesDefinition } from '../compile/effective-topology.js'
+import { occurrenceBoundaryTargets, occurrenceEndpointReferencesDefinition } from '../compile/effective-topology.js'
 import { pruneNetDisplayState, removeAuthoredNetViews, removeNetDeliverySuppressions, removeProjectedLinkSuppressions } from './occurrence-cleanup.js'
 import { spliceDiff, transformSplice } from './text-splice.js'
-import { normalizedComboOptions } from '../schema/combo-options.js'
+import { registeredExtensionCommands } from '../extensions/commands/registry.js'
 import {
-  IMAGE_BLEND_MODES,
-  IMAGE_MASK_COMBINE_MODES,
-  IMAGE_OPACITY_MAX,
-  MAX_IMAGE_CANVAS_DIMENSION,
-  MAX_IMAGE_LINEAR_COMPONENT,
-  MAX_IMAGE_TRANSLATION,
-} from '../image-document/model.js'
-
-const err = (code: string, message: string, refs?: readonly DiagnosticRef[]): Diagnostic =>
-  diag('error', 'command', code, message, refs === undefined ? undefined : { refs })
-
-const isObj = (v: Json | undefined): v is JsonObject =>
-  typeof v === 'object' && v !== null && !Array.isArray(v)
-
-const hasExactKeys = (value: JsonObject, required: readonly string[], optional: readonly string[] = []): boolean => {
-  const keys = Object.keys(value)
-  const allowed = new Set([...required, ...optional])
-  return required.every((key) => Object.hasOwn(value, key)) && keys.every((key) => allowed.has(key))
-}
-
-const safeIntegerBetween = (value: Json | undefined, min: number, max: number): value is number =>
-  Number.isSafeInteger(value) && Number(value) >= min && Number(value) <= max
-
-const validImageTransform = (value: Json | undefined): boolean => {
-  if (!isObj(value) || !hasExactKeys(value, ['a', 'b', 'c', 'd', 'tx', 'ty'], ['components'])) return false
-  if (!['a', 'b', 'c', 'd'].every((key) => safeIntegerBetween(value[key], -MAX_IMAGE_LINEAR_COMPONENT, MAX_IMAGE_LINEAR_COMPONENT)) ||
-    !['tx', 'ty'].every((key) => safeIntegerBetween(value[key], -MAX_IMAGE_TRANSLATION, MAX_IMAGE_TRANSLATION))) return false
-  if (value.components === undefined) return true
-  const components = value.components
-  if (!isObj(components) || !hasExactKeys(components, [
-    'x', 'y', 'width', 'height', 'rotation', 'flipHorizontal', 'flipVertical', 'sourceWidth', 'sourceHeight',
-  ])) return false
-  if (!['x', 'y', 'rotation'].every((key) => typeof components[key] === 'number' && Number.isFinite(components[key])) ||
-    !['width', 'height', 'sourceWidth', 'sourceHeight'].every((key) =>
-      typeof components[key] === 'number' && Number.isFinite(components[key]) && Number(components[key]) > 0 &&
-      Number(components[key]) <= MAX_IMAGE_CANVAS_DIMENSION)) return false
-  return typeof components.flipHorizontal === 'boolean' && typeof components.flipVertical === 'boolean'
-}
-
-const validImageRecipeChanges = (operation: 'canvas' | 'layer' | 'mask', changes: Json | undefined): boolean => {
-  if (!isObj(changes) || Object.keys(changes).length === 0) return false
-  const validators: Record<string, (value: Json | undefined) => boolean> = operation === 'canvas' ? {
-    width: (value) => safeIntegerBetween(value, 1, MAX_IMAGE_CANVAS_DIMENSION),
-    height: (value) => safeIntegerBetween(value, 1, MAX_IMAGE_CANVAS_DIMENSION),
-    compositing: (value) => value === 'premultiplied-alpha' || value === 'linear-premultiplied-alpha',
-  } : operation === 'layer' ? {
-    name: (value) => typeof value === 'string',
-    visible: (value) => typeof value === 'boolean',
-    opacity: (value) => safeIntegerBetween(value, 0, IMAGE_OPACITY_MAX),
-    transform: validImageTransform,
-    blendMode: (value) => typeof value === 'string' && (IMAGE_BLEND_MODES as readonly string[]).includes(value),
-    clipping: (value) => value === 'none' || value === 'clip-to-previous',
-    z_index: (value) => Number.isSafeInteger(value),
-    isolation: (value) => value === 'isolated' || value === 'pass-through',
-  } : {
-    enabled: (value) => typeof value === 'boolean',
-    invert: (value) => typeof value === 'boolean',
-    opacity: (value) => safeIntegerBetween(value, 0, IMAGE_OPACITY_MAX),
-    transform: validImageTransform,
-    combineMode: (value) => typeof value === 'string' && (IMAGE_MASK_COMBINE_MODES as readonly string[]).includes(value),
-    channel: (value) => value === 'alpha' || value === 'luminance',
-  }
-  return Object.entries(changes).every(([key, value]) => validators[key]?.(value) === true)
-}
-
-const validImageRecipeRow = (row: Json): boolean => {
-  if (!isObj(row) || typeof row.op !== 'string') return false
-  if (row.op === 'canvas') return hasExactKeys(row, ['op', 'changes']) && validImageRecipeChanges('canvas', row.changes)
-  if (row.op === 'layer' || row.op === 'mask') {
-    return hasExactKeys(row, ['op', 'id', 'changes']) && typeof row.id === 'string' && row.id.length > 0 &&
-      validImageRecipeChanges(row.op, row.changes)
-  }
-  if (row.op === 'reorder') {
-    return hasExactKeys(row, ['op', 'ids'], ['parent']) &&
-      (row.parent === undefined || (typeof row.parent === 'string' && row.parent.length > 0)) &&
-      Array.isArray(row.ids) && row.ids.length > 0 && row.ids.every((id) => typeof id === 'string' && id.length > 0) &&
-      new Set(row.ids).size === row.ids.length
-  }
-  return false
-}
-
-const commandSchemaOf = (
-  doc: WorkflowDocument,
-  nodeType: string,
-  context: CommandExecutionContext,
-  resolve?: (type: string) => NodeSchema | undefined,
-): NodeSchema | undefined => context.kind === 'initial'
-  ? context.schemaResolverFor?.(doc)(nodeType) ?? resolve?.(nodeType)
-  : resolve?.(nodeType)
+  commandError as err,
+  commandSchemaOf,
+  ensureCommandViewGraph as ensureViewGraph,
+  isCommandObject as isObj,
+  isCompleteAssetRef,
+} from './command-support.js'
 
 export interface OutputCountSchemaPlan {
   readonly nodeType: string
@@ -168,21 +84,6 @@ const outputCountSchemaPlanFrom = (value: Json | undefined): OutputCountSchemaPl
     schemaSnapshot,
     schemaPlanDigest: value.schemaPlanDigest,
   }
-}
-
-const isCompleteAssetRef = (value: Json | undefined): value is JsonObject & {
-  readonly digest: string
-  readonly name: string
-  readonly size: number
-  readonly mediaType: string
-  readonly virtualPath: string
-} => {
-  if (!isObj(value) || Object.keys(value).length !== 5) return false
-  return /^blake3:[0-9a-f]{64}$/.test(typeof value.digest === 'string' ? value.digest : '') &&
-    typeof value.name === 'string' &&
-    typeof value.size === 'number' && Number.isSafeInteger(value.size) && value.size >= 0 &&
-    typeof value.mediaType === 'string' &&
-    typeof value.virtualPath === 'string'
 }
 
 // Finite only (CO2): NaN/Infinity are not JSON and would poison geometry.
@@ -308,12 +209,6 @@ function graphOf(doc: WorkflowDocument, graphId: Json | undefined): GraphDef | u
 function removeDefinitionLink(graphId: string, linkId: string, tx: TransactionBuilder): void {
   removeProjectedLinkSuppressions(graphId, linkId, tx)
   tx.remove(['graphs', graphId, 'links', linkId])
-}
-
-/** Ensure view.graphs[graphId] exists before writing under it. */
-function ensureViewGraph(tx: TransactionBuilder, graphId: string): void {
-  const view = tx.current.view.graphs[graphId]
-  if (!view) tx.set(['view', 'graphs', graphId], { nodes: {} })
 }
 
 function regionFromJson(value: Json | undefined): RegionContract | undefined {
@@ -968,9 +863,7 @@ function imageApplyAssetOf(resolve?: (type: string) => NodeSchema | undefined): 
       if (!def) return [err('graph.missing', `image.applyAsset: unknown graph '${params.graphId}'`)]
       const node = def.nodes[params.nodeId]
       if (!node) return [err('node.missing', `image.applyAsset: unknown node '${params.nodeId}'`)]
-      const schema = context.kind === 'initial'
-        ? context.schemaResolverFor?.(doc)(node.type) ?? resolve?.(node.type)
-        : resolve?.(node.type)
+      const schema = commandSchemaOf(doc, node.type, context, resolve)
       if (!schema) return [err('schema.missing', `image.applyAsset: no schema for '${node.type}'`)]
       const input = schema.items.find((item) => item.kind === 'input' && item.id === params.inputId)
       if (input?.kind !== 'input' || !isImageAssetInput(input)) {
@@ -997,379 +890,6 @@ function imageApplyAssetOf(resolve?: (type: string) => NodeSchema | undefined): 
       tx.set(
         ['graphs', params.graphId, 'nodes', params.nodeId, 'values', params.inputId],
         params.asset,
-      )
-      return []
-    },
-  }
-}
-
-export const MASK_PAINT_SOURCE_EXT_KEY = 'dinkster.imageEditor.maskPaintSource'
-
-export function maskPaintSourceNodeId(node: NodeData): string | undefined {
-  const marker = node.ext?.[MASK_PAINT_SOURCE_EXT_KEY]
-  return isObj(marker) && Object.keys(marker).length === 2 && typeof marker.nodeId === 'string' &&
-    marker.outputId === 'mask' ? marker.nodeId : undefined
-}
-
-const sameAssetRef = (left: Json | undefined, right: Json | undefined): boolean =>
-  isCompleteAssetRef(left) && isCompleteAssetRef(right) &&
-  left.digest === right.digest && left.name === right.name && left.size === right.size &&
-  left.mediaType === right.mediaType && left.virtualPath === right.virtualPath
-
-const sortedStringList = (value: Json | undefined): readonly string[] | undefined => {
-  if (!Array.isArray(value) || value.some((item) => typeof item !== 'string') || new Set(value).size !== value.length) return undefined
-  return [...value].sort() as string[]
-}
-
-function maskPaintRecipeHeader(value: string): { readonly sourceDigest: string } | undefined {
-  const recipe = parseMaskPaintRecipe(value)
-  return recipe ? { sourceDigest: recipe.sourceDigest } : undefined
-}
-
-function imageApplyMaskPaintOf(resolve?: (type: string) => NodeSchema | undefined): CommandDefinition {
-  return {
-    id: 'image.applyMaskPaint',
-    run(doc, params, tx, context) {
-      if (!isObj(params) || Object.keys(params).length !== 9 || typeof params.graphId !== 'string' ||
-          typeof params.loaderNodeId !== 'string' || params.inputId !== 'image' || !isCompleteAssetRef(params.expectedSource) ||
-          typeof params.operations !== 'string' || (params.paintNodeId !== null && typeof params.paintNodeId !== 'string') ||
-          (params.expectedPaintOperations !== null && typeof params.expectedPaintOperations !== 'string')) {
-        return [err('params.invalid', 'image.applyMaskPaint: malformed guarded paint transaction')]
-      }
-      const expectedLinks = sortedStringList(params.expectedMaskLinkIds)
-      const expectedNets = sortedStringList(params.expectedMaskNetIds)
-      if (!expectedLinks || !expectedNets) return [err('params.invalid', 'image.applyMaskPaint: mask topology ids must be unique string arrays')]
-      const graph = doc.graphs[params.graphId]
-      const loader = graph?.nodes[params.loaderNodeId]
-      if (!graph || !loader) return [err('image.maskTargetMissing', 'The mask source node no longer exists')]
-      if (Object.values(doc.occurrenceTopologies ?? {}).some((topology) => topology.bodyGraph === params.graphId)) {
-        return [err('image.maskOccurrenceUnsupported', 'Mask paint does not support occurrence-local topology')]
-      }
-      if (loader.type !== 'dinkster.load_image') return [err('image.maskTargetInvalid', 'Mask paint requires dinkster.load_image')]
-      const loaderSchema = commandSchemaOf(doc, loader.type, context, resolve)
-      const paintSchema = commandSchemaOf(doc, 'dinkster.mask.paint', context, resolve)
-      const loaderImage = loaderSchema && inputsOf(loaderSchema).find((input) => input.id === 'image')
-      const loaderOutputs = loaderSchema ? outputsOf(loaderSchema) : []
-      const paintInputs = paintSchema ? inputsOf(paintSchema) : []
-      const paintOutputs = paintSchema ? outputsOf(paintSchema) : []
-      if (!loaderImage || canonicalTypeIdOf(loaderImage.type) !== 'asset<dinkster.image>' ||
-          canonicalTypeIdOf(loaderOutputs.find((output) => output.id === 'image')?.type ?? { kind: 'wildcard' }) !== 'dinkster.image' ||
-          canonicalTypeIdOf(loaderOutputs.find((output) => output.id === 'mask')?.type ?? { kind: 'wildcard' }) !== 'dinkster.mask' ||
-          canonicalTypeIdOf(paintInputs.find((input) => input.id === 'source')?.type ?? { kind: 'wildcard' }) !== 'asset<dinkster.image>' ||
-          canonicalTypeIdOf(paintInputs.find((input) => input.id === 'operations')?.type ?? { kind: 'wildcard' }) !== 'core.string' ||
-          paintInputs.find((input) => input.id === 'operations')?.widget?.widgetType !== 'STRING' ||
-          paintInputs.find((input) => input.id === 'operations')?.widget?.options.multiline !== true ||
-          canonicalTypeIdOf(paintOutputs.find((output) => output.id === 'mask')?.type ?? { kind: 'wildcard' }) !== 'dinkster.mask') {
-        return [err('image.maskSchemaMissing', 'The backend does not expose the required mask paint schemas')]
-      }
-      if (!sameAssetRef(loader.values.image, params.expectedSource)) return [err('image.sourceChanged', 'The loader source changed during editing')]
-      const recipe = maskPaintRecipeHeader(params.operations)
-      if (!recipe || recipe.sourceDigest !== params.expectedSource.digest) return [err('image.maskRecipeInvalid', 'Mask operations do not match the loader source')]
-      const source = { node: asNodeId(params.loaderNodeId), port: asPortId('mask') }
-      const currentLinks = Object.values(graph.links).filter((link) => sameEndpoint(link.from, source)).map((link) => link.id).sort()
-      const currentNets = Object.values(graph.nets).filter((net) => samePortRef(net.source, source)).map((net) => net.id).sort()
-      if (currentLinks.join('\0') !== expectedLinks.join('\0') || currentNets.join('\0') !== expectedNets.join('\0')) {
-        return [err('image.maskTopologyChanged', 'The loader mask topology changed during editing')]
-      }
-      let paintNodeId = params.paintNodeId as string | null
-      const associatedPaintIds = Object.values(graph.nodes).filter((node) =>
-        node.type === 'dinkster.mask.paint' && maskPaintSourceNodeId(node) === params.loaderNodeId).map((node) => node.id)
-      if ((paintNodeId === null && associatedPaintIds.length !== 0) ||
-          (paintNodeId !== null && (associatedPaintIds.length !== 1 || associatedPaintIds[0] !== paintNodeId))) {
-        return [err('image.maskPaintChanged', 'The associated mask paint topology changed during editing')]
-      }
-      if (paintNodeId === null) {
-        paintNodeId = allocateOne(tx, params.graphId, graph, 'n')
-        tx.set(['graphs', params.graphId, 'nodes', paintNodeId], {
-          id: paintNodeId,
-          type: 'dinkster.mask.paint',
-          values: { source: params.expectedSource, operations: params.operations },
-          ext: { [MASK_PAINT_SOURCE_EXT_KEY]: { nodeId: params.loaderNodeId, outputId: 'mask' } },
-        })
-        const position = doc.view.graphs[params.graphId]?.nodes?.[params.loaderNodeId]?.position ?? { x: 0, y: 0 }
-        ensureViewGraph(tx, params.graphId)
-        tx.set(['view', 'graphs', params.graphId, 'nodes', paintNodeId], { position: { x: position.x + 280, y: position.y + 120 } })
-      } else {
-        const paint = graph.nodes[paintNodeId]
-        if (!paint || paint.type !== 'dinkster.mask.paint' || maskPaintSourceNodeId(paint) !== params.loaderNodeId ||
-            !sameAssetRef(paint.values.source, params.expectedSource) || paint.values.operations !== params.expectedPaintOperations) {
-          return [err('image.maskPaintChanged', 'The associated mask paint node changed during editing')]
-        }
-        tx.set(['graphs', params.graphId, 'nodes', paintNodeId, 'values', 'operations'], params.operations)
-      }
-      const replacement = { node: asNodeId(paintNodeId), port: asPortId('mask') }
-      for (const linkId of expectedLinks) tx.set(['graphs', params.graphId, 'links', linkId, 'from'], replacement)
-      for (const netId of expectedNets) tx.set(['graphs', params.graphId, 'nets', netId, 'source'], replacement)
-      return []
-    },
-  }
-}
-
-// ---------------------------------------------------------------------------
-// image.documentExport
-// ---------------------------------------------------------------------------
-
-function imageDocumentExportOf(resolve?: (type: string) => NodeSchema | undefined): CommandDefinition {
-  return {
-    id: 'image.documentExport',
-    run(doc, params, tx, context) {
-      if (!isObj(params) || Object.keys(params).length !== 4 || typeof params.graphId !== 'string' ||
-        typeof params.expectedGraphFingerprint !== 'string' || !isCompleteAssetRef(params.asset) ||
-        params.asset.mediaType !== 'application/vnd.dinkster.image-document+json' || !isVec2(params.position)) {
-        return [err('params.invalid', 'image.documentExport requires graphId, expectedGraphFingerprint, document asset and position')]
-      }
-      const graph = doc.graphs[params.graphId]
-      if (!graph || sha256Hex(canonicalJson(graph)) !== params.expectedGraphFingerprint) {
-        return [err('image.graphChanged', 'The export graph changed while the document was being uploaded')]
-      }
-      const load = commandSchemaOf(doc, 'dinkster.layers.load', context, resolve)
-      const flatten = commandSchemaOf(doc, 'dinkster.layers.flatten', context, resolve)
-      const input = load?.items.find((item) => item.kind === 'input' && item.id === 'document')
-      const output = load?.items.find((item) => item.kind === 'output' && item.id === 'layers')
-      const layers = flatten?.items.find((item) => item.kind === 'input' && item.id === 'layers')
-      const selector = flatten?.items.find((item) => item.kind === 'input' && item.id === 'selector')
-      if (input?.kind !== 'input' || input.widget?.widgetType !== 'ASSET' ||
-        canonicalTypeIdOf(input.type) !== 'dinkster.asset' ||
-        output?.kind !== 'output' || canonicalTypeIdOf(output.type) !== 'dinkster.layers' ||
-        layers?.kind !== 'input' || canonicalTypeIdOf(layers.type) !== 'dinkster.layers' ||
-        selector?.kind !== 'input' || canonicalTypeIdOf(selector.type) !== 'core.string') {
-        return [err('image.exportUnavailable', 'The backend does not advertise compatible layer load and flatten nodes')]
-      }
-      const allocation = graphAllocator(tx, params.graphId, graph)
-      const loaderId = allocation.mint('n')
-      const flattenId = allocation.mint('n')
-      const linkId = allocation.mint('l')
-      allocation.commit()
-      tx.set(['graphs', params.graphId, 'nodes', loaderId], {
-        id: loaderId, type: load!.type, values: { document: params.asset },
-      })
-      tx.set(['graphs', params.graphId, 'nodes', flattenId], {
-        id: flattenId, type: flatten!.type, values: { selector: 'composite' },
-      })
-      tx.set(['graphs', params.graphId, 'links', linkId], {
-        id: linkId, from: { node: loaderId, port: 'layers' }, to: { node: flattenId, port: 'layers' },
-      })
-      ensureViewGraph(tx, params.graphId)
-      tx.set(['view', 'graphs', params.graphId, 'nodes', loaderId], { position: params.position })
-      tx.set(['view', 'graphs', params.graphId, 'nodes', flattenId], {
-        position: { x: params.position.x + 320, y: params.position.y },
-      })
-      return []
-    },
-  }
-}
-
-function imageDocumentRecipeExportOf(resolve?: (type: string) => NodeSchema | undefined): CommandDefinition {
-  return {
-    id: 'image.documentRecipeExport',
-    run(doc, params, tx, context) {
-      if (!isObj(params) || Object.keys(params).length !== 7 || typeof params.graphId !== 'string' ||
-        typeof params.expectedGraphFingerprint !== 'string' || typeof params.sourceNodeId !== 'string' ||
-        typeof params.sourceOutputId !== 'string' || typeof params.commands !== 'string' ||
-        typeof params.format !== 'string' || !Number.isSafeInteger(params.quality)) {
-        return [err('params.invalid', 'image.documentRecipeExport requires a guarded layer source, commands and output policy')]
-      }
-      let commands: Json
-      try {
-        commands = JSON.parse(params.commands) as Json
-      } catch {
-        return [err('params.invalid', 'image.documentRecipeExport commands must be canonical JSON')]
-      }
-      if (!Array.isArray(commands) || canonicalJson(commands) !== params.commands || !commands.every(validImageRecipeRow)) {
-        return [err('params.invalid', 'image.documentRecipeExport commands must be a canonical array')]
-      }
-      const graph = doc.graphs[params.graphId]
-      if (!graph || sha256Hex(canonicalJson(graph)) !== params.expectedGraphFingerprint) {
-        return [err('image.graphChanged', 'The recipe source graph changed after the image document was opened')]
-      }
-      const sourceNode = graph.nodes[params.sourceNodeId]
-      const source = sourceNode === undefined
-        ? undefined
-        : commandSchemaOf(doc, sourceNode.type, context, resolve)?.items.find((item) =>
-          item.kind === 'output' && item.id === params.sourceOutputId)
-      const edit = commandSchemaOf(doc, 'dinkster.layers.edit', context, resolve)
-      const flatten = commandSchemaOf(doc, 'dinkster.layers.flatten', context, resolve)
-      const save = commandSchemaOf(doc, 'dinkster.save_image', context, resolve)
-      const editLayers = edit?.items.find((item) => item.kind === 'input' && item.id === 'layers')
-      const editCommands = edit?.items.find((item) => item.kind === 'input' && item.id === 'commands')
-      const editOutput = edit?.items.find((item) => item.kind === 'output' && item.id === 'layers')
-      const flattenLayers = flatten?.items.find((item) => item.kind === 'input' && item.id === 'layers')
-      const flattenSelector = flatten?.items.find((item) => item.kind === 'input' && item.id === 'selector')
-      const flattenImage = flatten?.items.find((item) => item.kind === 'output' && item.id === 'image')
-      const saveImages = save?.items.find((item) => item.kind === 'input' && item.id === 'images')
-      const saveFormat = save?.items.find((item) => item.kind === 'input' && item.id === 'format')
-      const saveQuality = save?.items.find((item) => item.kind === 'input' && item.id === 'quality')
-      if (source?.kind !== 'output' || canonicalTypeIdOf(source.type) !== 'dinkster.layers' ||
-        editLayers?.kind !== 'input' || canonicalTypeIdOf(editLayers.type) !== 'dinkster.layers' ||
-        editCommands?.kind !== 'input' || canonicalTypeIdOf(editCommands.type) !== 'core.string' ||
-        editOutput?.kind !== 'output' || canonicalTypeIdOf(editOutput.type) !== 'dinkster.layers' ||
-        flattenLayers?.kind !== 'input' || canonicalTypeIdOf(flattenLayers.type) !== 'dinkster.layers' ||
-        flattenSelector?.kind !== 'input' || canonicalTypeIdOf(flattenSelector.type) !== 'core.string' ||
-        flattenImage?.kind !== 'output' || canonicalTypeIdOf(flattenImage.type) !== 'dinkster.image' ||
-        saveImages?.kind !== 'input' || canonicalTypeIdOf(saveImages.type) !== 'dinkster.image' ||
-        saveFormat?.kind !== 'input' || canonicalTypeIdOf(saveFormat.type) !== 'core.combo' ||
-        saveFormat.widget?.widgetType !== 'COMBO' ||
-        !normalizedComboOptions(saveFormat.widget).some((option) => option.value === params.format) ||
-        saveQuality?.kind !== 'input' || canonicalTypeIdOf(saveQuality.type) !== 'core.int' ||
-        saveQuality.widget?.widgetType !== 'INT') {
-        return [err('image.recipeExportUnavailable', 'The backend does not advertise compatible layer edit, flatten and image save nodes')]
-      }
-      const qualityMin = saveQuality.widget.options['min']
-      const qualityMax = saveQuality.widget.options['max']
-      const qualityStep = saveQuality.widget.options['step']
-      if (!Number.isSafeInteger(qualityMin) || !Number.isSafeInteger(qualityMax) ||
-        !Number.isSafeInteger(qualityStep) || Number(qualityStep) <= 0 || Number(qualityMin) > Number(qualityMax) ||
-        Number(params.quality) < Number(qualityMin) || Number(params.quality) > Number(qualityMax) ||
-        (Number(params.quality) - Number(qualityMin)) % Number(qualityStep) !== 0) {
-        return [err('image.recipeExportUnavailable', 'The backend does not advertise a compatible image quality range')]
-      }
-      const allocation = graphAllocator(tx, params.graphId, graph)
-      const editId = allocation.mint('n')
-      const flattenId = allocation.mint('n')
-      const saveId = allocation.mint('n')
-      const sourceLinkId = allocation.mint('l')
-      const flattenLinkId = allocation.mint('l')
-      const saveLinkId = allocation.mint('l')
-      allocation.commit()
-      tx.set(['graphs', params.graphId, 'nodes', editId], {
-        id: editId, type: edit!.type, values: { commands: params.commands },
-      })
-      tx.set(['graphs', params.graphId, 'nodes', flattenId], {
-        id: flattenId, type: flatten!.type, values: { selector: 'composite' },
-      })
-      tx.set(['graphs', params.graphId, 'nodes', saveId], {
-        id: saveId, type: save!.type,
-        values: { format: params.format as string, quality: params.quality as number },
-      })
-      tx.set(['graphs', params.graphId, 'links', sourceLinkId], {
-        id: sourceLinkId,
-        from: { node: params.sourceNodeId, port: params.sourceOutputId },
-        to: { node: editId, port: 'layers' },
-      })
-      tx.set(['graphs', params.graphId, 'links', flattenLinkId], {
-        id: flattenLinkId, from: { node: editId, port: 'layers' }, to: { node: flattenId, port: 'layers' },
-      })
-      tx.set(['graphs', params.graphId, 'links', saveLinkId], {
-        id: saveLinkId, from: { node: flattenId, port: 'image' }, to: { node: saveId, port: 'images' },
-      })
-      const sourcePosition = doc.view.graphs[params.graphId]?.nodes?.[params.sourceNodeId]?.position ?? { x: 80, y: 80 }
-      ensureViewGraph(tx, params.graphId)
-      tx.set(['view', 'graphs', params.graphId, 'nodes', editId], {
-        position: { x: sourcePosition.x + 320, y: sourcePosition.y },
-      })
-      tx.set(['view', 'graphs', params.graphId, 'nodes', flattenId], {
-        position: { x: sourcePosition.x + 640, y: sourcePosition.y },
-      })
-      tx.set(['view', 'graphs', params.graphId, 'nodes', saveId], {
-        position: { x: sourcePosition.x + 960, y: sourcePosition.y },
-      })
-      return []
-    },
-  }
-}
-
-// ---------------------------------------------------------------------------
-// image.compositorApply
-// ---------------------------------------------------------------------------
-
-const contextResolves = (
-  doc: WorkflowDocument,
-  graphId: string,
-  instancePath: readonly string[],
-): boolean => {
-  let graph: GraphDef | undefined = doc.graphs[doc.root]
-  for (const nodeId of instancePath) {
-    const node = graph?.nodes[nodeId]
-    const childId = node === undefined ? undefined : subgraphDefIdOf(node.type)
-    graph = childId === undefined ? undefined : doc.graphs[childId]
-    if (graph === undefined) return false
-  }
-  return graph?.id === graphId
-}
-
-function imageCompositorApplyOf(resolve?: (type: string) => NodeSchema | undefined): CommandDefinition {
-  return {
-    id: 'image.compositorApply',
-    run(doc, params, tx, context) {
-      if (
-        !isObj(params) ||
-        Object.keys(params).length !== 6 ||
-        typeof params.graphId !== 'string' ||
-        typeof params.nodeId !== 'string' ||
-        typeof params.inputId !== 'string' ||
-        !Array.isArray(params.instancePath) ||
-        !params.instancePath.every((nodeId) => typeof nodeId === 'string') ||
-        typeof params.expectedRecipeFingerprint !== 'string' ||
-        !/^sha256:[0-9a-f]{64}$/.test(params.expectedRecipeFingerprint) ||
-        !isCompositorRecipe(params.recipe)
-      ) {
-        return [err(
-          'params.invalid',
-          'image.compositorApply: params must be {graphId,nodeId,inputId,instancePath,expectedRecipeFingerprint,recipe}',
-        )]
-      }
-      if (!contextResolves(doc, params.graphId, params.instancePath)) {
-        return [err(
-          'image.compositorContextInvalid',
-          `image.compositorApply: instance path does not resolve to graph '${params.graphId}'`,
-        )]
-      }
-      const instancePath = params.instancePath as string[]
-      const def = doc.graphs[params.graphId]
-      const node = def?.nodes[params.nodeId]
-      if (!def) return [err('graph.missing', `image.compositorApply: unknown graph '${params.graphId}'`)]
-      if (!node) return [err('node.missing', `image.compositorApply: unknown node '${params.nodeId}'`)]
-      if (subgraphDefIdOf(node.type) !== undefined) {
-        return [err('image.compositorInputInvalid', 'image.compositorApply: promoted subgraph inputs are not writable compositor targets')]
-      }
-      const resolver = context.kind === 'initial'
-        ? context.schemaResolverFor?.(doc) ?? resolve
-        : resolve
-      if (!resolver) return [err('schema.missing', `image.compositorApply: no schema resolver for '${node.type}'`)]
-      const schema = resolver?.(node.type)
-      if (!schema) return [err('schema.missing', `image.compositorApply: no schema for '${node.type}'`)]
-      const input = schema.items.find((item) => item.kind === 'input' && item.id === params.inputId)
-      if (input?.kind !== 'input' || input.widget?.widgetType !== 'COMPOSITOR' ||
-          canonicalTypeIdOf(input.type) !== 'dinkster.compositor') {
-        return [err(
-          'image.compositorInputInvalid',
-          `image.compositorApply: '${params.inputId}' is not a writable dinkster.compositor input`,
-        )]
-      }
-      const endpoint = { node: asNodeId(params.nodeId), port: asPortId(params.inputId) }
-      const definitionDriven = Object.values(def.links).some((link) => sameEndpoint(link.to, endpoint)) ||
-        Object.values(def.nets).some((net) => net.sinks.some((sink) => samePortRef(sink, endpoint)))
-      let occurrenceDriven = false
-      if (instancePath.length > 0) {
-        const owner = {
-          instancePath: instancePath.slice(0, -1).map(asNodeId),
-          node: asNodeId(instancePath.at(-1)!),
-        }
-        const effective = effectiveOccurrenceTopology(doc, resolver, owner)
-        if (effective.diagnostics.some((diagnostic) => diagnostic.severity === 'error')) {
-          return [err('image.compositorContextInvalid', 'image.compositorApply: selected occurrence topology is invalid')]
-        }
-        occurrenceDriven = effectiveTopologyDrivesPort(
-          effective,
-          def.id,
-          instancePath.map(asNodeId),
-          endpoint,
-        )
-      }
-      if (definitionDriven || occurrenceDriven) {
-        return [err('image.compositorInputDriven', `image.compositorApply: '${params.inputId}' is driven`)]
-      }
-      const current = node.values[params.inputId]
-      const fingerprint = compositorRecipeFingerprint(current)
-      if (fingerprint === undefined) {
-        return [err('image.compositorRecipeInvalid', `image.compositorApply: '${params.inputId}' contains an invalid recipe`)]
-      }
-      if (fingerprint !== params.expectedRecipeFingerprint) {
-        return [err('image.compositorRecipeChanged', `image.compositorApply: recipe '${params.inputId}' changed during editing`)]
-      }
-      tx.set(
-        ['graphs', params.graphId, 'nodes', params.nodeId, 'values', params.inputId],
-        copyCompositorRecipe(params.recipe) as unknown as Json,
       )
       return []
     },
@@ -3696,10 +3216,7 @@ export const CORE_COMMANDS: readonly CommandDefinition[] = [
   selectionMove,
   nodeSetValueOf(),
   imageApplyAssetOf(),
-  imageApplyMaskPaintOf(),
-  imageCompositorApplyOf(),
-  imageDocumentExportOf(),
-  imageDocumentRecipeExportOf(),
+  ...registeredExtensionCommands(),
   nodeSetOutputCountOf(),
   textSplice,
   nodeSetControllerOf(),
@@ -3855,7 +3372,7 @@ function batchCommand(registry: ReadonlyMap<string, CommandDefinition>): Command
 
 export function coreCommandRegistry(
   extra: readonly CommandDefinition[] = [],
-  resolve?: (type: string) => NodeSchema | undefined,
+  resolve?: SchemaResolver,
 ): ReadonlyMap<string, CommandDefinition> {
   const map = new Map<string, CommandDefinition>()
   for (const cmd of [
@@ -3874,10 +3391,7 @@ export function coreCommandRegistry(
     nodeSetValueOf(resolve),
     nodeSetValuesOf(resolve),
     imageApplyAssetOf(resolve),
-    imageApplyMaskPaintOf(resolve),
-    imageCompositorApplyOf(resolve),
-    imageDocumentExportOf(resolve),
-    imageDocumentRecipeExportOf(resolve),
+    ...registeredExtensionCommands(resolve),
     ...extra,
   ]) {
     if (map.has(cmd.id)) throw new Error(`duplicate command id '${cmd.id}'`)

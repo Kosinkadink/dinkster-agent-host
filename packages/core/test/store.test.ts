@@ -8,7 +8,7 @@ import type { GraphDef, Json, WorkflowDocument } from '../src/format/document.js
 import { netViewPositions } from '../src/format/net-views.js'
 import { asDynamicMemberId, asGraphDefId, asLineageId, asLinkId, asNetId, asNodeId, asPortId, asSelectorCandidateId, asSelectorId, asValueSourceId } from '../src/ids.js'
 import { elabInputsOf, elaborateInterface } from '../src/schema/elaborate.js'
-import { parseDinksterSchemaWire15 } from '../src/schema/dinkster-wire.js'
+import { parseDinksterSchema } from '../src/schema/dinkster-wire.js'
 import { initialDynamicStateOf } from '../src/schema/model.js'
 
 const port = (node: string, portId: string) => ({ node: asNodeId(node), port: asPortId(portId) })
@@ -211,8 +211,8 @@ describe('DocumentStore.dispatch', () => {
   })
 
   it('seeds a fresh wire-15 choice and undoes edits back to the explicit first option', () => {
-    const parsed = parseDinksterSchemaWire15('Resize', {
-      schemaVersion: 15,
+    const parsed = parseDinksterSchema('Resize', {
+      schemaVersion: 1,
       interface: [{
         role: 'dynamicCombo',
         id: 'resize_type',

@@ -13,7 +13,7 @@ import type { WorkflowDocument } from '../src/format/document.js'
 import { loadDocument } from '../src/format/migrate.js'
 import { asConnectionId, asNodeId } from '../src/ids.js'
 import { parseObjectInfo, type ObjectInfoEntry } from '../src/schema/object-info.js'
-import { parseDinksterSchemaWire15, parseDinksterSchemaWire16, type DinksterWireSchema } from '../src/schema/dinkster-wire.js'
+import { parseDinksterSchema, type DinksterWireSchema } from '../src/schema/dinkster-wire.js'
 import { DINKSTER_GRAPH_FEATURE_DECIMAL_INT } from '../src/compile/dinkster-graph.js'
 import { coreVirtualNodeKind } from '../src/virtual-node.js'
 
@@ -453,7 +453,7 @@ const dynSchemaOf = (type: string, items: (InputSpec | OutputSpec)[]): NodeSchem
 })
 
 const wire15SchemaOf = (type: string, interfaceItems: readonly Record<string, unknown>[]): NodeSchema => {
-  const parsed = parseDinksterSchemaWire15(type, { schemaVersion: 15, interface: interfaceItems } as never)
+  const parsed = parseDinksterSchema(type, { schemaVersion: 1, interface: interfaceItems } as never)
   if (!parsed.schema || parsed.diagnostics.length > 0) throw new Error(`bad test schema ${type}: ${JSON.stringify(parsed.diagnostics)}`)
   return { ...parsed.schema, isOutputNode: true }
 }
@@ -788,9 +788,9 @@ const dynSchemas: Record<string, NodeSchema> = {
     role: 'inputFamily', id: 'items', memberPrefix: 'items', minMembers: 1, maxMembers: 3, required: false,
     template: [{ role: 'input', id: 'value', type: { kind: 'concrete', types: ['IMAGE'] }, required: false }],
   }]),
-  'comfy.ResizeImageMaskNode': parseDinksterSchemaWire16(
+  'comfy.ResizeImageMaskNode': parseDinksterSchema(
     'comfy.ResizeImageMaskNode',
-    readJson('fixtures/dinkster-resize-image-mask-wire16.json') as DinksterWireSchema,
+    { ...readJson('fixtures/dinkster-resize-image-mask-wire16.json') as DinksterWireSchema, schemaVersion: 1 },
   ).schema!,
 }
 const dynResolve = (type: string) => dynSchemas[type]

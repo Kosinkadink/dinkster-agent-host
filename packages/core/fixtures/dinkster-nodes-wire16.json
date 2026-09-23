@@ -1,26 +1,38 @@
 {
-  "schemaVersion": 16,
+  "schemaVersion": 1,
   "dinkster": {
     "version": "wire16-golden",
-    "schemaWire": 16
+    "schemaWire": 1
   },
   "nodes": {
     "test.lazy_matrix": {
-      "schemaVersion": 16,
+      "schemaVersion": 1,
       "displayName": "Lazy Matrix",
       "category": "test",
       "interface": [
         {
           "role": "input",
           "id": "absent",
-          "type": { "kind": "concrete", "types": ["core.int"] },
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          },
           "required": true,
-          "futureField": { "additive": true }
+          "futureField": {
+            "additive": true
+          }
         },
         {
           "role": "input",
           "id": "false",
-          "type": { "kind": "concrete", "types": ["core.int"] },
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          },
           "required": false,
           "lazy": false,
           "onAbsent": "omit"
@@ -28,12 +40,21 @@
         {
           "role": "input",
           "id": "true",
-          "type": { "kind": "concrete", "types": ["core.int"] },
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          },
           "required": false,
           "lazy": true,
           "forceInput": true,
           "advanced": true,
-          "widget": { "type": "NUMBER", "min": 0, "max": 10 }
+          "widget": {
+            "type": "NUMBER",
+            "min": 0,
+            "max": 10
+          }
         },
         {
           "role": "inputFamily",
@@ -44,7 +65,12 @@
             {
               "role": "input",
               "id": "leaf",
-              "type": { "kind": "concrete", "types": ["core.string"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.string"
+                ]
+              },
               "required": false,
               "lazy": true
             }
@@ -61,7 +87,12 @@
                 {
                   "role": "input",
                   "id": "leaf",
-                  "type": { "kind": "concrete", "types": ["core.float"] },
+                  "type": {
+                    "kind": "concrete",
+                    "types": [
+                      "core.float"
+                    ]
+                  },
                   "required": false,
                   "lazy": true
                 }
@@ -77,7 +108,12 @@
             {
               "role": "input",
               "id": "shared",
-              "type": { "kind": "concrete", "types": ["core.float"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.float"
+                ]
+              },
               "required": false,
               "lazy": true
             }
@@ -85,12 +121,22 @@
           "variants": [
             {
               "key": "image",
-              "type": { "kind": "concrete", "types": ["comfy.IMAGE"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "comfy.IMAGE"
+                ]
+              },
               "inputs": [
                 {
                   "role": "input",
                   "id": "variant",
-                  "type": { "kind": "concrete", "types": ["core.boolean"] },
+                  "type": {
+                    "kind": "concrete",
+                    "types": [
+                      "core.boolean"
+                    ]
+                  },
                   "required": false,
                   "lazy": true
                 }
@@ -102,12 +148,22 @@
           "role": "dynamicSlot",
           "id": "open_slot",
           "required": false,
-          "slotType": { "kind": "concrete", "types": ["comfy.IMAGE"] },
+          "slotType": {
+            "kind": "concrete",
+            "types": [
+              "comfy.IMAGE"
+            ]
+          },
           "inputs": [
             {
               "role": "input",
               "id": "dependent",
-              "type": { "kind": "concrete", "types": ["core.float"] },
+              "type": {
+                "kind": "concrete",
+                "types": [
+                  "core.float"
+                ]
+              },
               "required": false,
               "lazy": true
             }
@@ -116,24 +172,44 @@
         {
           "role": "output",
           "id": "result",
-          "type": { "kind": "concrete", "types": ["core.int"] }
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          }
         },
         {
           "role": "output",
           "id": "preview_false",
-          "type": { "kind": "concrete", "types": ["core.int"] },
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          },
           "preview": false
         },
         {
           "role": "output",
           "id": "preview_true",
-          "type": { "kind": "concrete", "types": ["core.int"] },
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          },
           "preview": true
         },
         {
           "role": "outputFamily",
           "id": "preview_family",
-          "type": { "kind": "concrete", "types": ["core.int"] },
+          "type": {
+            "kind": "concrete",
+            "types": [
+              "core.int"
+            ]
+          },
           "memberPrefix": "member",
           "preview": true
         }

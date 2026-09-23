@@ -3,10 +3,31 @@
     {
       "id": 1,
       "type": "SaveVideo",
-      "pos": [0, 0],
-      "inputs": [{ "name": "video", "type": "VIDEO", "link": null }],
-      "outputs": [{ "name": "video", "type": "VIDEO", "links": [] }],
-      "widgets_values": ["video/test", "auto", "av1", "auto", "auto"]
+      "pos": [
+        0,
+        0
+      ],
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": []
+        }
+      ],
+      "widgets_values": [
+        "video/test",
+        "auto",
+        "av1",
+        "auto",
+        "auto"
+      ]
     }
   ],
   "links": []

@@ -13,7 +13,7 @@ concurrency:
 jobs:
   test:
     name: pinned sources, types and tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNNERS).linux }}
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4

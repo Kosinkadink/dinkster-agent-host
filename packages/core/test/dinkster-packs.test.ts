@@ -17,7 +17,7 @@ import {
 
 const payload = {
   schemaVersion: DINKSTER_SCHEMA_WIRE_VERSION,
-  dinkster: { version: '0.9.0', schemaWire: 3 },
+  dinkster: { version: '0.9.0', schemaWire: 1 },
   packs: {
     core: { displayName: 'Dinkster Core' },
     'vhs.video': { displayName: 'Video Helper Suite', abbr: 'VHS', mark: '\u{1F3A5}', color: '#64b5f6' },
@@ -30,6 +30,8 @@ const payload = {
     },
     'dev.pack': { displayName: 'Dev Pack', source: 'local:/home/dev/pack' },
     'junk.prov': { displayName: 'Junk Prov', version: '', artifactDigest: 42, source: null },
+    'with.settings': { displayName: 'Configurable Pack', settings: true },
+    'junk.settings': { displayName: 'Not Configurable', settings: 'true' },
     bare: {},
     dropped: { displayName: 'Bad Fields', abbr: '', mark: 42, color: 'not-a-color' },
     'with.icon': {
@@ -156,6 +158,11 @@ describe('packsFromDinksterWire', () => {
     expect(packs.get('dropped')).toEqual({ displayName: 'Bad Fields' })
   })
 
+  it('retains only the literal declared-settings marker', () => {
+    expect(packs.get('with.settings')).toEqual({ displayName: 'Configurable Pack', settings: true })
+    expect(packs.get('junk.settings')).toEqual({ displayName: 'Not Configurable' })
+  })
+
   it('decodes the icon descriptor (backend 2078063): digest + mediaType', () => {
     expect(packs.get('with.icon')).toEqual({
       displayName: 'Iconed',
@@ -251,7 +258,7 @@ describe('per-node interface signature (backend 5b58c53)', () => {
 
 describe('serverInfoFromDinksterWire', () => {
   it('decodes the dinkster server-identity header', () => {
-    expect(serverInfoFromDinksterWire(payload)).toEqual({ version: '0.9.0', schemaWire: 3 })
+    expect(serverInfoFromDinksterWire(payload)).toEqual({ version: '0.9.0', schemaWire: 1 })
   })
 
   it('absent or malformed headers yield undefined, never a diagnostic', () => {
@@ -264,13 +271,13 @@ describe('serverInfoFromDinksterWire', () => {
 
 describe('graphFeaturesFromDinksterWire', () => {
   it('decodes graphFeatures from the dinkster header (Dinkster ea6eca7)', () => {
-    const dinkster = { version: '0.9.0', schemaWire: 10, graphFeatures: ['typedLiteral'] }
+    const dinkster = { version: '0.9.0', schemaWire: 1, graphFeatures: ['typedLiteral'] }
     expect(graphFeaturesFromDinksterWire({ nodes: {}, dinkster })).toEqual(['typedLiteral'])
   })
 
-  it('absent field yields undefined (older backend = no negotiated forms)', () => {
+  it('absent field yields undefined', () => {
     expect(graphFeaturesFromDinksterWire({ nodes: {} })).toBeUndefined()
-    expect(graphFeaturesFromDinksterWire({ nodes: {}, dinkster: { version: '0.9.0', schemaWire: 10 } })).toBeUndefined()
+    expect(graphFeaturesFromDinksterWire({ nodes: {}, dinkster: { version: '0.9.0', schemaWire: 1 } })).toBeUndefined()
   })
 
   it('malformed field yields undefined; non-string entries drop, unknown flags pass through', () => {
@@ -284,18 +291,18 @@ describe('graphFeaturesFromDinksterWire', () => {
 
 describe('mergeableTypesFromDinksterWire', () => {
   it('decodes mergeableTypes from the dinkster header (Dinkster 6dbbddd)', () => {
-    const dinkster = { version: '0.9.0', schemaWire: 12, mergeableTypes: ['comfy.IMAGE'] }
+    const dinkster = { version: '0.9.0', schemaWire: 1, mergeableTypes: ['comfy.IMAGE'] }
     expect(mergeableTypesFromDinksterWire({ nodes: {}, dinkster })).toEqual(['comfy.IMAGE'])
   })
 
   it('an empty list decodes as [] (settled: no providers), distinct from absent', () => {
-    expect(mergeableTypesFromDinksterWire({ nodes: {}, dinkster: { version: '0.9.0', schemaWire: 12, mergeableTypes: [] } }))
+    expect(mergeableTypesFromDinksterWire({ nodes: {}, dinkster: { version: '0.9.0', schemaWire: 1, mergeableTypes: [] } }))
       .toEqual([])
   })
 
-  it('absent field yields undefined (older backend = merge arm off)', () => {
+  it('absent field yields undefined', () => {
     expect(mergeableTypesFromDinksterWire({ nodes: {} })).toBeUndefined()
-    expect(mergeableTypesFromDinksterWire({ nodes: {}, dinkster: { version: '0.9.0', schemaWire: 12 } })).toBeUndefined()
+    expect(mergeableTypesFromDinksterWire({ nodes: {}, dinkster: { version: '0.9.0', schemaWire: 1 } })).toBeUndefined()
   })
 
   it('malformed field yields undefined; non-string entries drop silently', () => {

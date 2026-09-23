@@ -1,4 +1,4 @@
-import type { FetchLike } from './connection.js'
+import type { FetchLike } from './connection-contract.js'
 
 export interface CollabCredentials {
   readonly token?: string | undefined
@@ -20,7 +20,7 @@ export interface Delegation {
   readonly displayName: string
   readonly scope: string
   readonly sessionId: string | null
-  readonly expiresAt: number
+  readonly expiresAt?: number
   readonly kind: 'agent'
 }
 
@@ -31,7 +31,7 @@ export interface MintDelegation {
   readonly expiresInSeconds?: number
 }
 
-export async function mintDelegation(baseUrl: string, options: MintDelegation, fetchFn: FetchLike = fetch): Promise<{ token: string; id: string; expiresAt: number }> {
+export async function mintDelegation(baseUrl: string, options: MintDelegation, fetchFn: FetchLike = fetch): Promise<{ token: string; id: string; expiresAt?: number }> {
   const response = await fetchFn(`${baseUrl}/api/auth/delegations`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(options),
   })

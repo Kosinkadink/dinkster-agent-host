@@ -31,6 +31,7 @@ export const CONTRIBUTION_CATEGORIES = [
   'command',
   'keybinding',
   'setting',
+  'canvasLayer',
   'hostUi',
   'searchProvider',
   'eventConsumer',

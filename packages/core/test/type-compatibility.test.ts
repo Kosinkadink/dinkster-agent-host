@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canonicalCompatTypeId, canonicalCompatTypeIdOf, typesCompatible } from '../src/schema/compat.js'
+import { canonicalCompatTypeId, canonicalCompatTypeIdOf, typesCompatible } from '../src/schema/type-compatibility.js'
 import type { TypeExpr } from '../src/schema/model.js'
 
 const c = (name: string): TypeExpr => ({ kind: 'concrete', name })
