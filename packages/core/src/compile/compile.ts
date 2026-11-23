@@ -376,9 +376,9 @@ function compileImpl(
   const isVirtualNode = (graphId: string, node: NodeData): boolean =>
     node.virtual === true && resolveNode(graphId, node)?.virtual === true
   /**
-   * Capability gate for the $typed graph wire form (joint contract, Dinkster
-   * ea6eca7): absent = the target server would pass the marker through as a
-   * plain literal dict, so HOLD the lowering and refuse loudly instead.
+   * Capability gate for the $typed graph wire form: absent = the target
+   * server would pass the marker through as a plain literal dict, so HOLD
+   * the lowering and refuse loudly instead.
    */
   const emitTypedLiterals = input.graphFeatures?.includes(DINKSTER_GRAPH_FEATURE_TYPED_LITERAL) ?? false
   const emitDecimalInts = input.graphFeatures?.includes(DINKSTER_GRAPH_FEATURE_DECIMAL_INT) ?? false

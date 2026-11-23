@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "description": "Framework-free core: document model, schema registry, identity, contracts (M-1).",
+  "description": "Framework-free core: document model, schema registry, identity, contracts.",
   "exports": {
     ".": "./src/index.ts",
     "./comfy-v1": "./src/comfy-v1.ts"
