@@ -1,10 +1,9 @@
 /**
  * Native Dinkster graph wire (POST /api/jobs `graph`) with first-class regions.
  *
- * Grounded in Dinkster source (commit 6822752 "M6: add explicit graph regions",
- * node-id grammar closed at 95106fd). This module is the ONE place the
- * native graph wire shape is understood on our side - the same quarantine
- * rule as schema/dinkster-wire.ts for the schema wire. It owns:
+ * This module is the ONE place the native graph wire shape is understood
+ * on our side - the same quarantine rule as schema/dinkster-wire.ts for the
+ * schema wire. It owns:
  *
  * - The wire TYPES: a graph is {nodes: {id: entry}} where an entry is either
  *   a plain node ({nodeType, inputs}) or a region ({region: {...}}) carrying

@@ -296,7 +296,7 @@ describe('F0 authored and effective manifests', () => {
     }]) expect(() => validateAuthoredManifest(value)).not.toThrow()
   })
 
-  it('decodes only the canonical S0-B effective snapshot shape', () => {
+  it('decodes only the canonical effective snapshot shape', () => {
     const result = decodeEffectiveExtensionSnapshot({
       format: 'dinkster.extension-snapshot', version: 1, frontendApi: '1.0.0', extensions: [{
         id: 'comfy.monitor', version: '1.2.0', packageDigest: `sha256:${'a'.repeat(64)}`,
