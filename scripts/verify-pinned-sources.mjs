@@ -4,8 +4,8 @@ import { readFileSync } from 'node:fs'
 
 const expectedTrees = new Map([
   ['packages/agent-host', '49f3b6f8db8fbb283fb48a32a8fed256488ab1450dcf05a06dee7d5254c8a503'],
-  ['packages/client', '996d6e0622550c8e897788d10b946e4a2e36a38a1469b65c887aada8af088700'],
-  ['packages/core', '0ee22ab556623c0b73a8331b9c2be05778f6a1ca552c8211f8d32f94ddf312b1'],
+  ['packages/client', 'afaab95647ebb29e00f0328224611c0e96a7efbf8c84f2a374c6e530e92b7016'],
+  ['packages/core', '9a84590b7764e7e3a637ed8024c08d033e63761dc07df78bbc2695cc188e023c'],
 ])
 
 for (const [directory, expected] of expectedTrees) {

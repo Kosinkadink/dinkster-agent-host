@@ -572,7 +572,7 @@ describe('WS frame shaping', () => {
     // The WS connects in the constructor, so the descriptor frame and any
     // replayed ops can land while the joiner is still awaiting the HTTP
     // snapshot. They must reach the (later) first subscriber or a rejoin
-    // never catches up past the snapshot revision (found live 2026-07-27).
+    // never catches up past the snapshot revision.
     const sockets: FakeWS[] = []
     const connection = new CollabHttpConnection({
       baseUrl: 'http://test:8765',

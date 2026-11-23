@@ -66,8 +66,7 @@ export interface DinksterLinkWire {
  * runtime type id (same vocabulary workers wrap with: 'core.int',
  * 'list<core.int>', ...) the engine wraps "value" with, so a literal can
  * feed a destination whose declared type does not resolve to a runtime id.
- * EMISSION RULE (joint contract, pinned 6382cf1; AMENDED 2026-07-26 for
- * typed assets): emit into non-concrete destinations, AND into concrete
+ * EMISSION RULE: emit into non-concrete destinations, AND into concrete
  * destinations exactly when the value's runtime type is an asset source
  * (asset<T> / list<asset<T>>) that DIFFERS from the declared type - the
  * stamp is what routes the literal through the backend's coercion planner

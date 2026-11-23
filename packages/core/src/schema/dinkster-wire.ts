@@ -2655,9 +2655,9 @@ export function graphFeaturesFromDinksterWire(payload: DinksterNodesPayload): re
 }
 
 /**
- * Decode the /api/nodes "dinkster" header's mergeableTypes list (additive,
- * joint contract 2026-07-26, Dinkster 6dbbddd): the sorted ATOM type ids with a
- * registered batch-merge provider (list<T> -> one batched T), derived from
+ * Decode the /api/nodes "dinkster" header's additive mergeableTypes list:
+ * the sorted ATOM type ids with a registered batch-merge provider
+ * (list<T> -> one batched T), derived from
  * the composed registry at envelope build time. PRESENTATION gating only -
  * the widget layer offers the multi-select merge arm on membership; the
  * backend coercion planner stays the enforcement point, so a stale list can

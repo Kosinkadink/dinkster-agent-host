@@ -1066,8 +1066,8 @@ describe('shared DocumentSession', () => {
     // descriptor frame (catch-up baseline) can arrive while
     // connectSharedSession is still awaiting the HTTP snapshot; the
     // connection buffers it and replays it synchronously inside onEvent.
-    // Found live 2026-07-27: without the replay, a rejoin whose session
-    // already held ops above the snapshot revision never caught up.
+    // Without replay, a rejoin whose session already holds ops above the
+    // snapshot revision cannot catch up.
     const conn = new FakeConnection(baseDoc())
     conn.appendForeign('peer', foreignAddNode('n9-peer'), false) // pre-join op; snapshot stays at 0
     const subscribe = conn.onEvent.bind(conn)
