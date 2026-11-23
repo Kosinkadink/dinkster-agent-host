@@ -567,14 +567,14 @@ describe('asset-typed tap $typed lowering', () => {
 })
 
 // ---------------------------------------------------------------------------
-// 2026-07-26 emission-rule amendment: asset-source literals stamp $typed
+// Asset-source literals stamp $typed
 // even into CONCRETE destinations when the runtime type differs from the
 // declared type - the stamp routes the literal through the backend coercion
 // planner (decode asset<T> -> T, lift list<asset<T>> -> list<T>, registry-
 // gated merge list<asset<T>> -> T) instead of wrapping refs raw.
 // ---------------------------------------------------------------------------
 
-describe('asset-source stamping on concrete destinations (2026-07-26 amendment)', () => {
+describe('asset-source stamping on concrete destinations', () => {
   // isAssetRefValue-complete refs: the scalar-T arms only stamp values that
   // are genuinely refs (junk stays plain and fails server-side as before).
   const ref = {

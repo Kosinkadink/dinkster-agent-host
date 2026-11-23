@@ -138,9 +138,9 @@ export const typeExprFromTypeId = (typeId: string): TypeExpr => {
 /**
  * True when a canonical type id is an ASSET-SOURCE form the backend's
  * coercion planner accepts on a concrete destination: `asset<T>` (decode
- * arm) or `list<asset<T>>` (lift/merge arms). The 2026-07-26 joint
- * emission-rule amendment keys on exactly these forms: a literal whose
- * runtime type is an asset source DIFFERING from the concrete declared
+ * arm) or `list<asset<T>>` (lift/merge arms). The emission rule keys on
+ * exactly these forms: a literal whose runtime type is an asset source
+ * DIFFERING from the concrete declared
  * type must be $typed-stamped (the plain literal would be wrapped as the
  * declared type raw and never reach the planner). Bare `dinkster.asset` and
  * `list<dinkster.asset>` are NOT asset sources - the untyped atom has no

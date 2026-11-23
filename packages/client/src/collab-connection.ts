@@ -28,11 +28,9 @@
  *   session dedups by revision).
  * - A DELETED session refuses the WS upgrade before it becomes a socket
  *   (404), which a reconnect-forever policy cannot distinguish from a
- *   restarting server - and while the backend now guarantees
- *   session_closed is queued ahead of the server-initiated close for
- *   every registered subscriber (a delivery race we observed live and
- *   reported 2026-07-26 was fixed in Dinkster ac7f27e), that is an
- *   in-process ordering guarantee only: transport failure can still
+ *   restarting server. The backend guarantees session_closed is queued
+ *   ahead of the server-initiated close for every registered subscriber,
+ *   but that is an in-process ordering guarantee only: transport failure can still
  *   lose any WS frame. So while the WS is down, the adapter probes
  *   GET /api/sessions/{id}: a definite 404 resolves to a session-closed
  *   event; transient probe failures (server down) keep polling, symmetric
@@ -608,7 +606,7 @@ export class CollabHttpConnection implements CollabConnection {
     // so the descriptor frame (the catch-up baseline) and any replayed ops
     // can land while the joiner is still awaiting the HTTP snapshot - a
     // session subscribing afterwards must not lose them, or a rejoin never
-    // catches up past the snapshot revision (found live, 2026-07-27).
+    // catches up past the snapshot revision.
     if (this.buffered !== undefined) {
       const queue = this.buffered
       this.buffered = undefined
