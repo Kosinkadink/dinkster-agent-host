@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "description": "Backend connection service: schema registry, prompt submission, WS event stream, execution store (M0).",
+  "description": "Backend connection service: schema registry, prompt submission, WS event stream, execution store.",
   "exports": {
     ".": "./src/index.ts",
     "./comfy-v1": "./src/comfy-v1.ts"

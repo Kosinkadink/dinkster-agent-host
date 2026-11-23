@@ -1,7 +1,6 @@
 /**
  * SharedDocumentSession: the multiplayer DocumentSession over the
- * dinkster-collab v1 surface (joint contract pinned with the backend,
- * protocolVersion 1).
+ * dinkster-collab v1 surface (protocolVersion 1).
  *
  * Concurrency model - server-ordered optimistic concurrency and re-execution
  * rebase. The server never transforms patches. Command families may opt into
