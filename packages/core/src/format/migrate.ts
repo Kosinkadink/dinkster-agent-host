@@ -7,8 +7,8 @@
  * the pipeline, version gates and diagnostics are in place and tested.
  *
  * Foreign formats are DETECTED and rejected with targeted diagnostics:
- * - legacy litegraph workflows: translated by a dedicated importer (later
- *   milestone), never loaded directly
+ * - legacy litegraph workflows: translated by a dedicated importer,
+ *   never loaded directly
  * - Comfy API prompts: compiler OUTPUT, not authorable documents
  */
 
