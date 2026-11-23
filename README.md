@@ -21,7 +21,7 @@ a five-minute budget. The workflow grants read-only repository contents and
 does not persist checkout credentials.
 
 `@dinkster/client` and `@dinkster/core` are not published. This repository
-workspace-links pinned source trees with comment-only cleanup for them. See
+workspace-links pinned source trees with documentation-only cleanup for them. See
 [`SOURCE_REVISIONS.md`](SOURCE_REVISIONS.md) for the revisions and verification
 command.
 
